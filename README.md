@@ -23,6 +23,7 @@ There are a ton of boilerplates for React, a ton of isomorphic boilerplates, but
  React is a great library for this since it has exactly zero browser specific APIs cooked in, so it can run on both the client and server. For sanity, I used Yahoo's implementation of the Flux flow with their [Fluxible library. ](fluxible.io)
 
 Baseline features I wanted to cover:
+
 1. Shared client and server routes
 2. Shared client and server view and view logic
 3. Shared utilities, configuration, and constants
