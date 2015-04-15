@@ -5,7 +5,26 @@ export default function(server, passport) {
     if (req.isAuthenticated()) {
       return next();
     }
-    res.redirect('/signin');
+    req.abortNavigation = {
+      to: '/signin',
+      params: {
+        reason: 'UNAUTHENTICATED'
+      }
+    };
+    next();
+  }
+
+  function isAdmin(req, res, next) {
+    if (req.user && req.user.userLevel > 1) {
+      return next();
+    }
+    req.abortNavigation = {
+      to: '/signin',
+      params: {
+        reason: 'UNAUTHORIZED'
+      }
+    };
+    next();
   }
 
   // Abstract of sending data from the server to client,
@@ -77,28 +96,14 @@ export default function(server, passport) {
       content: 'I\'m some content that\'s going to be awesome.'
     };
     sendData({data, req, res, next});
-
   });
-  //
-  // server.get('/about', (req, res, next) => {
-  //   debug(req.body);
-  //   debug(req.url);
-  //   debug('XHR?', req.xhr);
-  //   if (req.xhr) {
-  //     setTimeout(() => {
-  //       res.json({
-  //         hello: 'my darling.',
-  //         URL: req.url
-  //       });
-  //     }, 500);
-  //   } else {
-  //     debug('About middleware used...');
-  //     req.preRender = {
-  //       preRender: 'response'
-  //     };
-  //     next();
-  //   }
-  // });
+
+  server.get('/admin-page', isLoggedIn, isAdmin, (req, res, next) => {
+    const data = {
+      content: 'Im an admin page, look at me go.'
+    };
+    sendData({data, req, res, next});
+  });
 
   server.post('/logout', (req, res) => {
     req.logout();

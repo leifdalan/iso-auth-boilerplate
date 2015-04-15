@@ -8,7 +8,7 @@ export default createStore({
     'CHANGE_ROUTE': 'handleNavigate',
     'LOGIN': 'login',
     'LOGOUT': 'logout',
-    'REDIRECT': 'booya',
+    'REDIRECT': 'setRedirect',
     'CLEAR_REDIRECT': 'clearRedirect',
     'NAVIGATION_START': 'navigationStart',
     'NAVIGATION_ERROR': 'navigationError',
@@ -16,7 +16,7 @@ export default createStore({
   },
 
   navigationError() {
-    this.booya({
+    this.setRedirect({
       url: '/'
     });
   },
@@ -57,7 +57,7 @@ export default createStore({
     this.emitChange();
   },
 
-  booya(payload) {
+  setRedirect(payload) {
     this.redirect = payload.url;
     this.emitChange();
   },

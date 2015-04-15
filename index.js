@@ -91,6 +91,12 @@ server.use('/dist', express.static(path.join(__dirname, '/dist')));
 // ----------------------------------------------------------------------------
 
 server.use((req, res, next) => {
+  debug('Abort?', req.abortNavigation);
+  // Skip attempts to render if the server has aborted for any reason.
+  if (req.abortNavigation) {
+    return next();
+  }
+
   let context = app.createContext();
 
   // Pass flag to router's transition context for first
@@ -98,9 +104,10 @@ server.use((req, res, next) => {
   // stores on first render. Flag is needed for auth verification.
   if (req.user) {
     let state = {
-      login: req.user
+      user: req.user
     };
-    context.user = true;
+
+    context.user = req.user;
     context.executeAction(loginAction, state);
   }
 
@@ -123,7 +130,7 @@ server.use((req, res, next) => {
         "onAbort" triggers if there is a react-router "abort()" or
         a "transitionTo()" or a redirect().`, to, params, query
       );
-      req.reactAbort = {to, params, query};
+      req.abortNavigation = {to, params, query};
       next();
       // res.redirect('/');
     }
@@ -141,7 +148,7 @@ server.use((req, res, next) => {
     context.executeAction(navigateAction, state, (err) => {
       if (err) {
         debug('Navigate error:', err);
-        req.reactAbort = true;
+        req.abortNavigation = true;
         next();
       }
 
@@ -174,8 +181,8 @@ server.use((req, res, next) => {
 
 server.use((req, res) => {
 
-  if (req.reactAbort) {
-    const {to, params, query} = req.reactAbort;
+  if (req.abortNavigation) {
+    const {to, params, query} = req.abortNavigation;
     debug('React aborting, attempting redirect.', to, params, query);
     req.flash('flashMessage', CONSTANTS[params.reason]);
     res.redirect(to);

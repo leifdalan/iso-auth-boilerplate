@@ -3,40 +3,15 @@ import React from 'react';
 import {FluxibleMixin} from 'fluxible';
 import ApplicationStore from '../stores/ApplicationStore'
 import debug from 'debug';
+import {CheckAdminMixin} from '../mixins/authMixins';
 debug('Component:Admin');
 
 export default React.createClass({
   displayName: 'AdminPage',
 
-  mixins: [FluxibleMixin],
+  mixins: [FluxibleMixin, CheckAdminMixin],
 
   statics: {
-
-    willTransitionTo(transition) {
-      const {loggedIn, userLevel} =
-        transition
-          .context
-          .getActionContext()
-          .getStore(ApplicationStore)
-          .getState();
-
-      const isLoggedIn = transition.context.user || loggedIn;
-
-      if (!isLoggedIn) {
-        debug('Redirecting from about to "/"...');
-        transition.redirect('/signin', {reason: 'UNAUTHENTICATED'});
-      } else {
-        const isAuthorized = transition.context.user.userLevel > 1 ||
-          userLevel > 1;
-        if (!isAuthorized) {
-          debug('Redirecting from about to "/"...');
-          transition.redirect('/', {
-            reason: 'UNAUTHORIZED'
-          });
-        }
-      }
-    },
-
     storeListeners: [ApplicationStore]
   },
 
