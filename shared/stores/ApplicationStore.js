@@ -32,13 +32,16 @@ export default createStore({
   },
 
   flashMessagez(payload) {
+    if (payload instanceof Array) {
+      payload = payload[0];
+    }
     this.flashMessage = payload;
     this.emitChange();
-    this.flashMessage = null;
   },
 
   navigationStart() {
     this.appIsLoading = true;
+    this.flashMessage = null;
     this.emitChange();
   },
 

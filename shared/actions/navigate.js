@@ -3,14 +3,14 @@ import request from 'superagent';
 import RSVP from 'rsvp';
 const debug = require('debug')('Action:navigate');
 
-export default function (actionContext, payload, done) {
+export default function ({dispatch}, payload, done) {
   debug(payload);
   new RSVP.Promise((resolve, reject) => {
     if (payload.preRender) {
       debug('preRendering...');
       resolve(payload.preRender);
     } else {
-      actionContext.dispatch('NAVIGATION_START');
+      dispatch('NAVIGATION_START');
       setTimeout(() => {
         request
           .get(payload.path)
@@ -27,11 +27,14 @@ export default function (actionContext, payload, done) {
         });
       }, 500);
     }
-  }).then(() => {
-    actionContext.dispatch('CHANGE_ROUTE');
-    actionContext.dispatch('NAVIGATION_END');
+  }).then((resolution) => {
+    dispatch('CHANGE_ROUTE');
+    dispatch('NAVIGATION_END');
+    if (resolution.flashMessage) {
+      dispatch('FLASH_MESSAGE', resolution.flashMessage);
+    }
     done();
   }).catch((err) => {
-    actionContext.dispatch('NAVIGATION_ERROR', err);
+    dispatch('NAVIGATION_ERROR', err);
   });
 }

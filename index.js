@@ -13,6 +13,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import url from 'url';
 import routes from './shared/routes';
+import CONSTANTS from './shared/constants';
 
 // React goodness
 import React from 'react';
@@ -131,8 +132,11 @@ server.use((req, res, next) => {
   router.run((Handler, state) => {
 
     // Inject server data and login data for store consumption
-    state.preRender = req.preRender || true;
+    state.preRender = req.preRender || {};
     state.login = req.user;
+    const flashMessage = req.flash('flashMessage');
+    debug(flashMessage);
+    state.preRender.flashMessage = flashMessage;
 
     context.executeAction(navigateAction, state, (err) => {
       if (err) {
@@ -168,9 +172,13 @@ server.use((req, res, next) => {
   });
 });
 
-server.use(({reactAbort, to, params, query}, res) => {
-  if (reactAbort) {
-    res.send('REACT ABORT!!!');
+server.use((req, res) => {
+
+  if (req.reactAbort) {
+    const {to, params, query} = req.reactAbort;
+    debug('React aborting, attempting redirect.', to, params, query);
+    req.flash('flashMessage', CONSTANTS[params.reason]);
+    res.redirect(to);
   }
 });
 
