@@ -24,13 +24,23 @@ const webPackAddress = 'http://localhost:3002';
 gulp.task('server', function() {
   var options = {
     script: 'server.js',
-    ext: 'js,jsx'
+    ext: 'js,jsx',
+    env: {}
   };
-  if (process.env.REACT_SERVER_RENDER === 'false') {
+  if ($.util.env.clientOnly) {
     options.ignore = [paths.sharedJS, 'node_modules', '!shared/routes.js'];
-  } else {
+    options.env.REACT_CLIENT_RENDER = true;
+    options.env.REACT_SERVER_RENDER = false;
+  } else if ($.util.env.serverOnly) {
     options.ignore = ['node_modules'];
+    options.env.REACT_SERVER_RENDER = true;
+    options.env.REACT_CLIENT_RENDER = false;
+  } else if ($.util.env.iso) {
+    options.ignore = ['node_modules'];
+    options.env.REACT_SERVER_RENDER = true;
+    options.env.REACT_CLIENT_RENDER = true;
   }
+
   nodemon(options);
 });
 
@@ -174,3 +184,5 @@ gulp.task('bundleJS', function() {
 gulp.task('dev', ['clean', 'watch', 'devserver', 'browser-sync', 'less', 'server']);
 
 gulp.task('build', ['clean', 'bundleJS']);
+
+gulp.task('server-only', ['clean', 'watch', 'browser-sync', 'less', 'server']);

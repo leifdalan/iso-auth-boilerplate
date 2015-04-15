@@ -20,8 +20,11 @@ export default React.createClass({
       <body>
         <div id="app" dangerouslySetInnerHTML={{__html: this.props.markup}}></div>
       </body>
-      <script dangerouslySetInnerHTML={{__html: this.props.state}}></script>
-      <script src="/dist/client.js" defer></script>
+
+        <script dangerouslySetInnerHTML={{__html: this.props.state}}></script>
+      {this.props.clientRender &&
+        <script src="/dist/client.js" defer></script>
+      }
       </html>
     );
   }

@@ -39,6 +39,8 @@ passportConfig(passport);
 const server = express();
 const PORT = process.env.PORT || 3030;
 
+debug('Environment Variables:');
+debug(process.env.REACT_CLIENT_RENDER);
 // ----------------------------------------------------------------------------
 // Express middleware (order matters!)
 // ----------------------------------------------------------------------------
@@ -72,9 +74,9 @@ server.use(flash());
 routes(server, passport);
 
 // Proxy public folder to WebPack's hot loading server during development
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' && process.env.REACT_CLIENT_RENDER) {
   server.use('/dist', proxy(url.parse('http://localhost:3002/dist')));
-} else {
+} else if (process.env.NODE_ENV === 'production') {
   // Signify gzipped assets on production
   server.use('/dist/*.js', (req, res, next) => {
     res.set('Content-Encoding', 'gzip');
@@ -170,12 +172,14 @@ server.use((req, res, next) => {
           context: componentContext
         }));
       }
+      let clientRender = process.env.REACT_CLIENT_RENDER !== 'false';
 
       debug('Rendering Application component into HTML');
       const html = React.renderToStaticMarkup(htmlComponent({
         title: 'farts',
         state: exposed,
-        markup
+        markup,
+        clientRender
       }));
 
       debug('Sending markup');
