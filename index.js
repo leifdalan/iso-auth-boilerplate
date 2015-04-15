@@ -91,7 +91,7 @@ server.use('/dist', express.static(path.join(__dirname, '/dist')));
 // ----------------------------------------------------------------------------
 
 server.use((req, res, next) => {
-  debug('Abort?', req.abortNavigation);
+
   // Skip attempts to render if the server has aborted for any reason.
   if (req.abortNavigation) {
     return next();
@@ -141,9 +141,14 @@ server.use((req, res, next) => {
     // Inject server data and login data for store consumption
     state.preRender = req.preRender || {};
     state.login = req.user;
+
+    // Include flash messaging in initial server response
     const flashMessage = req.flash('flashMessage');
-    debug(flashMessage);
-    state.preRender.flashMessage = flashMessage;
+    if (flashMessage.length) {
+      debug('Flash message vvvvvvv');
+      debug(flashMessage);
+      state.preRender.flashMessage = flashMessage;
+    }
 
     context.executeAction(navigateAction, state, (err) => {
       if (err) {

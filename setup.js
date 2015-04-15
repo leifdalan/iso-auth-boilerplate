@@ -1,20 +1,10 @@
-var Fs = require('fs');
-var Path = require('path');
-var Async = require('async');
-var Promptly = require('promptly');
-var Mongodb = require('mongodb');
-var Handlebars = require('handlebars');
+'use scrict';
 
-Async.auto({
+// Babel entry point
+require('babel/register')({
+  ignore: /node_modules\/(?!react-router)/,
+  stage: 0
+});
 
-}, function (err, results) {
-  if (err) {
-      console.error('Setup failed.');
-      console.error(err);
-      return process.exit(1);
-  }
-
-  console.log('Setup complete.');
-  process.exit(0);
-
-})
+// Server code, including ES6/7 syntax
+require('./babel-setup');

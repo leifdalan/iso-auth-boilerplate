@@ -4,6 +4,7 @@ import RSVP from 'rsvp';
 const debug = require('debug')('Action:navigate');
 
 export default function ({dispatch}, payload, done) {
+  debug('Navigation Payload vvvvv');
   debug(payload);
   new RSVP.Promise((resolve, reject) => {
     if (payload.preRender) {
@@ -29,7 +30,6 @@ export default function ({dispatch}, payload, done) {
     }
   }).then((resolution) => {
     dispatch('CHANGE_ROUTE');
-    dispatch('NAVIGATION_END');
     if (resolution.flashMessage) {
       dispatch('FLASH_MESSAGE', resolution.flashMessage);
     }

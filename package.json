@@ -87,12 +87,9 @@
     "webpack-dev-server": "1.6.4"
   },
   "scripts": {
-    "dev": "NODE_ENV=development && REACT_SERVER_RENDER=false && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible,-send,-eslint* && gulp dev",
-    "iso": "NODE_ENV=development && REACT_SERVER_RENDER=true && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible,-send,-eslint* && gulp dev",
+    "dev": "NODE_ENV=development && REACT_SERVER_RENDER=false && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev",
+    "iso": "NODE_ENV=development && REACT_SERVER_RENDER=true && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev",
     "prod": "NODE_ENV=production && REACT_SERVER_RENDER=true && DEBUG=-* && gulp build && node server",
-    "test": "gulp build check",
-    "build-js": "webpack --config webpack.config.js",
-    "build-css": "rm -rf app/css-dist && mkdir -p app/css-dist && node-sass --output-style compressed styles/main.scss app/css-dist/bundle.css",
-    "build": "npm run-script build-js && npm run-script build-css"
+    "setup": "DEBUG=*,-babel && node ./setup.js"
   }
 }

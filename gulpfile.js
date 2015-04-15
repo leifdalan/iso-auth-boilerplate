@@ -96,7 +96,8 @@ gulp.task('browser-sync', function() {
   setTimeout(function() {
     debug('Starting browserSync server, proxying 3030 to 3000.');
     browserSync({
-      proxy: 'http://localhost:3030'
+      proxy: 'http://localhost:3030',
+      port: 3000
     });
   }, 4000);
 });
