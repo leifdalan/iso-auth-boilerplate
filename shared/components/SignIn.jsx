@@ -79,12 +79,14 @@ export default React.createClass({
         <form onSubmit={this.login} action="/login">
           <input
             type="text"
+            name="email"
             ref="username"
             value={this.state.usernameValue}
             onChange={this.usernameHandler}
           />
           <input
             type="password"
+            name="password"
             ref="password"
             value={this.state.passwordValue}
             onChange={this.passwordHandler}
@@ -97,7 +99,7 @@ export default React.createClass({
             onChange={this.numberHandler}
           />
 
-          <button onClick={this.login}>Log in</button>
+          <button type="submit" onClick={this.login}>Log in</button>
           <button onClick={this.signUp}>Sign Up!</button>
           {this.state.flashWarning &&
             <p>HEY! only letters and numbers, please.</p>

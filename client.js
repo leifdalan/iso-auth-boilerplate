@@ -9,8 +9,8 @@ import config from './config';
 
 const bootstrapDebug = debug('Bootstrapping App:');
 
-// react a11y warnings!
-require('react-a11y')();
+// // react a11y warnings!
+// require('react-a11y')();
 
 // Second part of the server/client relay handoff
 const dehydratedState = window.App;

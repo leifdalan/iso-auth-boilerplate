@@ -32,6 +32,22 @@ module.exports = {
         loader: ExtractTextPlugin.extract(
           'style-loader',
           'css-loader!less-loader!autoprefixer-loader?browsers=last 5 version')
+      },
+      {
+        test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&minetype=application/font-woff'
+      },
+      {
+        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&minetype=application/octet-stream'
+      },
+      {
+        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'file'
+      },
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&minetype=image/svg+xml'
       }
     ]
   },

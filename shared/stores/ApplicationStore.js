@@ -31,11 +31,11 @@ export default createStore({
     this.userLevel = null;
   },
 
-  flashMessagez(payload) {
-    if (payload instanceof Array) {
-      payload = payload[0];
+  flashMessagez(message) {
+    if (message instanceof Array) {
+      message = message[0];
     }
-    this.flashMessage = payload;
+    this.flashMessage = message;
     this.emitChange();
   },
 
@@ -47,9 +47,10 @@ export default createStore({
 
   handleNavigate(route) {
     this.appIsLoading = false;
-    debug('HANDLING NAVIGATE', route);
+    debug('HANDLING NAVIGATE vvvvvvv');
+    debug(route);
     if (this.currentRoute && route.path === this.currentRoute.path) {
-      debug('same path?!?!');
+      debug('Attempted to navigate to the same path.');
       return;
     }
 
@@ -67,11 +68,11 @@ export default createStore({
     this.emitChange();
   },
 
-  login({userLevel, local}) {
+  login({userLevel=1, local}) {
     debug('logging in');
     this.loggedIn = true;
     this.email = local.email;
-    this.userLevel = userLevel || 1;
+    this.userLevel = userLevel;
     this.emitChange();
   },
 

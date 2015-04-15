@@ -40,7 +40,9 @@ const server = express();
 const PORT = process.env.PORT || 3030;
 
 debug('Environment Variables:');
-debug(process.env.REACT_CLIENT_RENDER);
+debug('REACT_CLIENT_RENDER:', process.env.REACT_CLIENT_RENDER);
+debug('REACT_SERVER_RENDER:', process.env.REACT_SERVER_RENDER);
+
 // ----------------------------------------------------------------------------
 // Express middleware (order matters!)
 // ----------------------------------------------------------------------------
@@ -74,11 +76,12 @@ server.use(flash());
 routes(server, passport);
 
 // Proxy public folder to WebPack's hot loading server during development
-if (process.env.NODE_ENV === 'development' && process.env.REACT_CLIENT_RENDER) {
+if (process.env.NODE_ENV === 'development' &&
+  process.env.REACT_CLIENT_RENDER !== 'false') {
   server.use('/dist', proxy(url.parse('http://localhost:3002/dist')));
 } else if (process.env.NODE_ENV === 'production') {
   // Signify gzipped assets on production
-  server.use('/dist/*.js', (req, res, next) => {
+  server.use('/dist/*', (req, res, next) => {
     res.set('Content-Encoding', 'gzip');
     next();
   });

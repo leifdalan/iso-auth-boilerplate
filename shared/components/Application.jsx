@@ -7,7 +7,7 @@ import {loginAction, logoutAction} from '../actions/authActions';
 import clearRedirect from '../actions/clearRedirect';
 import {FluxibleMixin} from 'fluxible';
 
-const debug = require('debug')('Component:Application');
+let debug = require('debug')('Component:Application');
 
 export default React.createClass({
   contextTypes: {
@@ -45,6 +45,7 @@ export default React.createClass({
   },
 
   render() {
+    debug('Rendering Application');
     return (
       <div>
         {this.state.flashMessage &&
@@ -54,7 +55,10 @@ export default React.createClass({
           <div>I'm loading!</div>
         }
         <Nav {...this.state} />
-        <h1>Hello&nbsp;{this.state.email || 'Stranger'} {this.state.userLevel}</h1>
+        <h1>Hello&nbsp;{this.state.email || 'Stranger'}</h1>
+        {this.state.loggedIn &&
+          <h2>You're user level is {this.state.userLevel}</h2>
+        }
         <RouteHandler {...this.state} />
         {this.state.loggedIn &&
           <button onClick={this.logout}>Log out</button>

@@ -12,9 +12,9 @@ const userSchema = mongoose.Schema({
 });
 
 // generating a hash
-userSchema.methods.generateHash = (password) => {
-  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-};
+userSchema.methods.generateHash = (password) =>
+  bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+
 
 // checking if password is valid
 userSchema.methods.validPassword = function(password) {

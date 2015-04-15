@@ -12,6 +12,7 @@ export const loginAction = ({dispatch}, {email, password, user}, done) => {
       .post('/login')
       .send({email, password})
       .set('Accept', 'application/json')
+      .set('X-Requested-With', 'XMLHttpRequest')
       .end((err, {body}) => {
         const {success, user, message} = body;
         debug('RESPONSE?!');
@@ -34,6 +35,7 @@ export const logoutAction = ({dispatch}, payload, done) => {
   request
     .post('/logout')
     .set('Accept', 'application/json')
+    .set('X-Requested-With', 'XMLHttpRequest')
     .end((err, res) => {
       debug('Response:', res);
       dispatch('LOGOUT');
@@ -48,6 +50,7 @@ export const signUpAction = ({dispatch}, {email, password, userLevel}, done) => 
   request
     .post('/signup')
     .set('Accept', 'application/json')
+    .set('X-Requested-With', 'XMLHttpRequest')
     .send({email, password, userLevel})
     .end((err, {body}) => {
       const {success, user, message} = body;

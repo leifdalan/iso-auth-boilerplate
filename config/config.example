@@ -1,6 +1,7 @@
 module.exports = {
   url : '{{mongodbUrl}}',
   clientDebug: '*,-socket.io-client*,-engine.io-client:*,-socket.io-parser*',
+  serverDebug: '*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint*',
   webpackAddress: 'http://localhost:3002',
   publicPath: 'dist'
 };

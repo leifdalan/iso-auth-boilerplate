@@ -58,35 +58,48 @@ export default function(server, passport) {
         if (loginErr) {
           return next(loginErr);
         }
-        return res.json({
-          success: true,
-          user
-        });
+        if (req.xhr) {
+          res.json({
+            success: true,
+            user
+          });
+        } else {
+          // Support for no Javascript.
+          res.redirect('/dashboard');
+        }
       });
     })(req, res, next);
   });
 
   server.post('/login', (req, res, next) => {
+    debug(req.body);
     passport.authenticate('local-login', (err, user) => {
       debug('Logging in.');
       const failMessage = {
         success: false,
         message: 'Username or password incorrect.'
       };
+
       if (err) {
         return res.status(401).json(failMessage);
       }
+
       if (!user) {
         return res.status(401).json(failMessage);
       }
+
       req.logIn(user, function(loginErr) {
         if (loginErr) {
           return next(loginErr);
         }
-        return res.json({
-          success: true,
-          user
-        });
+        if (req.xhr) {
+          res.json({
+            success: true,
+            user
+          });
+        } else {
+          res.redirect('/dashboard');
+        }
       });
     })(req, res, next);
   });

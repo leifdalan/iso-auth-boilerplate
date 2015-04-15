@@ -1,6 +1,4 @@
 var gulp = require('gulp');
-var gutil = require('gulp-util');
-var nodemon = require('gulp-nodemon');
 var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var browserSync = require('browser-sync');
@@ -41,7 +39,9 @@ gulp.task('server', function() {
     options.env.REACT_CLIENT_RENDER = true;
   }
 
-  nodemon(options);
+  // options.env.DEBUG = config.serverDebug;
+
+  $.nodemon(options);
 });
 
 gulp.task('eslint', function() {
@@ -93,10 +93,10 @@ gulp.task('devserver', function(callback) {
   .listen(3002, 'localhost', function(err) {
   if (err) {
     $.notify(err);
-    throw new gutil.PluginError('webpack-dev-server', err);
+    throw new $.util.PluginError('webpack-dev-server', err);
 
   }
-  gutil.log('[webpack-dev-server]', webPackAddress);
+  $.util.log('[webpack-dev-server]', webPackAddress);
   // keep the server alive or continue?
   callback();
   });
@@ -121,11 +121,13 @@ gulp.task('browser-reload', function() {
 });
 
 // Compile LESS
-gulp.task('less', ['lessLint'], function() {
+gulp.task('less', function() {
   return gulp.src('src/less/main.less')
     .pipe($.sourcemaps.init())
     .pipe($.less())
-    .on('error', debug)
+    .on('error', function (err) {
+      debug(err);
+    })
     .pipe($.sourcemaps.write({
       includeContent: false
     }))
@@ -133,8 +135,9 @@ gulp.task('less', ['lessLint'], function() {
       loadMaps: true
     }))
     .pipe($.autoprefixer())
-    .on('error', debug)
-    .pipe($.sourcemaps.write('.'))
+    .on('error', function (err) {
+      debug(err);
+    })
     .pipe(gulp.dest('dist'))
     .pipe($.filter('**/*.css'))
     .pipe(browserSync.reload({
@@ -145,7 +148,10 @@ gulp.task('less', ['lessLint'], function() {
 
 gulp.task('lessLint', function() {
   debug('Less Linting');
-  return gulp.src(['./src/less/**/*.less', '!./src/less/lib/**/*'])
+  return gulp.src([
+    './src/less/**/*.less',
+    '!./src/less/lib/**/*',
+    '!./bower_components/**/*'])
     .pipe($.recess())
     .on('error', debug)
     .pipe($.notify({
