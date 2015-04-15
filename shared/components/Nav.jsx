@@ -9,7 +9,7 @@ export default React.createClass({
   },
   render() {
     return (
-      <ul className="pure-menu pure-menu-open pure-menu-horizontal">
+      <ul>
         <SharedLinks {...this.props} />
         {this.props.email &&
           <LoggedInLinks {...this.props} />
