@@ -6,6 +6,7 @@ import Home from './Home';
 import Page from './Page';
 import Dashboard from './Dashboard';
 import SignIn from './SignIn';
+import AdminPage from './AdminPage';
 
 export default (
   <Route name="app" path="/" handler={Application}>
@@ -13,6 +14,7 @@ export default (
     <Route name="page" path="/page/:id" handler={Page}/>
     <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
     <Route name="signin" path="/signin" handler={SignIn}/>
+    <Route name="adminPage" path="/admin-page" handler={AdminPage}/>
     <DefaultRoute name="home" handler={Home}/>
   </Route>
 );

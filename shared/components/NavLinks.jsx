@@ -19,7 +19,6 @@ export const SharedLinks = React.createClass({
         <li>
           <Link to='/about'>About</Link>
         </li>
-        <Link to='/dashboard'>Dashboard!!</Link>
         {!this.props.loggedIn &&
           <li>
             <Link to='/signIn'>SignIn</Link>
@@ -30,18 +29,18 @@ export const SharedLinks = React.createClass({
   }
 });
 
-export const AdminLinks = React.createClass({
+export const LoggedInLinks = React.createClass({
   contextTypes: {
     router: React.PropTypes.func.isRequired
   },
   render() {
     return (
-      <li
-        className={this.context.router.isActive('/admin') ?
-          'pure-menu-selected' : ''
-        }>
-        <Link to='/page/admin'>Admin Only</Link>
+      <li>
+
         <Link to='/dashboard'>Dashboard!!</Link>
+        {this.props.userLevel > 1 &&
+          <Link to='adminPage'>Admin Only</Link>
+        }
       </li>
     );
   }
