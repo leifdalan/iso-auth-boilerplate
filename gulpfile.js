@@ -188,6 +188,6 @@ gulp.task('bundleJS', function() {
 
 gulp.task('dev', ['clean', 'watch', 'devserver', 'browser-sync', 'less', 'server']);
 
-gulp.task('build', ['clean', 'bundleJS']);
+gulp.task('build', ['clean', 'less', 'bundleJS']);
 
 gulp.task('server-only', ['clean', 'watch', 'browser-sync', 'less', 'server']);
