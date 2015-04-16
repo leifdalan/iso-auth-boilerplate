@@ -135,9 +135,8 @@ gulp.task('less', function() {
       loadMaps: true
     }))
     .pipe($.autoprefixer())
-    .on('error', function (err) {
-      debug(err);
-    })
+    .on('error', debug)
+    .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest('dist'))
     .pipe($.filter('**/*.css'))
     .pipe(browserSync.reload({

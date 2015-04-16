@@ -76,7 +76,7 @@ export default React.createClass({
 
   render() {
     return (
-        <form onSubmit={this.login} action="/login">
+        <form onSubmit={this.login} method="POST" action="/login">
           <input
             type="text"
             name="email"

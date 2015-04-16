@@ -198,8 +198,8 @@ Async.auto({
 
   mongoose.disconnect();
   debug('Setup complete!');
-  debug('Now just run `npm run dev` (client only rendering) or `npm run iso`' +
-        ' (client-server rendering)');
+  debug('Now just run `npm run client` (client only rendering) or `npm run iso`' +
+        ' (client-server rendering) or `npm server-only`.');
   process.exit(0);
 
 });

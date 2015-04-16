@@ -98,6 +98,7 @@ export default function(server, passport) {
             user
           });
         } else {
+          req.flash('flashMessage', 'Welcome!');
           res.redirect('/dashboard');
         }
       });
@@ -120,6 +121,12 @@ export default function(server, passport) {
 
   server.post('/logout', (req, res) => {
     req.logout();
-    res.send('YUP, logged out, dude.');
+    if (req.xhr) {
+      res.send('YUP, logged out, dude.');
+    } else {
+      req.flash('flashMessage', 'Come back again soon!');
+      res.redirect('/');
+    }
+
   });
 }

@@ -179,7 +179,7 @@ server.use((req, res, next) => {
 
       debug('Rendering Application component into HTML');
       const html = React.renderToStaticMarkup(htmlComponent({
-        title: 'farts',
+        title: 'Isomorphic Auth Flow',
         state: exposed,
         markup,
         clientRender
