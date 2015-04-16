@@ -2,8 +2,6 @@
   "name": "isomorphic-react-auth-boilerplate",
   "version": "0.0.1",
   "description": "Simple Isomorphic app with passport auth flow",
-   "type" : "git",
-   "url" : "https://github.com/leifdalan/iso-auth-boilerplate",
   "dependencies": {
     "async": "^0.9.0",
     "babel": "^5.0.12",
@@ -59,7 +57,6 @@
     "gulp-nodemon": "*",
     "gulp-notify": "^2.2.0",
     "gulp-recess": "^1.1.2",
-    "gulp-rimraf": "0.1.0",
     "gulp-sourcemaps": "^1.2.7",
     "gulp-util": "3.0.1",
     "gulp-webpack": "^1.3.2",
@@ -68,7 +65,6 @@
     "react-hot-loader": "^1.1.1",
     "strip-loader": "^0.1.0",
     "style-loader": "^0.8.3",
-    "url": "^0.10.3",
     "vinyl-source-stream": "^1.0.0",
     "webpack-dev-server": "1.6.4"
   },
@@ -77,6 +73,27 @@
     "client": "NODE_ENV=development && REACT_SERVER_RENDER=false && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev --clientOnly",
     "iso": "NODE_ENV=development && REACT_SERVER_RENDER=true && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev --iso",
     "prod": "NODE_ENV=production && REACT_SERVER_RENDER=true && DEBUG=-* && gulp build && node server",
-    "setup": "DEBUG=*,-babel && node ./setup.js"
-  }
+    "setup": "DEBUG=*,-babel && node ./setup.js",
+    "start": "node server.js"
+  },
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leifdalan/iso-auth-boilerplate.git"
+  },
+  "keywords": [
+    "isomorphic",
+    "react",
+    "passport",
+    "authentication",
+    "boilerplate",
+    "fluxible",
+    "react-router"
+  ],
+  "author": "Leif Dalan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leifdalan/iso-auth-boilerplate/issues"
+  },
+  "homepage": "https://github.com/leifdalan/iso-auth-boilerplate"
 }

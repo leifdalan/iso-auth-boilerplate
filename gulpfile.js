@@ -3,6 +3,7 @@ var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var browserSync = require('browser-sync');
 var debug = require('debug');
+var del = require('del');
 var webpackHotConfig = require('./webpack.hot-config');
 var webpackConfig = require('./webpack.config');
 
@@ -175,9 +176,8 @@ gulp.task('watch', function() {
   gulp.watch([paths.sharedJS, paths.baseJS], ['eslint']);
 });
 
-gulp.task('clean', function() {
-  return gulp.src('./dist/**/*', {read: false})
-    .pipe($.rimraf());
+gulp.task('clean', function(cb) {
+  del(['build'], cb);
 });
 
 gulp.task('bundleJS', function() {
