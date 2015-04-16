@@ -28,8 +28,8 @@ export default React.createClass({
   render() {
     return (
         <div>
-          <p>Here's your dashboard, doggy.</p>
-          <p>I think your email is: {this.state.email}</p>
+          <p>Here's your dashboard!</p>
+          <p>I think your user name is: {this.state.email}</p>
         </div>
     );
   }

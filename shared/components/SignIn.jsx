@@ -16,7 +16,7 @@ export default React.createClass({
 
   getInitialState() {
     let appState = this.getStore(ApplicationStore).getState();
-    appState.usernameValue = 'asdf';
+    appState.usernameValue = '';
     return appState;
   },
 
@@ -76,30 +76,46 @@ export default React.createClass({
 
   render() {
     return (
-        <form onSubmit={this.login} method="POST" action="/login">
+        <form className="signin-form"
+          onSubmit={this.login}
+          method="POST"
+          action="/login">
+          <div className="row">
           <input
             type="text"
             name="email"
             ref="username"
+            placeholder="Username"
             value={this.state.usernameValue}
             onChange={this.usernameHandler}
           />
+          </div>
+          <div className="row">
           <input
             type="password"
             name="password"
             ref="password"
+            placeholder="Password"
             value={this.state.passwordValue}
             onChange={this.passwordHandler}
           />
+          </div>
+          <div className="row">
           <input
             type="number"
             ref="number"
-            placeholder="Enter a number for admin level"
+            placeholder="Admin Level"
             value={this.state.numberValue}
             onChange={this.numberHandler}
           />
-
-          <button type="submit" onClick={this.login}>Log in</button>
+          </div>
+          <button
+            className="button-primary"
+            type="submit"
+            onClick={this.login}>
+            Log in
+          </button>
+          <small> - OR - </small>
           <button onClick={this.signUp}>Sign Up!</button>
           {this.state.flashWarning &&
             <p>HEY! only letters and numbers, please.</p>

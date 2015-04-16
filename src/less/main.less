@@ -1,11 +1,81 @@
+@import './lib/normalize.less';
+@import './lib/skeleton.less';
+
 @import './someModule.less';
 body {
-  background: ;
   div {
-    border: 1px solid green;
+
   }
 }
 
+.container {
+}
+
 .active {
-  background: #85c085;
+  background: #bbbbbb;
+}
+
+.loading-bar, .flash {
+  opacity: 0.9;
+  background: #eee;
+  position: fixed;
+  top: 0;
+}
+
+.main-nav {
+  margin-top: 40px;
+  margin-bottom: 30px;
+  display: table;
+  table-layout: fixed;
+  ul {
+    &.is-hovered {
+      li a.active {
+        background: transparent;
+        color: #555;
+        &.hovering, &:hover {
+          background: #33C3F0;
+          color: white;
+
+        }
+      }
+    }
+    display: table-row;
+  }
+  width: 100%;
+  li {
+    display: table-cell;
+    text-align: center;
+    list-style: none;
+    a {
+      width: 90%;
+      display: block;
+      line-height: 30px;
+      text-decoration: none;
+      display: inline-block;
+      height: 38px;
+      color: #555;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 38px;
+      letter-spacing: .1rem;
+      text-transform: uppercase;
+      text-decoration: none;
+      white-space: nowrap;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+      cursor: pointer;
+      box-sizing: border-box;
+      &.active, &.hovering, &:hover {
+        background: #33C3F0;
+        color: white;
+      }
+    }
+  }
+}
+
+.signin-form {
+  button {
+    display: block;
+  }
 }

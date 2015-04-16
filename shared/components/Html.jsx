@@ -15,6 +15,10 @@ export default React.createClass({
         <meta charSet="utf-8" />
         <title>{this.props.title}</title>
         <meta name="viewport" content="width=device-width, user-scalable=no" />
+        <link
+          href="http://fonts.googleapis.com/css?family=Raleway"
+          rel="stylesheet"
+          type="text/css" />
         <link rel="stylesheet" href="/dist/main.css" />
       </head>
       <body>

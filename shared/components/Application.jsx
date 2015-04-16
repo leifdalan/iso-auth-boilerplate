@@ -20,7 +20,8 @@ export default React.createClass({
     storeListeners: [ApplicationStore]
   },
 
-  logout() {
+  logout(e) {
+    e.preventDefault();
     this.executeAction(logoutAction);
   },
 
@@ -52,22 +53,30 @@ export default React.createClass({
     );
 
     return (
-      <div>
+      <div className="app">
         {this.state.flashMessage &&
-          <div>{this.state.flashMessage}</div>
+          <button
+            className="u-full-width button-primary flash">
+            {this.state.flashMessage}
+          </button>
         }
         {this.state.appIsLoading &&
-          <div>I'm loading!</div>
+          <button
+            className="u-full-width button primary loading-bar">
+            Loading
+          </button>
         }
-        <Nav {...this.state} />
-        <h1>Hello&nbsp;{this.state.email || 'Stranger'}</h1>
-        {this.state.loggedIn &&
-          <h2>You're user level is {this.state.userLevel}</h2>
-        }
-        <RouteHandler {...this.state} />
-        {this.state.loggedIn && {loggedInForm}}
+        <div className="container">
+          <Nav className="nav" {...this.state} />
+          <h1>Hello,&nbsp;{this.state.email || 'Stranger'}</h1>
+          {this.state.loggedIn &&
+            <h2>Your user level is {this.state.userLevel}</h2>
+          }
+          <RouteHandler {...this.state} />
+          {this.state.loggedIn && {loggedInForm}}
 
-        <button onClick={this.log}>Log current application state</button>
+          <button onClick={this.log}>Log current application state</button>
+        </div>
       </div>
     );
   }

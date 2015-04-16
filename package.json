@@ -10,6 +10,7 @@
     "babel-runtime": "^5.0.12",
     "bcrypt-nodejs": "latest",
     "body-parser": "1.2.0",
+    "classnames": "^1.2.0",
     "compression": "1.2.0",
     "connect-flash": "^0.1.1",
     "connect-gzip-static": "^1.0.0",
