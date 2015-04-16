@@ -76,7 +76,7 @@
     "iso": "NODE_ENV=development && REACT_SERVER_RENDER=true && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev --iso",
     "prod": "NODE_ENV=production && REACT_SERVER_RENDER=true && DEBUG=-* && gulp build && node server",
     "setup": "DEBUG=*,-babel && node ./setup.js",
-    "start": "node server.js"
+    "start": "npm cache clean && npm install && npm run setup && npm run client"
   },
   "main": "server.js",
   "repository": {

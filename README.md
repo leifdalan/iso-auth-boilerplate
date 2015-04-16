@@ -49,9 +49,12 @@ This is very much a __work in progress__, and I'm open to accepting issues or co
 ##Getting started
 If you don't have [mongoDB installed](http://docs.mongodb.org/manual/installation/) already, this is required for authentication and data persistence. Setup will fail if you don't already have a mongo instance running. Also, you're going to need to install ```npm``` if you haven't already.
 
+If you want to just get started, simply type this in the command line:
+```bash
+npm start
+```
 
-
-From the command line, as always, first run:
+If you want to go step by step, see the following sub processes that are all run by ```npm start```:
 ```bash
 npm install
 ```
