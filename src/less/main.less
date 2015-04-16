@@ -8,9 +8,6 @@ body {
   }
 }
 
-.container {
-}
-
 .active {
   background: #bbbbbb;
 }
@@ -32,10 +29,10 @@ body {
       li a.active {
         background: transparent;
         color: #555;
+        transition: none;
         &.hovering, &:hover {
           background: #33C3F0;
           color: white;
-
         }
       }
     }
@@ -66,9 +63,11 @@ body {
       border: 1px solid #bbb;
       cursor: pointer;
       box-sizing: border-box;
+      transition: background .5s ease;
       &.active, &.hovering, &:hover {
         background: #33C3F0;
         color: white;
+        transition: none;
       }
     }
   }

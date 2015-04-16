@@ -1,5 +1,5 @@
 import React from 'react';
-import {Route, DefaultRoute} from 'react-router';
+import {Route, DefaultRoute, NotFoundRoute} from 'react-router';
 import Application from './Application';
 import About from './About';
 import Home from './Home';
@@ -7,6 +7,7 @@ import Page from './Page';
 import Dashboard from './Dashboard';
 import SignIn from './SignIn';
 import AdminPage from './AdminPage';
+import NotFound from './NotFound';
 
 export default (
   <Route name="app" path="/" handler={Application}>
@@ -16,5 +17,6 @@ export default (
     <Route name="signin" path="/signin" handler={SignIn}/>
     <Route name="adminPage" path="/admin-page" handler={AdminPage}/>
     <DefaultRoute name="home" handler={Home}/>
+    <NotFoundRoute handler={NotFound}/>
   </Route>
 );

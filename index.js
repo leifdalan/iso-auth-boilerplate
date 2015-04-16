@@ -81,7 +81,7 @@ if (process.env.NODE_ENV === 'development' &&
   server.use('/dist', proxy(url.parse('http://localhost:3002/dist')));
 } else if (process.env.NODE_ENV === 'production') {
   // Signify gzipped assets on production
-  server.use('/dist/*', (req, res, next) => {
+  server.use('/dist/*.js', (req, res, next) => {
     res.set('Content-Encoding', 'gzip');
     next();
   });
