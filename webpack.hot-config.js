@@ -1,19 +1,23 @@
-var path = require('path');
-var config = require('./config');
-var webpack = require('webpack');
-var webpackAddress =
-    config.PROTOCOL +
-    config.HOSTNAME +
-    ':' +
-    config.WEBPACK_DEV_SERVER_PORT;
-var publicPath = webpackAddress + config.PUBLIC_PATH;
+import path from 'path';
+import config from './config';
+import webpack from 'webpack';
+
+const {
+  PROTOCOL,
+  HOSTNAME,
+  WEBPACK_DEV_SERVER_PORT,
+  PUBLIC_PATH,
+  BABEL_STAGE
+} = config;
+const webpackAddress = `${PROTOCOL}${HOSTNAME}:${WEBPACK_DEV_SERVER_PORT}`
+const publicPath = `${webpackAddress}PUBLIC_PATH`;
 module.exports = {
   devtool: 'eval-source-map',
   cache: true,
   context: __dirname,
   entry: {
     client: [
-      'webpack-dev-server/client?' + webpackAddress,
+      `webpack-dev-server/client?${webpackAddress}`,
       'webpack/hot/dev-server',
       './client'
     ]
@@ -21,7 +25,7 @@ module.exports = {
 
   contentBase: path.join(__dirname),
   output: {
-    path: path.join(__dirname, config.PUBLIC_PATH),
+    path: path.join(__dirname, PUBLIC_PATH),
     filename: 'client.js',
     publicPath: publicPath + '/'
   },
@@ -39,7 +43,7 @@ module.exports = {
     loaders: [{
       test: /\.(js|jsx)$/,
       exclude: /node_modules\/(?!react-router)/,
-      loaders: ['react-hot-loader', 'babel-loader?stage=0']
+      loaders: ['react-hot-loader', `babel-loader?stage=${BABEL_STAGE}`]
     }]
   }
 };

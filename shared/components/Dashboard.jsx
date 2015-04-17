@@ -19,10 +19,10 @@ export default React.createClass({
 
   componentDidMount() {
     let timer = 0;
-    setInterval(() => {
+    this.interval = setInterval(() => {
       timer++;
       this.setState({
-        title: `${timer} Timing!!!`
+        title: `${timer} Look the title changes!!!`
       });
     }, 250);
   },
@@ -36,6 +36,10 @@ export default React.createClass({
   onChange() {
     var state = this.getStore(ApplicationStore).getState();
     this.setState(state);
+  },
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   },
 
   render() {

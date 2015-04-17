@@ -81,33 +81,33 @@ export default React.createClass({
           method="POST"
           action="/login">
           <div className="row">
-          <input
-            type="text"
-            name="email"
-            ref="username"
-            placeholder="Username"
-            value={this.state.usernameValue}
-            onChange={this.usernameHandler}
+            <input
+              type="text"
+              name="email"
+              ref="username"
+              placeholder="Username"
+              value={this.state.usernameValue}
+              onChange={this.usernameHandler}
           />
           </div>
           <div className="row">
-          <input
-            type="password"
-            name="password"
-            ref="password"
-            placeholder="Password"
-            value={this.state.passwordValue}
-            onChange={this.passwordHandler}
+            <input
+              type="password"
+              name="password"
+              ref="password"
+              placeholder="Password"
+              value={this.state.passwordValue}
+              onChange={this.passwordHandler}
           />
           </div>
           <div className="row">
-          <input
-            type="number"
-            ref="number"
-            placeholder="Admin Level"
-            value={this.state.numberValue}
-            onChange={this.numberHandler}
-          />
+            <input
+              type="number"
+              ref="number"
+              placeholder="Admin Level"
+              value={this.state.numberValue}
+              onChange={this.numberHandler}
+            />
           </div>
           <button
             className="button-primary"
