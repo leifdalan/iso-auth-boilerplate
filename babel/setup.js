@@ -3,7 +3,7 @@ import Fs from 'fs';
 import Path from 'path';
 import Async from 'async';
 import Promptly from 'promptly';
-import User from './models/user';
+import User from '../models/user';
 import mongoose from 'mongoose';
 import Handlebars from 'handlebars';
 const debug = require('debug')('Setup:');
@@ -12,15 +12,17 @@ Async.auto({
 
   mongodbUrl: (done) => {
 
-    debug('Let\'s set up some configuration and a few users.');
-    debug('Defaults are in (parentheses)');
+    debug(`Let\'s set up some configuration and a few users.
+
+    `);
 
     const options = {
       'default': 'mongodb://localhost:27017/iso-auth-boilerplate'
     };
 
     Promptly.prompt(
-      '--- MongoDB URL: (mongodb://localhost:27017/iso-auth-boilerplate)',
+      '\n--- MongoDB URL: ---\n' +
+      '(default: mongodb://localhost:27017/iso-auth-boilerplate) ',
       options, done
     );
   },
@@ -39,7 +41,8 @@ Async.auto({
           'default': 'admin'
         };
         Promptly.prompt(
-          '--- Admin username (admin)',
+          '\n--- Admin username ---\n' +
+          '(default: admin) ',
           options, done
         );
       }
@@ -53,7 +56,8 @@ Async.auto({
     };
 
     Promptly.prompt(
-      '--- Admin password (admin)',
+      '\n--- Admin password ---\n' +
+      '(default: admin) ',
       options, done
     );
   }],
@@ -65,7 +69,8 @@ Async.auto({
     };
 
     Promptly.prompt(
-      '--- Regular user username (foo)',
+      '\n--- Regular user username ---\n' +
+      '(default: foo) ',
       options, done
     );
 
@@ -78,15 +83,18 @@ Async.auto({
     };
 
     Promptly.prompt(
-      '--- Regular user password (bar)',
+      '\n--- Regular user password ---\n' +
+      '(default: bar) ',
       options, done
     );
 
   }],
   createConfig: ['regularUserPassword', (done, results) => {
 
-    const configTemplatePath = Path.resolve(__dirname, 'config', 'config.example');
-    const configPath = Path.resolve(__dirname, 'config', 'index.js');
+    const configTemplatePath = Path.resolve(
+      __dirname, '../config', 'config.example'
+    );
+    const configPath = Path.resolve(__dirname, '../config', 'index.js');
     const options = { encoding: 'utf-8' };
 
     Fs.readFile(configTemplatePath, options,  (err, source) => {
@@ -111,7 +119,12 @@ Async.auto({
     debug('!!!======DRAGONS======!!!');
     debug('This will delete all users if you type "y".');
 
-    Promptly.confirm('--- Delete all users? (N)', options, done);
+    Promptly.confirm(
+      '\n--- Delete all users? ---\n' +
+      '(default: N) ',
+      options,
+      done
+    );
   }],
 
   clearUsers: ['regularUserPassword', (done, results) => {
@@ -198,8 +211,21 @@ Async.auto({
 
   mongoose.disconnect();
   debug('Setup complete!');
-  debug('Now just run `npm run client` (client only rendering) or `npm run iso`' +
-        ' (client-server rendering) or `npm server-only`.');
+  debug(`
+    Now just run either of these:
+
+    \u2609 \`npm run client\` (client only rendering)
+    \u2609 \`npm run iso\` (client-server rendering)
+    \u2609 \`npm run server-only\` (server-only, no client-render)
+    \u2609 \`npm run prod\` (client-server, no debugging, optimized assets).
+
+
+    Happy coding!
+    \u263A \u2615 \u26F3
+
+
+    `
+  );
   process.exit(0);
 
 });

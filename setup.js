@@ -7,4 +7,4 @@ require('babel/register')({
 });
 
 // Server code, including ES6/7 syntax
-require('./babel-setup');
+require('./babel/setup');

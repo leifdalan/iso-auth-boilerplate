@@ -32,6 +32,7 @@
     "proxy-middleware": "^0.11.0",
     "react": "0.13.x",
     "react-bootstrap": "^0.20.3",
+    "react-document-title": "^1.0.2",
     "react-router": "bobpace/react-router#transitionContext",
     "rsvp": "^3.0.18",
     "serialize-javascript": "^1.0.0",
@@ -75,11 +76,11 @@
     "server-only": "NODE_ENV=development && REACT_SERVER_RENDER=true && REACT_CLIENT_RENDER=false && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp server-only --serverOnly",
     "client": "NODE_ENV=development && REACT_SERVER_RENDER=false && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev --clientOnly",
     "iso": "NODE_ENV=development && REACT_SERVER_RENDER=true && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev --iso",
-    "prod": "NODE_ENV=production && REACT_SERVER_RENDER=true && DEBUG=-* && gulp build && node server",
+    "prod": "NODE_ENV=production && REACT_SERVER_RENDER=true && DEBUG=-* && gulp build && node index",
     "setup": "DEBUG=*,-babel && node ./setup.js",
     "start": "npm cache clean && npm install && npm run setup --no-spin && npm run client"
   },
-  "main": "server.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/leifdalan/iso-auth-boilerplate.git"

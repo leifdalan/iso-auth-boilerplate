@@ -1,13 +1,21 @@
 var path = require('path');
 var config = require('./config');
 var webpack = require('webpack');
+var webpackAddress =
+    config.PROTOCOL +
+    config.HOSTNAME +
+    ':' +
+    config.WEBPACK_DEV_SERVER_PORT;
+var publicPath = webpackAddress + config.PUBLIC_PATH;
+console.log(publicPath);
+console.log(webpackAddress);
 module.exports = {
   devtool: 'eval-source-map',
   cache: true,
   context: __dirname,
   entry: {
     client: [
-      'webpack-dev-server/client?' + config.webpackAddress,
+      'webpack-dev-server/client?' + webpackAddress,
       'webpack/hot/dev-server',
       './client'
     ]
@@ -15,9 +23,9 @@ module.exports = {
 
   contentBase: path.join(__dirname),
   output: {
-    path: path.join(__dirname, config.publicPath),
+    path: path.join(__dirname, config.PUBLIC_PATH),
     filename: 'client.js',
-    publicPath: 'http://localhost:3002/dist/'
+    publicPath: publicPath + '/'
   },
 
   plugins: [

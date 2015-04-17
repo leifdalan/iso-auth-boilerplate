@@ -17,7 +17,7 @@ Also for development, these tools are used:
 - Several other gulp packages for linting/optimizing/etc.
 
 ####Goals
-There are a ton of boilerplates for React, a ton of isomorphic boilerplates, but I've been disappointed with most of them as they don't really address the problems with server rendering, async, and mostly auth flow. I wanted to make an SPA with shared routes and shared views to cut down on code duplication, but still have the realistic expectation that there will be async operations and auth to manage and bake that into a boilerplate.
+There are a ton of boilerplates for React and a ton of isomorphic boilerplates, but I've been disappointed with most of them as they don't really address the problems with server rendering, async, and mostly auth flow. I wanted to make an SPA with shared routes and shared views to cut down on code duplication, but still have the realistic expectation that there will be async operations and auth to manage and bake that into a boilerplate.
 
 
  React is a great library for this since it has exactly zero browser specific APIs cooked in, so it can run on both the client and server. For sanity, I used Yahoo's implementation of the Flux flow with their [Fluxible library. ](fluxible.io)
@@ -36,12 +36,17 @@ Baseline features I wanted to cover:
   * Store auth state on client to selectively render elements (eg. navigation)
   * "Double" protection from direct navigation (server redirect, client react-router redirect
     )
-7. Robust & fun development workflow
+7. Functional parity with client JavaScript omitted
+8. Robust & fun development workflow
 
 ####Notes
-I have set the babel [experimental stage to 1](https://babeljs.io/docs/usage/experimental/) to support [Object Rest/Spread Properties](https://github.com/sebmarkbage/ecmascript-rest-spread) as this can be used very handily in React components. Since a transpiler is already running, I decided to practice and use as much ECMA 6 syntax as possible.
+* I've set an artificial lag on XHRs of 500ms to highlight the asynchronous server requests. This gives us the opportunity to verify that all navigation Flux actions are async, and can trigger a "loading" application state, as is always needed.
 
-Also, very importantly, I'm using a **branch of react-router** to support fluxible's context inside of the ```willTransitionTo()``` hook. This is a known issue for the two technologies, as discussed in [this issue](https://github.com/rackt/react-router/pull/590). The branch can be found [here](https://github.com/bobpace/react-router/tree/transitionContext) coutesy of [bobpace](https://github.com/bobpace). I plan to regularly rebase against the react-router master branch if they don't decide accept bobpace's PR.
+* I have set the babel [experimental stage to 1](https://babeljs.io/docs/usage/experimental/) to support [Object Rest/Spread Properties](https://github.com/sebmarkbage/ecmascript-rest-spread) as this can be used very handily in React components. Since a transpiler is already running, I decided to practice and use as much ECMA 6 syntax as possible.
+
+* I'm using a <span style="font-weight:bold;text-decoration:underline;">branch of react-router</span> to support fluxible's context inside of the ```willTransitionTo()``` hook. This is a known issue for the two technologies, as discussed in [this issue](https://github.com/rackt/react-router/pull/590). The branch can be found [here](https://github.com/bobpace/react-router/tree/transitionContext) coutesy of [bobpace](https://github.com/bobpace). I plan to regularly rebase against the react-router master branch if they don't decide accept bobpace's PR.
+
+* Bonus feature: Functional parity without any JavaScript in the browser! Yes, this is an app written in JavaScript that doesn't need JavaScript to run. Obviously, in ```npm run server-only``` mode, ```History.pushState``` functionality doesn't apply.
 
 
 This is very much a __work in progress__, and I'm open to accepting issues or considering pull requests.
@@ -95,7 +100,7 @@ I decided to use BrowerSync for style live editing, as webpack was markedly slow
 ##TODO
 - [ ] Test coverage
 - [ ] Generalize file patterns, action constants, move to config
-- [ ] Create minimally styled version
+- [x] Create minimally styled version
 - [ ] Create deploy script
 - [ ] Add gulp tasks deploying assets to AWS with revisioning for production
 - [ ] Host demo on heroku or other free service

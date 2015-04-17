@@ -3,7 +3,8 @@ import React from 'react'
 import {FluxibleMixin} from 'fluxible'
 import ApplicationStore from '../stores/ApplicationStore'
 import {CheckLoginMixin} from '../mixins/authMixins';
-import debug from 'debug'
+import debug from 'debug';
+import DocumentTitle from 'react-document-title';
 debug('Component:Dashboard');
 
 export default React.createClass({
@@ -16,8 +17,20 @@ export default React.createClass({
     storeListeners: [ApplicationStore]
   },
 
+  componentDidMount() {
+    let timer = 0;
+    setInterval(() => {
+      timer++;
+      this.setState({
+        title: `${timer} Timing!!!`
+      });
+    }, 250);
+  },
+
   getInitialState() {
-    return this.getStore(ApplicationStore).getState();
+    let state = this.getStore(ApplicationStore).getState();
+    state.title = 'Dashboard';
+    return state;
   },
 
   onChange() {
@@ -27,10 +40,12 @@ export default React.createClass({
 
   render() {
     return (
+      <DocumentTitle title={this.state.title}>
         <div>
           <p>Here's your dashboard!</p>
           <p>I think your user name is: {this.state.email}</p>
         </div>
+      </DocumentTitle>
     );
   }
 })

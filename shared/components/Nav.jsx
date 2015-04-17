@@ -1,7 +1,6 @@
 'use strict';
 import React from 'react';
 import {Link} from 'react-router';
-import {SharedLinks} from './NavLinks';
 import classnames from 'classnames';
 
 export default React.createClass({

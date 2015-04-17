@@ -5,6 +5,7 @@ import ApplicationStore from '../stores/ApplicationStore';
 import {RouteHandler, Navigation} from 'react-router';
 import {loginAction, logoutAction} from '../actions/authActions';
 import clearRedirect from '../actions/clearRedirect';
+import DocumentTitle from 'react-document-title';
 import {FluxibleMixin} from 'fluxible';
 
 const debug = require('debug')('Component:Application');
@@ -53,31 +54,33 @@ export default React.createClass({
     );
 
     return (
-      <div className="app">
-        {this.state.flashMessage &&
-          <button
-            className="u-full-width button-primary flash">
-            {this.state.flashMessage}
-          </button>
-        }
-        {this.state.appIsLoading &&
-          <button
-            className="u-full-width button primary loading-bar">
-            Loading
-          </button>
-        }
-        <div className="container">
-          <Nav className="nav" {...this.state} />
-          <h1>Hello,&nbsp;{this.state.email || 'Stranger'}</h1>
-          {this.state.loggedIn &&
-            <h2>Your user level is {this.state.userLevel}</h2>
+      <DocumentTitle title="Isomorphic Auth Flow">
+        <div className="app">
+          {this.state.flashMessage &&
+            <button
+              className="u-full-width button-primary flash">
+              {this.state.flashMessage}
+            </button>
           }
-          <RouteHandler {...this.state} />
-          {this.state.loggedIn && {loggedInForm}}
+          {this.state.appIsLoading &&
+            <button
+              className="u-full-width button primary loading-bar">
+              Loading
+            </button>
+          }
+          <div className="container">
+            <Nav {...this.state} />
+            <h1>Hello,&nbsp;{this.state.email || 'Stranger'}</h1>
+            {this.state.loggedIn &&
+              <h2>Your user level is {this.state.userLevel}</h2>
+            }
+            <RouteHandler {...this.state} />
+            {this.state.loggedIn && {loggedInForm}}
 
-          <button onClick={this.log}>Log current application state</button>
+            <button onClick={this.log}>Log current application state</button>
+          </div>
         </div>
-      </div>
+      </DocumentTitle>
     );
   }
 });
