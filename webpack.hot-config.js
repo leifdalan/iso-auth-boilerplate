@@ -7,8 +7,6 @@ var webpackAddress =
     ':' +
     config.WEBPACK_DEV_SERVER_PORT;
 var publicPath = webpackAddress + config.PUBLIC_PATH;
-console.log(publicPath);
-console.log(webpackAddress);
 module.exports = {
   devtool: 'eval-source-map',
   cache: true,

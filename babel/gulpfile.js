@@ -24,7 +24,7 @@ const paths = {
 };
 const webPackAddress = `${PROTOCOL}${HOSTNAME}:${WPDEVPORT}`;
 
-gulp.task('server', () => {
+gulp.task('server', (cb) => {
   const options = {
     script: 'index.js',
     ext: 'js,jsx',
@@ -43,9 +43,9 @@ gulp.task('server', () => {
     options.env.REACT_SERVER_RENDER = true;
     options.env.REACT_CLIENT_RENDER = true;
   }
-  // options.env.DEBUG = config.serverDebug;
 
   $.nodemon(options);
+  cb();
 });
 
 gulp.task('eslint', () => {
