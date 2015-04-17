@@ -18,9 +18,11 @@ import reactRender from './reactrender';
 import passport from 'passport';
 import passportConfig from '../config/passport';
 import config from '../config';
+
 const {
   PUBLIC_PATH: PUBLICPATH,
   WEBPACK_DEV_SERVER_PORT: DEVSERVERPORT,
+  url: mongoUrl,
   HOSTNAME,
   PROTOCOL,
   DEVELOPMENT_PORT
@@ -28,7 +30,7 @@ const {
 
 const debug = require('debug')('Server');
 
-mongoose.connect(config.url);
+mongoose.connect(mongoUrl);
 
 passportConfig(passport);
 
@@ -36,9 +38,11 @@ const server = express();
 const PORT = process.env.PORT || DEVELOPMENT_PORT;
 
 debug('Environment Variables:');
-debug('REACT_CLIENT_RENDER:', process.env.REACT_CLIENT_RENDER);
-debug('REACT_SERVER_RENDER:', process.env.REACT_SERVER_RENDER);
-debug(`${PROTOCOL}${HOSTNAME}:${DEVSERVERPORT}${PUBLICPATH}`);
+debug('REACT_CLIENT_RENDER: %s', process.env.REACT_CLIENT_RENDER);
+debug('REACT_SERVER_RENDER: %s', process.env.REACT_SERVER_RENDER);
+debug('WEBPACK_DEV_SERVER_PORT: %s', process.env.WEBPACK_DEV_SERVER_PORT);
+debug('NODE_ENV: %s', process.env.NODE_ENV);
+debug(`Dev server: ${PROTOCOL}${HOSTNAME}:${DEVSERVERPORT}${PUBLICPATH}`);
 // ----------------------------------------------------------------------------
 // Express middleware (order matters!)
 // ----------------------------------------------------------------------------
@@ -91,6 +95,7 @@ server.use(`${PUBLICPATH}`,
   express.static(path.join(__dirname, `../${PUBLICPATH}`))
 );
 
+// Fluxible + react-router markup generator, attemps to send response.
 server.use(reactRender);
 
 server.use((req, res) => {

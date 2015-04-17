@@ -95,7 +95,7 @@ gulp.task('devserver', (callback) => {
       colors: true
     }
   })
-  .listen(3002, 'localhost', (err) => {
+  .listen(WPDEVPORT, HOSTNAME, (err) => {
   if (err) {
     $.notify(err);
     throw new $.util.PluginError('webpack-dev-server', err);
