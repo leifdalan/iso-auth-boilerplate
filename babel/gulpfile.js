@@ -1,13 +1,15 @@
-var gulp = require('gulp');
-var webpack = require('webpack');
-var WebpackDevServer = require('webpack-dev-server');
-var browserSync = require('browser-sync');
-var debug = require('debug');
-var del = require('del');
-var webpackHotConfig = require('../webpack.hot-config');
-var webpackConfig = require('../webpack.config');
-var CST = require('../shared/constants');
+import gulp from 'gulp';
+import webpack from 'webpack';
+import WebpackDevServer from 'webpack-dev-server';
+import browserSync from 'browser-sync';
+import del from 'del';
+import webpackHotConfig from '../webpack.hot-config';
+import webpackConfig from '../webpack.config';
+import CST from '../shared/constants';
 import config from '../config';
+
+const debug = require('debug')('gulp:feedback');
+const $ = require('gulp-load-plugins')();
 const {
   WEBPACK_DEV_SERVER_PORT: WPDEVPORT,
   DEVELOPMENT_PORT: DEVPORT,
@@ -16,20 +18,14 @@ const {
   PROTOCOL,
   BROWSER_RELOAD_TIMEOUT,
 } = config;
-
-
-var $ = require('gulp-load-plugins')(),
-
-debug = debug('gulp:feedback');
-
 const paths = {
   sharedJS: '../shared/*',
   baseJS: '../*.js'
 };
 const webPackAddress = `${PROTOCOL}${HOSTNAME}:${WPDEVPORT}`;
 
-gulp.task('server', function() {
-  var options = {
+gulp.task('server', () => {
+  const options = {
     script: 'index.js',
     ext: 'js,jsx',
     env: {}
@@ -47,14 +43,12 @@ gulp.task('server', function() {
     options.env.REACT_SERVER_RENDER = true;
     options.env.REACT_CLIENT_RENDER = true;
   }
-  console.log(options);
-
   // options.env.DEBUG = config.serverDebug;
 
   $.nodemon(options);
 });
 
-gulp.task('eslint', function() {
+gulp.task('eslint', () => {
   return gulp.src([paths.sharedJS, paths.baseJS])
     .pipe($.eslint({
       globals: {
@@ -68,21 +62,21 @@ gulp.task('eslint', function() {
         window: true
       }
     }))
-    .on('error', function(error) {
+    .on('error', (error) => {
       debug(error);
     })
     .pipe($.notify({
-      message: function(file) {
+      message: (file) => {
         if (!file || !file.eslint || file.eslint.success || !file.eslint.messages.length) {
           // Don't show something if success
           return false;
         }
-        var errors = file.eslint.messages.map(function(data) {
+        const errors = file.eslint.messages.map((data) => {
           if (data) {
             return '(' + data.line + ':' + data.column + ') ' + data.message;
           }
         }).join('\n');
-        var endPath = file.eslint.filePath.replace(__dirname, '');
+        const endPath = file.eslint.filePath.replace(__dirname, '');
         return endPath + ' (' + file.eslint.messages.length + ' errors)\n' + errors;
       },
       title: 'ESLint'
@@ -91,7 +85,7 @@ gulp.task('eslint', function() {
 });
 
 
-gulp.task('devserver', function(callback) {
+gulp.task('devserver', (callback) => {
   // Start a webpack-dev-server
   new WebpackDevServer(webpack(webpackHotConfig), {
     publicPath: '/dist/',
@@ -101,7 +95,7 @@ gulp.task('devserver', function(callback) {
       colors: true
     }
   })
-  .listen(3002, 'localhost', function(err) {
+  .listen(3002, 'localhost', (err) => {
   if (err) {
     $.notify(err);
     throw new $.util.PluginError('webpack-dev-server', err);
@@ -113,8 +107,8 @@ gulp.task('devserver', function(callback) {
   });
 });
 
-gulp.task('browser-sync', function() {
-  setTimeout(function() {
+gulp.task('browser-sync', () => {
+  setTimeout(() => {
     debug(`Starting browserSync server, proxying ${DEVPORT} to ${BSPORT}.`);
     browserSync({
       proxy: `${PROTOCOL}${HOSTNAME}:${DEVPORT}`,
@@ -123,8 +117,8 @@ gulp.task('browser-sync', function() {
   }, BROWSER_RELOAD_TIMEOUT);
 });
 
-gulp.task('browser-reload', function() {
-  setTimeout(function() {
+gulp.task('browser-reload', () => {
+  setTimeout(() => {
     debug('Reloading open browsers.');
     browserSync.reload();
   }, BROWSER_RELOAD_TIMEOUT);
@@ -132,7 +126,7 @@ gulp.task('browser-reload', function() {
 });
 
 // Compile LESS
-gulp.task('less', function() {
+gulp.task('less', () => {
   debug('LESSING');
   return gulp.src('src/less/main.less')
     .pipe($.sourcemaps.init())
@@ -157,7 +151,7 @@ gulp.task('less', function() {
     .pipe(gulp.dest('./dist')); // Copy to static dir
 });
 
-gulp.task('lessLint', function() {
+gulp.task('lessLint', () => {
   debug('Less Linting');
   return gulp.src([
     '../src/less/**/*.less',
@@ -166,7 +160,7 @@ gulp.task('lessLint', function() {
     .pipe($.recess())
     .on('error', debug)
     .pipe($.notify({
-      message: function(file) {
+      message: (file) => {
         if (!file || !file.recess || file.recess.success) {
 
           // Don't show something if success
@@ -180,18 +174,18 @@ gulp.task('lessLint', function() {
     .on('error', debug);
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', () => {
   gulp.watch('src/**/*.less', ['less']);
   gulp.watch('/index.js', ['browser-reload']);
   // gulp.watch(paths.less, ['less']);
   gulp.watch([paths.sharedJS, paths.baseJS], ['eslint']);
 });
 
-gulp.task('clean', function(cb) {
+gulp.task('clean', (cb) => {
   del(['build'], cb);
 });
 
-gulp.task('bundleJS', function() {
+gulp.task('bundleJS', () => {
   return gulp.src('./client.js')
     .pipe($.webpack(webpackConfig))
     .pipe(gulp.dest('./dist/'));
