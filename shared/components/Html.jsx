@@ -1,10 +1,11 @@
 'use strict';
 import React from 'react';
+import {PUBLIC_PATH} from '../../config';
 
 export default React.createClass({
   render() {
     const clientScript = (
-      <script src="/dist/client.js" defer></script>
+      <script src={`${PUBLIC_PATH}/client.js`} defer></script>
     );
     const clientBootstrap = (
       <script dangerouslySetInnerHTML={{__html: this.props.state}}>
@@ -25,7 +26,7 @@ export default React.createClass({
           />
           <link
             rel="stylesheet"
-            href="/dist/main.css"
+            href={`${PUBLIC_PATH}/main.css`}
           />
         </head>
         <body>

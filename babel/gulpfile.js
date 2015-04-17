@@ -19,8 +19,8 @@ const {
   BROWSER_RELOAD_TIMEOUT,
 } = config;
 const paths = {
-  sharedJS: '../shared/*',
-  baseJS: '../*.js'
+  sharedJS: './shared/**/*',
+  baseJS: './*.js'
 };
 const webPackAddress = `${PROTOCOL}${HOSTNAME}:${WPDEVPORT}`;
 
@@ -31,7 +31,7 @@ gulp.task('server', (cb) => {
     env: {}
   };
   if ($.util.env.clientOnly) {
-    options.ignore = ['shared', 'src', 'node_modules', '!../shared/routes.js'];
+    options.ignore = ['shared', 'src', 'node_modules', '!shared/routes.js'];
     options.env.REACT_CLIENT_RENDER = true;
     options.env.REACT_SERVER_RENDER = false;
   } else if ($.util.env.serverOnly) {
@@ -59,6 +59,7 @@ gulp.task('eslint', () => {
         __dirname: true,
         setTimeout: true,
         setInterval: true,
+        clearInterval: true,
         window: true
       }
     }))
@@ -126,23 +127,44 @@ gulp.task('browser-reload', () => {
 });
 
 // Compile LESS
-gulp.task('less', () => {
+gulp.task('less', (cb) => {
   debug('LESSING');
   return gulp.src('src/less/main.less')
     .pipe($.sourcemaps.init())
-    .pipe($.less())
-    .on('error', function (err) {
+    .on('error', (err) => {
       debug(err);
+      cb();
+    })
+    .pipe($.less())
+    .on('error', (err) => {
+      $.notify(err);
+      debug(err);
+      cb();
     })
     .pipe($.sourcemaps.write({
       includeContent: false
     }))
+    .on('error', (err) => {
+      debug(err);
+      cb();
+    })
     .pipe($.sourcemaps.init({
       loadMaps: true
     }))
+    .on('error', (err) => {
+      debug(err);
+      cb();
+    })
     .pipe($.autoprefixer())
-    .on('error', debug)
+    .on('error', (err) => {
+      debug(err);
+      cb();
+    })
     .pipe($.sourcemaps.write('.'))
+    .on('error', (err) => {
+      debug(err);
+      cb();
+    })
     .pipe(gulp.dest('./dist'))
     .pipe($.filter('**/*.css'))
     .pipe(browserSync.reload({
@@ -151,34 +173,11 @@ gulp.task('less', () => {
     .pipe(gulp.dest('./dist')); // Copy to static dir
 });
 
-gulp.task('lessLint', () => {
-  debug('Less Linting');
-  return gulp.src([
-    '../src/less/**/*.less',
-    '!../src/less/lib/**/*',
-    '!../bower_components/**/*'])
-    .pipe($.recess())
-    .on('error', debug)
-    .pipe($.notify({
-      message: (file) => {
-        if (!file || !file.recess || file.recess.success) {
-
-          // Don't show something if success
-          return false;
-        }
-        return file.relative + ' (' + file.recess.results.length + ' errors)\n';
-      },
-      title: 'LESS Lint'
-    }))
-    .pipe($.recess.reporter())
-    .on('error', debug);
-});
-
 gulp.task('watch', () => {
-  gulp.watch('src/**/*.less', ['less']);
+  gulp.watch('./**/*.less', ['less']);
   gulp.watch('/index.js', ['browser-reload']);
   // gulp.watch(paths.less, ['less']);
-  gulp.watch([paths.sharedJS, paths.baseJS], ['eslint']);
+  gulp.watch(['./**/*.{jsx,js}', '!./node_modules/**/*'], ['eslint']);
 });
 
 gulp.task('clean', (cb) => {

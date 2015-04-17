@@ -10,7 +10,7 @@ import flash from 'connect-flash';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import url from 'url';
-import routes from '../shared/routes';
+import routes from '../routes';
 import CST from '../shared/constants';
 import reactRender from './reactrender';
 
