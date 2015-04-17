@@ -49,8 +49,10 @@ export default React.createClass({
 
   render() {
     const name = this.context.router.getCurrentPath();
+    const buttonName = `button${name}`;
+    const formName = `form${name}`;
     const loggedInForm = (
-      <form action="/logout" method="POST">
+      <form key={formName} action="/logout" method="POST">
         <button type="submit" onClick={this.logout}>Log out</button>
       </form>
     );
@@ -80,10 +82,11 @@ export default React.createClass({
               <TransitionGroup component="div" transitionName="example">
 
                   <RouteHandler key={name} {...this.state} />
-
+                  <button key={buttonName} onClick={this.log}>Log current application state</button>
+                  {this.state.loggedIn && {loggedInForm}}
               </TransitionGroup>
             </section>
-            {this.state.loggedIn && {loggedInForm}}
+
 
 
           </div>

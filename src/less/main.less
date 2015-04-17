@@ -85,9 +85,8 @@ body {
 }
 
 .example-enter {
-  position: absolute;
   opacity: 0.01;
-  transition:all .3s ease-in-out;
+  transition:all .2s ease-in;
   transform: scale(.1);
   perspective: 800px;
 }
@@ -98,13 +97,15 @@ body {
 }
 
 .example-leave {
+
   opacity: 1;
-  transition:all .3s ease-in-out;
+  transition:all .05s linear;
   perspective: 800px;
 
 }
 
 .example-leave.example-leave-active {
+  position: absolute;
   opacity: 0.01;
-  transform: scale(40);
+  transform: scale(1.5);
 }
