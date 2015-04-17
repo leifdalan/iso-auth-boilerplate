@@ -30,6 +30,7 @@ export default function ({dispatch}, payload, done) {
     }
   }).then((resolution) => {
     dispatch('CHANGE_ROUTE');
+    dispatch('LOAD_PAGE', payload);
     if (resolution.flashMessage) {
       dispatch('FLASH_MESSAGE', resolution.flashMessage);
     }

@@ -9,7 +9,11 @@ body {
   }
 }
 
-..active {
+.main-content {
+  min-height: 200px;
+}
+
+.active {
   background: #bbbbbb;
 }
 
@@ -78,4 +82,29 @@ body {
   button {
     display: block;
   }
+}
+
+.example-enter {
+  position: absolute;
+  opacity: 0.01;
+  transition:all .3s ease-in-out;
+  transform: scale(.1);
+  perspective: 800px;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.example-leave {
+  opacity: 1;
+  transition:all .3s ease-in-out;
+  perspective: 800px;
+
+}
+
+.example-leave.example-leave-active {
+  opacity: 0.01;
+  transform: scale(40);
 }

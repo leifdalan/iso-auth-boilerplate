@@ -1,5 +1,6 @@
 'use strict';
 import {createStore} from 'fluxible/addons';
+const debug = require('debug')('Store:Page');
 
 export default createStore({
   storeName: 'PageStore',

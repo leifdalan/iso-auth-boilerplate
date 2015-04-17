@@ -10,7 +10,7 @@ const {
   BABEL_STAGE
 } = config;
 const webpackAddress = `${PROTOCOL}${HOSTNAME}:${WEBPACK_DEV_SERVER_PORT}`;
-const publicPath = `${webpackAddress}PUBLIC_PATH`;
+const publicPath = `${webpackAddress}${PUBLIC_PATH}`;
 
 export default {
   devtool: 'eval-source-map',
