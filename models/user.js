@@ -4,6 +4,9 @@ import bcrypt from 'bcrypt-nodejs';
 
 // define the schema for our user model
 const userSchema = mongoose.Schema({
+  groups: Array,
+  isValidated: Boolean,
+  loginToken: String,
   userLevel: Number,
   local: {
     email: String,

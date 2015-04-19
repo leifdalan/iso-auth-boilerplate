@@ -1,40 +1,50 @@
+import User from './models/user';
 const debug = require('debug')('Routes');
 
 export default function(server, passport) {
   function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-      return next();
+    if (req.user) {
+      debug('Is authenticated.');
+      next();
+    } else {
+      debug('Adding abort because not authenticated.');
+      req.abortNavigation = {
+        to: '/signin',
+        params: {
+          reason: 'UNAUTHENTICATED'
+        }
+      };
+      next();
     }
-    req.abortNavigation = {
-      to: '/signin',
-      params: {
-        reason: 'UNAUTHENTICATED'
-      }
-    };
-    next();
   }
 
   function isAdmin(req, res, next) {
     if (req.user && req.user.userLevel > 1) {
-      return next();
+      debug('Is authorized.');
+      next();
+    } else {
+      debug('Adding abort on because not authorized.');
+      req.abortNavigation = {
+        to: '/signin',
+        params: {
+          reason: 'UNAUTHORIZED'
+        }
+      };
+      next();
     }
-    req.abortNavigation = {
-      to: '/signin',
-      params: {
-        reason: 'UNAUTHORIZED'
-      }
-    };
-    next();
   }
 
   // Abstract of sending data from the server to client,
   // whether its the first request or an in-app XHR.
   function sendData({data, req, res, next}) {
+    debug('SEND DATA', data);
     if (req.xhr) {
+      debug('XHR REQUEST=======================', data);
       setTimeout(() => {
         res.json(data);
       }, 500);
     } else {
+      debug('PRERENDER=========================', data);
       req.preRender = data;
       next();
     }
@@ -112,7 +122,7 @@ export default function(server, passport) {
     sendData({data, req, res, next});
   });
 
-  server.get('/admin-page', isLoggedIn, isAdmin, (req, res, next) => {
+  server.get('/admin-page', isAdmin, (req, res, next) => {
     const data = {
       content: 'Im an admin page, look at me go.'
     };
@@ -129,4 +139,31 @@ export default function(server, passport) {
     }
 
   });
+  server.get('/admin/users/', isLoggedIn, isAdmin, (req, res, next) => {
+    debug('GETTING USERS');
+    User.find({}, (err, users) => {
+      if (err) {
+        debug('USER ERROR', err);
+        sendData({err, req, res, next});
+      } else {
+        debug('USERS', users);
+        sendData({data: users, req, res, next});
+      }
+    });
+  });
+  // server.post('/admin/users/', isLoggedIn, isAdmin, (req, res, next) => {
+  //   passport.authenticate('local-signup', (err, user) => {
+  //     debug('Logging in.');
+  //     const failMessage = {
+  //       success: false,
+  //       message: 'Well, that didn\'t work.'
+  //     };
+  //     if (err) {
+  //       return res.status(401).json(failMessage);
+  //     }
+  //     if (!user) {
+  //       return res.status(401).json(failMessage);
+  //     }
+  //   })(req, res, next);
+  // });
 }

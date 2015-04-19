@@ -34,7 +34,6 @@ export default function(passport) {
       // (lets us check if a user is logged in or not)
       passReqToCallback: true
     }, (req, email, password, done) => {
-      console.log('using local strategy...')
       if (email) {
         // Use lower-case e-mails to avoid case-sensitive e-mail matching
         email = email.toLowerCase();

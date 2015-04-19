@@ -6,7 +6,8 @@ import Home from './Home';
 import Page from './Page';
 import Dashboard from './Dashboard';
 import SignIn from './SignIn';
-import AdminPage from './AdminPage';
+import AdminIndex from './Admin';
+import Users from './Admin/Users';
 import NotFound from './NotFound';
 
 export default (
@@ -15,7 +16,11 @@ export default (
     <Route name="page" path="/page/:id" handler={Page}/>
     <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
     <Route name="signin" path="/signin" handler={SignIn}/>
-    <Route name="adminPage" path="/admin-page" handler={AdminPage}/>
+    <Route name="admin" path="/admin/">
+      <Route name="users" path="/admin/users/" handler={Users} />
+      <DefaultRoute name="adminDashboard" handler={AdminIndex}/>
+    </Route>
+
     <DefaultRoute name="home" handler={Home}/>
     <NotFoundRoute handler={NotFound}/>
   </Route>

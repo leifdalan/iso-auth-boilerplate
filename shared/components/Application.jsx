@@ -1,6 +1,7 @@
 'use strict';
 import React from 'react';
 import Nav from './Nav';
+import AdminNav from './Admin/AdminNav';
 import ApplicationStore from '../stores/ApplicationStore';
 import {RouteHandler, Navigation} from 'react-router';
 import {loginAction, logoutAction} from '../actions/authActions';
@@ -49,6 +50,7 @@ export default React.createClass({
 
   render() {
     const name = this.context.router.getCurrentPath();
+    debug(name);
     const buttonName = `button${name}`;
     const formName = `form${name}`;
     const loggedInForm = (
@@ -56,6 +58,11 @@ export default React.createClass({
         <button type="submit" onClick={this.logout}>Log out</button>
       </form>
     );
+
+    const Navigation =
+      this.state.userLevel > 1 && name.split('/')[1] === 'admin' ?
+        <AdminNav {...this.state} /> :
+        <Nav {...this.state} />;
 
     return (
       <DocumentTitle title="Isomorphic Auth Flow">
@@ -73,11 +80,7 @@ export default React.createClass({
             </button>
           }
           <div className="container">
-            <Nav {...this.state} />
-            <h1>Hello,&nbsp;{this.state.email || 'Stranger'}</h1>
-            {this.state.loggedIn &&
-              <h2>Your user level is {this.state.userLevel}</h2>
-            }
+            {Navigation}
             <section className="main-content">
               <TransitionGroup component="div" transitionName="example">
 
@@ -86,9 +89,6 @@ export default React.createClass({
                   {this.state.loggedIn && {loggedInForm}}
               </TransitionGroup>
             </section>
-
-
-
           </div>
         </div>
       </DocumentTitle>
