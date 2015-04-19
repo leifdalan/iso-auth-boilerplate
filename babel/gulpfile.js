@@ -17,6 +17,8 @@ const {
   HOSTNAME,
   PROTOCOL,
   BROWSER_RELOAD_TIMEOUT,
+  DEBUG,
+  NODE_ENV
 } = config;
 const paths = {
   sharedJS: './shared/**/*',
@@ -28,8 +30,12 @@ gulp.task('server', (cb) => {
   const options = {
     script: 'index.js',
     ext: 'js,jsx',
-    env: {}
+    env: {
+      DEBUG,
+      NODE_ENV
+    }
   };
+
   if ($.util.env.clientOnly) {
     options.ignore = ['shared', 'src', 'node_modules', '!shared/routes.js'];
     options.env.REACT_CLIENT_RENDER = true;
@@ -43,6 +49,12 @@ gulp.task('server', (cb) => {
     options.env.REACT_SERVER_RENDER = true;
     options.env.REACT_CLIENT_RENDER = true;
   }
+
+  if ($.util.env.admin) {
+    options.env.ALWAYS_ADMIN = true;
+  }
+  
+  debug('NODEMON OPTIONS: ', options);
 
   $.nodemon(options);
   cb();
@@ -128,7 +140,6 @@ gulp.task('browser-reload', () => {
 
 // Compile LESS
 gulp.task('less', (cb) => {
-  debug('LESSING');
   return gulp.src('src/less/main.less')
     .pipe($.sourcemaps.init())
     .on('error', (err) => {

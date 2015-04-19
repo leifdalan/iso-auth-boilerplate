@@ -201,6 +201,40 @@ Async.auto({
 
         });      }
     ], done);
+  }],
+  generateABunchOfUsers: ['insertUsers', (done, results) => {
+    function makeid() {
+      var text = "";
+      var possible =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+      for( var i=0; i < 5; i++ ) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      }
+
+      return text;
+    }
+    function createUser(callback) {
+      const newUser = new User();
+
+      newUser.local.email = makeid();
+      newUser.local.password = 'asdf';
+      newUser.save((err) => {
+        if (err) {
+          debug('Error adding user.');
+          callback(err);
+        }
+        return callback();
+      });
+    }
+    const numOfUsers = 300;
+    const asyncArray = [];
+    for (var i = 0; i < 300; i++) {
+      asyncArray.push(createUser);
+    }
+    Async.parallel(asyncArray, () => {
+      done();
+    });
   }]
 }, function (err) {
   if (err) {

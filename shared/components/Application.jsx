@@ -43,6 +43,13 @@ export default React.createClass({
     }
   },
 
+  clearFlash(e) {
+    e.preventDefault();
+    this.setState({
+      flashMessage: ''
+    });
+  },
+
   log() {
     const state = this.getStore(ApplicationStore).getState();
     debug(state);
@@ -69,6 +76,7 @@ export default React.createClass({
         <div className="app">
           {this.state.flashMessage &&
             <button
+              onClick={this.clearFlash}
               className="u-full-width button-primary flash">
               {this.state.flashMessage}
             </button>
@@ -83,10 +91,9 @@ export default React.createClass({
             {Navigation}
             <section className="main-content">
               <TransitionGroup component="div" transitionName="example">
-
-                  <RouteHandler key={name} {...this.state} />
-                  <button key={buttonName} onClick={this.log}>Log current application state</button>
-                  {this.state.loggedIn && {loggedInForm}}
+                <RouteHandler key={name} {...this.state} />
+                <button key={buttonName} onClick={this.log}>Log current application state</button>
+                {this.state.loggedIn && {loggedInForm}}
               </TransitionGroup>
             </section>
           </div>

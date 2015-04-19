@@ -21,22 +21,23 @@ export default function ({dispatch}, payload, done) {
           if (err) {
             debug(err);
             reject(err);
+          } else {
+            debug('Navigation Response--------');
+            debug(res);
+            resolve(res);
           }
-          debug('Navigation Response--------');
-          debug(res);
-          resolve(res);
       });
     }
   }).then((resolution) => {
     dispatch('CHANGE_ROUTE', payload);
-
+    debug('================================payload');
+    const activeRouteName = payload.routes[payload.routes.length - 1].name;
+    debug(activeRouteName);
     // Create dynamic action based on path, dispatch with data.
-    const pathWithUnderscores = payload.path.replace(/\//g, '_').toUpperCase();
-    const dataAction = `${pathWithUnderscores}_PAYLOAD`;
+    const dataAction = `${activeRouteName}_PAYLOAD`;
     dispatch(dataAction, resolution.body || resolution);
 
-    debug();
-    dispatch('LOAD_PAGE', payload);
+    // dispatch('LOAD_PAGE', payload);
     if (resolution.flashMessage) {
       dispatch('FLASH_MESSAGE', resolution.flashMessage);
     }

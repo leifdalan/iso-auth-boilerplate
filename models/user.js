@@ -5,13 +5,15 @@ import bcrypt from 'bcrypt-nodejs';
 // define the schema for our user model
 const userSchema = mongoose.Schema({
   groups: Array,
-  isValidated: Boolean,
-  loginToken: String,
-  userLevel: Number,
+  isValidated: { type: Boolean, default: true },
+  loginToken: { type: String, default: 'fakelogintoken' },
+  userLevel: { type: Number, default: 1},
   local: {
     email: String,
     password: String,
   },
+  created: { type: Date, default: Date.now },
+  lastUpdated: { type: Date, default: Date.now }
 });
 
 // generating a hash

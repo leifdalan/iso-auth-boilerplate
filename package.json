@@ -23,7 +23,7 @@
     "fluxible": "^0.3.0",
     "handlebars": "^3.0.1",
     "imports-loader": "0.6.3",
-    "lodash": "~2.4.1",
+    "lodash": "^2.4.1",
     "mongoose": "^4.0.1",
     "morgan": "^1.5.2",
     "passport": "^0.2.1",
@@ -73,9 +73,9 @@
     "webpack-dev-server": "1.6.4"
   },
   "scripts": {
-    "server-only": "NODE_ENV=development && REACT_SERVER_RENDER=true && REACT_CLIENT_RENDER=false && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp server-only --serverOnly",
-    "client": "NODE_ENV=development && REACT_SERVER_RENDER=false && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev --clientOnly",
-    "iso": "NODE_ENV=development && REACT_SERVER_RENDER=true && DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev --iso",
+    "server-only": "DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp server-only --serverOnly",
+    "client": "DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev --clientOnly --admin",
+    "iso": "DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp dev --iso",
     "prod": "NODE_ENV=production && REACT_SERVER_RENDER=true && DEBUG=-* && gulp build && node index",
     "setup": "DEBUG=*,-babel && node ./setup.js",
     "start": "npm cache clean && npm install && npm run setup --no-spin && npm run client"

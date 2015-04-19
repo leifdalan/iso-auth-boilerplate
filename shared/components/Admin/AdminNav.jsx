@@ -43,7 +43,7 @@ export default React.createClass({
             <Link
               onMouseOver={this.mouseOverLink}
               onMouseOut={this.mouseOut}
-              to='users'>Users
+              to='adminUsers'>Users
             </Link>
           </li>
           <li>

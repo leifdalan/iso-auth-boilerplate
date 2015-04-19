@@ -2,6 +2,14 @@ import User from './models/user';
 const debug = require('debug')('Routes');
 
 export default function(server, passport) {
+  // For token logins:
+  // server.use((req, res, next) => {
+  //   if (req.query.token)
+  //
+  //
+  //
+  //   next();
+  // });
   function isLoggedIn(req, res, next) {
     if (req.user) {
       debug('Is authenticated.');
@@ -40,9 +48,7 @@ export default function(server, passport) {
     debug('SEND DATA', data);
     if (req.xhr) {
       debug('XHR REQUEST=======================', data);
-      setTimeout(() => {
-        res.json(data);
-      }, 500);
+      res.json(data);
     } else {
       debug('PRERENDER=========================', data);
       req.preRender = data;
@@ -139,18 +145,26 @@ export default function(server, passport) {
     }
 
   });
+
+  // ----------------------------------------------------------------------------
+  // Admin Users CRUD
+  // ----------------------------------------------------------------------------
+
   server.get('/admin/users/', isLoggedIn, isAdmin, (req, res, next) => {
     debug('GETTING USERS');
-    User.find({}, (err, users) => {
-      if (err) {
-        debug('USER ERROR', err);
-        sendData({err, req, res, next});
-      } else {
-        debug('USERS', users);
-        sendData({data: users, req, res, next});
-      }
-    });
+    User.find({})
+      .limit(10)
+      .exec((err, users) => {
+        if (err) {
+          debug('USER ERROR', err);
+          sendData({err, req, res, next});
+        } else {
+          debug('USERS', users);
+          sendData({data: users, req, res, next});
+        }
+      });
   });
+
   // server.post('/admin/users/', isLoggedIn, isAdmin, (req, res, next) => {
   //   passport.authenticate('local-signup', (err, user) => {
   //     debug('Logging in.');
@@ -166,4 +180,56 @@ export default function(server, passport) {
   //     }
   //   })(req, res, next);
   // });
+
+  server.get('/admin/users/:id', isLoggedIn, isAdmin, (req, res, next) => {
+    debug('GETTING USER');
+    User.findOne({_id: req.params.id}, (err, users) => {
+      if (err) {
+        err.success = false;
+        debug('USER ERROR', err);
+        sendData({data: err, req, res, next});
+      } else {
+        debug('USERS', users);
+        users.success = true;
+        sendData({data: users, req, res, next});
+      }
+    });
+  });
+
+  server.put('/admin/users/:id', isLoggedIn, isAdmin, (req, res, next) => {
+    debug('SETTING USER');
+
+    // Encrypt new password, if it exists in the req.body.
+    if (req.body.local.password) {
+      let tempUser = new User();
+      req.body.local.password = tempUser.generateHash(req.body.local.password);
+    }
+
+    User.findOneAndUpdate(
+      {_id: req.params.id},
+      req.body,
+      {'new': true},
+      (err, user) => {
+        if (err) {
+          const data = {
+            error: err,
+            success: false
+          };
+
+          debug('USER ERROR', err);
+          err.success = false;
+          sendData({data: data, req, res, next});
+        } else {
+          const data = {
+            user,
+            success: {
+              message: 'User saved successfully.'
+            }
+          };
+          user.success = true;
+          debug('USERS', user);
+          sendData({data: data, req, res, next});
+        }
+      });
+  });
 }
