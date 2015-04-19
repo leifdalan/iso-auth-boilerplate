@@ -2,14 +2,20 @@ import User from './models/user';
 const debug = require('debug')('Routes');
 
 export default function(server, passport) {
-  // For token logins:
-  // server.use((req, res, next) => {
-  //   if (req.query.token)
-  //
-  //
-  //
-  //   next();
-  // });
+
+  // Middleware check for token logins
+  server.use((req, res, next) => {
+    if (req.query.token && req.query.un) {
+      req.body.email = req.query.un;
+      req.body.password = req.query.token;
+      debug('Attempting token login.');
+      req.tokenAttempt = true;
+      login(req, res, next);
+    } else {
+      next();
+    }
+  });
+
   function isLoggedIn(req, res, next) {
     if (req.user) {
       debug('Is authenticated.');
@@ -40,6 +46,45 @@ export default function(server, passport) {
       };
       next();
     }
+  }
+
+  function login(req, res, next) {
+    passport.authenticate('local-login', (err, user) => {
+      debug('Logging in.');
+      const failMessage = {
+        success: false,
+        message: 'Username or password incorrect.'
+      };
+
+      if (err) {
+        return res.status(401).json(failMessage);
+      }
+
+      if (!user) {
+        return res.status(401).json(failMessage);
+      }
+
+      req.logIn(user, function(loginErr) {
+        if (loginErr) {
+          return next(loginErr);
+        }
+        if (req.xhr) {
+          res.json({
+            success: true,
+            user
+          });
+        } else {
+          req.flash('flashMessage', 'Welcome!');
+          if (req.tokenAttempt) {
+            next();
+          } else {
+            res.redirect('/dashboard');
+
+          }
+
+        }
+      });
+    })(req, res, next);
   }
 
   // Abstract of sending data from the server to client,
@@ -89,36 +134,7 @@ export default function(server, passport) {
 
   server.post('/login', (req, res, next) => {
     debug(req.body);
-    passport.authenticate('local-login', (err, user) => {
-      debug('Logging in.');
-      const failMessage = {
-        success: false,
-        message: 'Username or password incorrect.'
-      };
-
-      if (err) {
-        return res.status(401).json(failMessage);
-      }
-
-      if (!user) {
-        return res.status(401).json(failMessage);
-      }
-
-      req.logIn(user, function(loginErr) {
-        if (loginErr) {
-          return next(loginErr);
-        }
-        if (req.xhr) {
-          res.json({
-            success: true,
-            user
-          });
-        } else {
-          req.flash('flashMessage', 'Welcome!');
-          res.redirect('/dashboard');
-        }
-      });
-    })(req, res, next);
+    login(req, res, next);
   });
 
   server.get('/dashboard', isLoggedIn, (req, res, next) => {
