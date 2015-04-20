@@ -1,5 +1,6 @@
 import {Strategy} from 'passport-local';
 import User from '../models/user';
+import uuid from 'uuid';
 const debug = require('debug')('Passport');
 
 export default function(passport) {
@@ -34,37 +35,70 @@ export default function(passport) {
       // (lets us check if a user is logged in or not)
       passReqToCallback: true
     }, (req, email, password, done) => {
-      console.log('using local strategy...')
       if (email) {
         // Use lower-case e-mails to avoid case-sensitive e-mail matching
         email = email.toLowerCase();
       }
 
+      let conditions = {
+        'local.email': email
+      }, tokenAttempt = false;
+      if (req.tokenAttempt) {
+        tokenAttempt = true;
+        debug('Passport knows about the token.');
+        conditions.loginToken = req.query.token;
+      }
 
       // asynchronous
       process.nextTick(() => {
-        User.findOne({
-          'local.email': email
-        }, (err, user) => {
-          // if there are any errors, return the error
-          if (err) {
-            return done(err);
-          }
-          // if no user is found, return the message
-          if (!user) {
-            return done(
-              null, false, req.flash('loginMessage', 'No user found.')
-            );
-          }
+        if (tokenAttempt) {
 
-          if (!user.validPassword(password)) {
-            return done(
-              null, false, req.flash('loginMessage', 'Oops! Wrong password.')
-            );
-          } else {
+          // Create new login token after each use.
+          const newToken = uuid.v4();
+          User.findOneAndUpdate(
+            conditions,
+            {loginToken: newToken},
+            (err, user) => {
+            // if there are any errors, return the error
+            debug('TOKEN LOGIN', err, user);
+            if (err) {
+              return done(err);
+            }
+            // if no user is found, return the message
+            if (!user) {
+              return done(
+                null, false, req.flash('loginMessage', 'No user found.')
+              );
+            }
+
+
             return done(null, user);
-          }
-        });
+
+          });
+
+        } else {
+          User.findOne(conditions, (err, user) => {
+            // if there are any errors, return the error
+            if (err) {
+              return done(err);
+            }
+            // if no user is found, return the message
+            if (!user) {
+              return done(
+                null, false, req.flash('loginMessage', 'No user found.')
+              );
+            }
+
+            if (!user.validPassword(password)) {
+              return done(
+                null, false, req.flash('loginMessage', 'Oops! Wrong password.')
+              );
+            } else {
+
+              return done(null, user);
+            }
+          });
+        }
       });
 
     }));
@@ -113,6 +147,7 @@ export default function(passport) {
 
               newUser.local.email = email;
               newUser.local.password = newUser.generateHash(password);
+              newUser.loginToken = newUser.generateToken();
               newUser.userLevel = req.body.userLevel;
 
               newUser.save((err) => {

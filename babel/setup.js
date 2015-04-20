@@ -6,6 +6,7 @@ import Promptly from 'promptly';
 import User from '../models/user';
 import mongoose from 'mongoose';
 import Handlebars from 'handlebars';
+import {ProgressBar} from 'progressbar';
 const debug = require('debug')('Setup:');
 
 Async.auto({
@@ -187,6 +188,7 @@ Async.auto({
 
             newUser.local.email = results.regularUserUsername;
             newUser.local.password = newUser.generateHash(results.regularUserPassword);
+            newUser.loginToken = newUser.generateToken();
             newUser.userLevel = 1;
 
 
@@ -201,6 +203,50 @@ Async.auto({
 
         });      }
     ], done);
+  }],
+  generateABunchOfUsers: ['insertUsers', (done, results) => {
+    const progressBar = new ProgressBar();
+    progressBar.setTotal(300);
+    let tick = 0;
+    function makeid() {
+      var text = "";
+      var possible =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+      for( var i=0; i < 5; i++ ) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      }
+
+      return text;
+    }
+    function createUser(callback) {
+      const newUser = new User();
+
+      newUser.local.email = makeid();
+      newUser.local.password = newUser.generateHash(results.regularUserPassword);
+      newUser.loginToken = newUser.generateToken();
+      newUser.userLevel = Math.floor(Math.random() * 3 + 1);
+      tick++;
+      progressBar.step(`Adding user ${newUser.local.email}`)
+        .setTotal(300)
+        .setTick(tick);
+      newUser.save((err) => {
+        if (err) {
+          debug('Error adding user.');
+          callback(err);
+        }
+
+        return callback();
+      });
+    }
+    const numOfUsers = 300;
+    const asyncArray = [];
+    for (var i = 0; i < 300; i++) {
+      asyncArray.push(createUser);
+    }
+    Async.parallel(asyncArray, () => {
+      done();
+    });
   }]
 }, function (err) {
   if (err) {

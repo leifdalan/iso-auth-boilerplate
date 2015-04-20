@@ -11,7 +11,7 @@ var defaults = {
   PROTOCOL: 'http://',
   BABEL_STAGE: 0,
   NODE_ENV: 'development',
-
+  DEBUG: '*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint*'
 };
 
 // Override defaults with environment variables

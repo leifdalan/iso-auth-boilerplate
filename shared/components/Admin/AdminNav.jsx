@@ -28,25 +28,6 @@ export default React.createClass({
     const classes = classnames({
       'is-hovered': this.state.isHovering
     });
-    const loggedInLinks =
-    (
-      <li>
-        <Link
-          onMouseOver={this.mouseOverLink}
-          onMouseOut={this.mouseOut}
-          to='/dashboard'>Dashboard
-        </Link>
-      </li>
-    );
-    const adminLink = (
-      <li>
-        <Link
-          onMouseOver={this.mouseOverLink}
-          onMouseOut={this.mouseOut}
-          to='admin'>Admin
-        </Link>
-      </li>
-    );
 
     return (
       <div className="main-nav">
@@ -55,31 +36,23 @@ export default React.createClass({
             <Link
               onMouseOver={this.mouseOverLink}
               onMouseOut={this.mouseOut}
-              to='/'>Home
+              to='admin'>Admin
             </Link>
           </li>
           <li>
             <Link
               onMouseOver={this.mouseOverLink}
               onMouseOut={this.mouseOut}
-              to='/about'>About
+              to='adminUsers'>Users
             </Link>
           </li>
-          {!this.props.loggedIn &&
-            <li>
-              <Link
-                onMouseOver={this.mouseOverLink}
-                onMouseOut={this.mouseOut}
-                to='/signIn'>SignIn
-              </Link>
-            </li>
-          }
-          {this.props.loggedIn &&
-            {loggedInLinks}
-          }
-          {this.props.userLevel > 1 &&
-            {adminLink}
-          }
+          <li>
+            <Link
+              onMouseOver={this.mouseOverLink}
+              onMouseOut={this.mouseOut}
+              to='/'>To Site
+            </Link>
+          </li>
 
         </ul>
       </div>

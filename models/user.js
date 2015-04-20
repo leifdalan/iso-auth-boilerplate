@@ -1,14 +1,20 @@
 // load the things we need
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt-nodejs';
+import uuid from 'uuid';
 
 // define the schema for our user model
 const userSchema = mongoose.Schema({
-  userLevel: Number,
+  groups: Array,
+  isValidated: { type: Boolean, default: true },
+  loginToken: { type: String, default: uuid.v4() },
+  userLevel: { type: Number, default: 1},
   local: {
     email: String,
     password: String,
   },
+  created: { type: Date, default: Date.now },
+  lastUpdated: { type: Date, default: Date.now }
 });
 
 // generating a hash
@@ -20,6 +26,9 @@ userSchema.methods.generateHash = (password) =>
 userSchema.methods.validPassword = function(password) {
   return bcrypt.compareSync(password, this.local.password);
 };
+
+userSchema.methods.generateToken = () => uuid.v4();
+
 
 // create the model for users and expose it to our app
 export default mongoose.model('User', userSchema);

@@ -1,9 +1,9 @@
 'use strict';
 import React from 'react';
 import {FluxibleMixin} from 'fluxible';
-import ApplicationStore from '../stores/ApplicationStore'
+import ApplicationStore from '../../stores/ApplicationStore'
 import debug from 'debug';
-import {CheckAdminMixin} from '../mixins/authMixins';
+import {CheckAdminMixin} from '../../mixins/authMixins';
 debug('Component:Admin');
 
 export default React.createClass({

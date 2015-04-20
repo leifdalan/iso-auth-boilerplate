@@ -81,13 +81,31 @@ if (process.env.NODE_ENV === 'development' &&
   server.use(`${PUBLICPATH}`,
     proxy(url.parse(`${PROTOCOL}${HOSTNAME}:${DEVSERVERPORT}${PUBLICPATH}`))
   );
-} else if (process.env.NODE_ENV === 'production') {
+} else {
 
   // Signify gzipped assets on production
   server.use(`${PUBLICPATH}/*.js`, (req, res, next) => {
     res.set('Content-Encoding', 'gzip');
     next();
   });
+}
+
+if (process.env.ALWAYS_ADMIN) {
+  let initialLogin = false;
+  server.use((req, res, next) => {
+    if (initialLogin) return next();
+    req.body = {email: 'admin', password: 'admin'};
+    passport.authenticate('local-login', (err, user) => {
+
+      req.logIn(user, function(loginErr) {
+        if (loginErr) {
+          return next(loginErr);
+        }
+        initialLogin = true;
+        next();
+      });
+    })(req, res, next);
+  })
 }
 
 server.use(favicon(path.join(__dirname, '../favicon.ico')));
