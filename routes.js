@@ -165,19 +165,8 @@ export default function(server, passport) {
   // Admin Users CRUD
   // ----------------------------------------------------------------------------
 
-  server.get('/admin/users/', isLoggedIn, isAdmin, (req, res, next) => {
-    debug('GETTING USERS');
-    User.find({})
-      .limit(10)
-      .exec((err, users) => {
-        if (err) {
-          debug('USER ERROR', err);
-          sendData({err, req, res, next});
-        } else {
-          debug('USERS', users);
-          sendData({data: users, req, res, next});
-        }
-      });
+  server.get('/admin/users/', isLoggedIn, isAdmin, (req, res) => {
+    res.redirect('/admin/users/page/20/1');
   });
 
   // server.post('/admin/users/', isLoggedIn, isAdmin, (req, res, next) => {
@@ -196,7 +185,39 @@ export default function(server, passport) {
   //   })(req, res, next);
   // });
 
-  //
+  // Paginated user Routes
+  server.get(
+    '/admin/users/page/:perpage/:currentPageNumber',
+    isLoggedIn,
+    isAdmin,
+    (req, res, next) => {
+    const {perpage, currentPageNumber} = req.params;
+    debug(req.params.perpage);
+    debug(req.params.currentPageNumber);
+    let data = {
+      perpage: Number(perpage),
+      currentPageNumber: Number(currentPageNumber)
+    };
+    // TODO use generators + Promises for multiple async
+    // http://davidwalsh.name/async-generators
+    User.find({})
+      .limit(perpage)
+      .skip((currentPageNumber - 1) * perpage)
+      .exec((err, users) => {
+        User.count({}, (countError, count) => {
+          data.totalUsers = count;
+          if (err) {
+            debug('USER ERROR', err);
+            sendData({err, req, res, next});
+          } else {
+            data.users = users;
+            debug('USERS', users);
+            sendData({data, req, res, next});
+          }
+        });
+
+      });
+  });
 
   server.get('/admin/users/:id', isLoggedIn, isAdmin, (req, res, next) => {
     debug('GETTING USER');

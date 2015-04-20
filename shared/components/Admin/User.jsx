@@ -16,21 +16,32 @@ export default React.createClass({
   },
 
   getInitialState() {
-    return this.getStore(UserStore).getState().singleUser;
+    let state = this.getStore(UserStore).getState().singleUser;
+    state.originalPassword = state.local.password;
+    return state;
   },
 
   onChange() {
-
-    const state = this.getStore(UserStore).getState().singleUser;
-    debug('Changed triggered', state);
+    let state = this.getStore(UserStore).getState().singleUser;
+    state.originalPassword = state.local.password;
     this.setState(state);
   },
 
   handleSubmit(e) {
     e.preventDefault();
+    debug(this.state.local.password, this.state.originalPassword);
+    if (this.state.local.password === this.state.originalPassword) {
+      debug('Setting...');
+      this.setState({
+        local: {
+          email: this.state.local.email
+        }
+      });
+    }
     this.setState({
       lastUpdated: new Date()
     });
+    debug('state', this.state);
     this.executeAction(editUserAction, this.state);
   },
 
@@ -48,7 +59,6 @@ export default React.createClass({
         [field]: e.target.value
       });
     }
-
   },
 
   render() {
@@ -91,7 +101,7 @@ export default React.createClass({
             onChange={this.handleChange.bind(null, 'email')}
             value={this.state.local.email}
             />
-          <label for="password">password</label>
+          <label for="password">password (encrypted)</label>
           <input
             type="text"
             id="password"

@@ -8,19 +8,26 @@ export default createStore({
 
   handlers: {
     'adminUsers_PAYLOAD': 'handlePayload',
+    'adminUsersPaginated_PAYLOAD': 'handlePayload',
     'adminUserEdit_PAYLOAD': 'handleEditPayload',
     'adminUserEdit_FAILURE': 'handleEditFailure'
   },
 
   initialize() {
     this.users = [];
+    this.totalUsers = null;
     this.singleUser = null;
+    this.currentPageNumber = null;
+    this.perpage = null;
     this._lastValidSingleUser = null;
   },
 
   handlePayload(payload) {
     debug('RECEIVING PAYLOAD', payload);
-    this.users = payload;
+    this.users = payload.users;
+    this.totalUsers = payload.totalUsers;
+    this.currentPageNumber = payload.currentPageNumber;
+    this.perpage = payload.perpage;
     this.emitChange();
   },
 
@@ -42,7 +49,10 @@ export default createStore({
   getState() {
     return {
       users: this.users,
-      singleUser: this.singleUser
+      singleUser: this.singleUser,
+      perpage: this.perpage,
+      currentPageNumber: this.currentPageNumber,
+      totalUsers: this.totalUsers
     };
   },
 
@@ -52,6 +62,9 @@ export default createStore({
 
   rehydrate(state) {
     this.users = state.users;
+    this.totalUsers = state.totalUsers;
     this.singleUser = state.singleUser;
+    this.perpage = state.perpage;
+    this.currentPageNumber = state.currentPageNumber;
   }
 });

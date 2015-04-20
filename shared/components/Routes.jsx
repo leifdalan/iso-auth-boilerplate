@@ -1,5 +1,5 @@
 import React from 'react';
-import {Route, DefaultRoute, NotFoundRoute} from 'react-router';
+import {Route, DefaultRoute, NotFoundRoute, Redirect} from 'react-router';
 import Application from './Application';
 import About from './About';
 import Home from './Home';
@@ -18,7 +18,19 @@ export default (
     <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
     <Route name="signin" path="/signin" handler={SignIn}/>
     <Route name="admin" path="/admin/">
+      <Redirect
+        from="adminUsers"
+        to="adminUsersPaginated"
+        params={{perpage: 20, pagenumber: 5}}
+      />
+
       <Route name="adminUsers" path="/admin/users/" handler={Users} />
+
+      <Route
+        name="adminUsersPaginated"
+        path="/admin/users/page/:perpage/:pagenumber"
+        handler={Users}
+      />
       <Route name="adminUserEdit" path="/admin/users/:id" handler={User} />
       <DefaultRoute name="adminDashboard" handler={AdminIndex}/>
     </Route>

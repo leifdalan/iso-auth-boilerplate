@@ -144,6 +144,7 @@ gulp.task('browser-reload', () => {
 
 // Compile LESS
 gulp.task('less', (cb) => {
+  debug('Lessing....');
   return gulp.src('src/less/main.less')
     .pipe($.sourcemaps.init())
     .on('error', (err) => {

@@ -2,6 +2,7 @@
 @import './lib/skeleton.less';
 
 @import './someModule.less';
+@import './paginator.less';
 body {
   background: white;
   div {
@@ -87,26 +88,26 @@ body {
 
 .example-enter {
   opacity: 0.01;
-  transition:all .2s ease-in;
-  transform: scale(.1);
-  perspective: 800px;
+  transition:opacity .2s ease-in;
+  /* transform: scale(.1); */
+  /* perspective: 800px; */
 }
 
 .example-enter.example-enter-active {
   opacity: 1;
-  transform: scale(1);
+  /* transform: scale(1); */
 }
 
 .example-leave {
 
   opacity: 1;
-  transition:all .05s linear;
-  perspective: 800px;
+  transition:opacity .05s linear;
+  /* perspective: 800px; */
 
 }
 
 .example-leave.example-leave-active {
   position: absolute;
   opacity: 0.01;
-  transform: scale(1.5);
+  /* transform: scale(1.5); */
 }
