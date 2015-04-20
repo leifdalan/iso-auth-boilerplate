@@ -81,7 +81,7 @@ if (process.env.NODE_ENV === 'development' &&
   server.use(`${PUBLICPATH}`,
     proxy(url.parse(`${PROTOCOL}${HOSTNAME}:${DEVSERVERPORT}${PUBLICPATH}`))
   );
-} else if (process.env.NODE_ENV === 'production') {
+} else {
 
   // Signify gzipped assets on production
   server.use(`${PUBLICPATH}/*.js`, (req, res, next) => {

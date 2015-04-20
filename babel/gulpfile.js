@@ -53,7 +53,11 @@ gulp.task('server', (cb) => {
   if ($.util.env.admin) {
     options.env.ALWAYS_ADMIN = true;
   }
-  
+
+  if ($.util.env.ptod) {
+    options.env.NODE_ENV = 'production';
+  }
+
   debug('NODEMON OPTIONS: ', options);
 
   $.nodemon(options);

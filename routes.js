@@ -74,14 +74,13 @@ export default function(server, passport) {
             user
           });
         } else {
-          req.flash('flashMessage', 'Welcome!');
+
           if (req.tokenAttempt) {
             next();
           } else {
+            req.flash('flashMessage', 'Welcome!');
             res.redirect('/dashboard');
-
           }
-
         }
       });
     })(req, res, next);
@@ -197,6 +196,8 @@ export default function(server, passport) {
   //   })(req, res, next);
   // });
 
+  //
+
   server.get('/admin/users/:id', isLoggedIn, isAdmin, (req, res, next) => {
     debug('GETTING USER');
     User.findOne({_id: req.params.id}, (err, users) => {
@@ -242,6 +243,7 @@ export default function(server, passport) {
               message: 'User saved successfully.'
             }
           };
+
           user.success = true;
           debug('USERS', user);
           sendData({data: data, req, res, next});
