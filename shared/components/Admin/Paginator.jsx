@@ -119,6 +119,8 @@ export default React.createClass({
   },
 
   render() {
+
+    const shouldrender = this.state.totalPages > 1;
     return (
       <div className="paginator">
         {this._shouldShowPrev() &&
@@ -132,7 +134,7 @@ export default React.createClass({
 
         }
 
-        {this._constructMiddle().map((link) => link)}
+        {shouldrender && this._constructMiddle().map((link) => link)}
 
         {this._shouldShowNext() &&
           <PaginatorLink

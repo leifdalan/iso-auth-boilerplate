@@ -48,7 +48,7 @@ export const CheckLoginMixin = {
       const isLoggedIn = transition.context.user || loggedIn;
       if (!isLoggedIn) {
         debug('Redirecting from about to "/signin"...');
-        transition.redirect('/signin', { reason: 'UNAUTHENTICATED' });
+        transition.redirect('/asdf', { reason: 'UNAUTHENTICATED' });
       }
     }
   }

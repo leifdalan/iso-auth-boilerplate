@@ -41,10 +41,20 @@ export default React.createClass({
     } else {
       this.setState(state);
     }
+
+    clearTimeout(this._flashTimeout);
+    if (this.state.flashMessage) {
+
+      this._flashTimeout = setTimeout(() => {
+        debug('Clearing...');
+        this.clearFlash();
+      }, 5000);
+    }
+
   },
 
   clearFlash(e) {
-    e.preventDefault();
+    e && e.preventDefault();
     this.setState({
       flashMessage: ''
     });
@@ -53,6 +63,10 @@ export default React.createClass({
   log() {
     const state = this.getStore(ApplicationStore).getState();
     debug(state);
+  },
+
+  componentWillUnmount() {
+    window.clearTimeout(this._flashTimeout);
   },
 
   render() {
@@ -74,19 +88,23 @@ export default React.createClass({
     return (
       <DocumentTitle title="Isomorphic Auth Flow">
         <div className="app">
-          {this.state.flashMessage &&
-            <button
-              onClick={this.clearFlash}
-              className="u-full-width button-primary flash">
-              {this.state.flashMessage}
-            </button>
-          }
+          <TransitionGroup component="div" transitionName="go-away">
+            {this.state.flashMessage &&
+              <button
+                key="flashMessage"
+                ref="flashMessage"
+                onClick={this.clearFlash}
+                className="u-full-width button-primary flash">
+                {this.state.flashMessage}
+              </button>
+            }
+          </TransitionGroup>
+          <TransitionGroup component="div" transitionName="loading">
           {this.state.appIsLoading &&
-            <button
-              className="u-full-width button primary loading-bar">
-              Loading
-            </button>
+            <div
+              className="loading-bar" key="loading"></div>
           }
+          </TransitionGroup>
           <div className="container">
             {Navigation}
             <section className="main-content">

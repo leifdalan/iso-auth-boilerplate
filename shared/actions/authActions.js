@@ -20,7 +20,10 @@ export const loginAction = ({dispatch}, {email, password, user}, done) => {
         // debug(success, user);
         if (success) {
           dispatch('LOGIN', user);
-          dispatch('REDIRECT', {url: '/dashboard'});
+          dispatch('REDIRECT', {
+            url: '/dashboard',
+            flashMessage: 'Welcome!'
+          });
         } else {
           dispatch('FLASH_MESSAGE', message);
         }

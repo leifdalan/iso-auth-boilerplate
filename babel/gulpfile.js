@@ -74,6 +74,7 @@ gulp.task('eslint', () => {
         process: true,
         __dirname: true,
         setTimeout: true,
+        clearTimeout: true,
         setInterval: true,
         clearInterval: true,
         window: true

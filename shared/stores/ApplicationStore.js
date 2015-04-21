@@ -12,8 +12,7 @@ export default createStore({
     'CLEAR_REDIRECT': 'clearRedirect',
     'NAVIGATION_START': 'navigationStart',
     'NAVIGATION_ERROR': 'navigationError',
-    'FLASH_MESSAGE': 'flashMessagez',
-    // 'SAVE_UNAUTHENTICATED_NAVIGATION_TRANSITION': 'saveTransition'
+    'FLASH_MESSAGE': 'flashMessagez'
   },
 
   navigationError() {
@@ -21,10 +20,6 @@ export default createStore({
       url: '/'
     });
   },
-
-  // saveTransition(transition) {
-  //
-  // },
 
   initialize() {
     this.currentRoute = null;
