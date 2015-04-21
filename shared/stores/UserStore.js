@@ -7,7 +7,6 @@ export default createStore({
   storeName: 'UserStore',
 
   handlers: {
-    'adminUsers_PAYLOAD': 'handlePayload',
     'adminUsersPaginated_PAYLOAD': 'handlePayload',
     'adminUserEdit_PAYLOAD': 'handleEditPayload',
     'adminUserEdit_FAILURE': 'handleEditFailure'
@@ -23,7 +22,7 @@ export default createStore({
   },
 
   handlePayload(payload) {
-    debug('RECEIVING PAYLOAD', payload);
+    // debug('RECEIVING PAYLOAD', payload);
     this.users = payload.users;
     this.totalUsers = payload.totalUsers;
     this.currentPageNumber = payload.currentPageNumber;

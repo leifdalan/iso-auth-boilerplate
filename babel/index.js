@@ -10,7 +10,7 @@ import flash from 'connect-flash';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import url from 'url';
-import routes from '../routes';
+import services from '../services';
 import CST from '../shared/constants';
 import reactRender from './reactrender';
 
@@ -72,8 +72,8 @@ server.use(passport.session());
 // use connect-flash for flash messages stored in session
 server.use(flash());
 
-// load our routes and pass in our app and fully configured passport
-routes(server, passport);
+// load our services and pass in our app and fully configured passport
+services(server);
 
 // Proxy public folder to WebPack's hot loading server during development
 if (process.env.NODE_ENV === 'development' &&

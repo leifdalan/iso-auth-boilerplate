@@ -43,7 +43,9 @@ export default React.createClass({
             <Link
               onMouseOver={this.mouseOverLink}
               onMouseOut={this.mouseOut}
-              to='adminUsers'>Users
+              to='adminUsersPaginated'
+              params={{perpage: 20, pagenumber: 1}}
+              >Users
             </Link>
           </li>
           <li>

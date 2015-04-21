@@ -30,7 +30,6 @@ export default function ({dispatch}, payload, done) {
     }
   }).then((resolution) => {
     dispatch('CHANGE_ROUTE', payload);
-    debug('================================payload');
     const activeRouteName = payload.routes[payload.routes.length - 1].name;
     debug(activeRouteName);
     // Create dynamic action based on path, dispatch with data.
