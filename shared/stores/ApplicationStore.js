@@ -12,7 +12,8 @@ export default createStore({
     'CLEAR_REDIRECT': 'clearRedirect',
     'NAVIGATION_START': 'navigationStart',
     'NAVIGATION_ERROR': 'navigationError',
-    'FLASH_MESSAGE': 'flashMessagez'
+    'FLASH_MESSAGE': 'flashMessagez',
+    // 'SAVE_UNAUTHENTICATED_NAVIGATION_TRANSITION': 'saveTransition'
   },
 
   navigationError() {
@@ -20,6 +21,10 @@ export default createStore({
       url: '/'
     });
   },
+
+  // saveTransition(transition) {
+  //
+  // },
 
   initialize() {
     this.currentRoute = null;
@@ -54,11 +59,24 @@ export default createStore({
       return;
     }
 
+    // Preserve flash message if this is a redirect.
+    if (this._redirectFlash) {
+      this.flashMessage = this._redirectFlash;
+    }
     this.currentRoute = route;
     this.emitChange();
+
+    // Preserve flash message if this is a redirect.
+    if (this._redirectFlash) {
+      this._redirectFlash = null;
+      this.flashMessage = null;
+    }
   },
 
   setRedirect(payload) {
+
+    // Preserve flash message if this is a redirect.
+    this._redirectFlash = payload.flashMessage;
     this.redirect = payload.url;
     this.emitChange();
   },

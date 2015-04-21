@@ -1,6 +1,6 @@
 import User from '../models/user';
 import {signUp, logOut, login, isAdmin, isLoggedIn} from './authentication';
-import {redirect, get, getOne, update} from './admin/users';
+import {redirect, get, getOne, update, create, deleteUser} from './admin/users';
 import adminUserServices from './admin/users';
 const debug = require('debug')('Routes');
 
@@ -52,7 +52,9 @@ export default function(server) {
     isAdmin,
     get
   );
+  server.post('/admin/users/', isLoggedIn, isAdmin, create);
   server.get('/admin/users/:id', isLoggedIn, isAdmin, getOne);
   server.put('/admin/users/:id', isLoggedIn, isAdmin, update);
+  server.delete('/admin/users/:id', isLoggedIn, isAdmin, deleteUser);
 
 };

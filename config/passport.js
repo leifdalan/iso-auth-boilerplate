@@ -125,20 +125,22 @@ export default function(passport) {
       // asynchronous
       process.nextTick(() => {
         // if the user is not already logged in:
-        if (!req.user) {
+        if (!req.user || req.url === '/admin/users') {
           User.findOne({
             'local.email': email
           }, (err, user) => {
 
             // if there are any errors, return the error
             if (err) {
+              debug('Signup Error.');
               return done(err);
             }
 
             // check to see if theres already a user with that email
             if (user) {
+              debug('Signup Error, user already exists.');
               return done(
-                null, false,
+                {message: 'User already exists.'}, false,
                 req.flash('signupMessage', 'That email is already taken.'));
             } else {
 
@@ -153,6 +155,7 @@ export default function(passport) {
               newUser.save((err) => {
                 if (err) {
                   return done(err);
+                  debug('User saving failed.', err);
                 }
                 return done(null, newUser);
               });

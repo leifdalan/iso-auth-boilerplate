@@ -12,22 +12,29 @@ export function redirect(req, res) {
   res.redirect('/admin/users/page/20/1');
 };
 
-// server.post('/admin/users/', isLoggedIn, isAdmin, (req, res, next) => {
-//   passport.authenticate('local-signup', (err, user) => {
-//     debug('Logging in.');
-//     const failMessage = {
-//       success: false,
-//       message: 'Well, that didn\'t work.'
-//     };
-//     if (err) {
-//       return res.status(401).json(failMessage);
-//     }
-//     if (!user) {
-//       return res.status(401).json(failMessage);
-//     }
-//   })(req, res, next);
-// });
+export function create(req, res, next) {
+  debug('Creating user');
+  passport.authenticate('local-signup', (err, user) => {
+    let data = {};
 
+    const failMessage = {
+      success: false,
+      message: 'Well, that didn\'t work.'
+    };
+    if (err) {
+      return res.status(401).json(err);
+    }
+    if (!user) {
+      return res.status(401).json(err);
+    }
+
+    res.status(200).send({
+      success: true,
+      message: `User ${user.local.email} created successfully`,
+      user
+    });
+  })(req, res, next);
+}
 
 export function get(req, res, next) {
   const {perpage, currentPageNumber} = req.params;
@@ -59,7 +66,10 @@ export function get(req, res, next) {
 
 export function getOne(req, res, next) {
   debug('GETTING USER');
-  User.findOne({_id: req.params.id}, (err, user) => {
+  User.findOne({
+    _id: req.params.id
+    },
+    (err, user) => {
     if (err) {
       err.success = false;
       debug('USER ERROR', err);
@@ -108,4 +118,26 @@ export function update(req, res, next) {
         sendData({data: data, req, res, next});
       }
     });
+}
+
+export function deleteUser(req, res, next) {
+  debug('DELETING USER');
+  User.findByIdAndRemove(req.params.id, (err, user) => {
+    let data = {};
+    if (err) {
+      data = {
+        success: false,
+        error: err
+      };
+      debug('Deletion error');
+    } else {
+      data = {
+        success: {
+          message: `${user.local.email} deleted successfully`
+        },
+        user
+      };
+    }
+    sendData({data, req, res, next});
+  });
 }

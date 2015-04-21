@@ -10,6 +10,7 @@ import AdminIndex from './Admin';
 import Users from './Admin/Users';
 import User from './Admin/User';
 import NotFound from './NotFound';
+import CreateUser from './Admin/CreateUser';
 
 export default (
   <Route name="app" path="/" handler={Application}>
@@ -21,10 +22,12 @@ export default (
       <Redirect
         from="adminUsers"
         to="adminUsersPaginated"
-        params={{perpage: 20, pagenumber: 5}}
+        params={{perpage: 20, pagenumber: 1}}
       />
 
+
       <Route name="adminUsers" path="/admin/users/" handler={Users} />
+      <Route name="createUser" path="/admin/users/create" handler={CreateUser} />
 
       <Route
         name="adminUsersPaginated"

@@ -56,6 +56,11 @@ export default React.createClass({
     );
   },
 
+  goToCreateUser(e) {
+    e.preventDefault();
+    this.context.router.transitionTo(`/admin/users/create`);
+  },
+
   render() {
     const paginator = (
       <Paginator
@@ -70,6 +75,13 @@ export default React.createClass({
     return (
       <div>
         <h1>Users</h1>
+        <div>
+          <button
+            className="button-primary"
+            onClick={this.goToCreateUser}>
+            Create user
+          </button>
+        </div>
         <input
           type="number"
           onChange={this.handleNumberInput}
@@ -82,6 +94,7 @@ export default React.createClass({
       </button>
 
         {paginator}
+
         {this.state.users.map(
           (user, index) =>
           <div
@@ -92,14 +105,16 @@ export default React.createClass({
             <h2>{user.local.email}</h2>
             <p>User level: {user.userLevel}</p>
             <button
-              className="button-primary"
+
               onClick={this.handleEditClick.bind(this, user._id)}>
               Edit
             </button>
           </div>
           )
         }
+
         {paginator}
+
       </div>
     );
   }

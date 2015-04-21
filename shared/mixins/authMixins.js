@@ -17,6 +17,12 @@ export const CheckAdminMixin = {
       if (!isLoggedIn) {
         debug('Redirecting from about to "/signin"...');
         transition.redirect('/signin', { reason: 'UNAUTHENTICATED' });
+        transition
+          .context
+          .executeAction(
+            'SAVE_UNAUTHENTICATED_NAVIGATION_TRANSITION',
+            transition
+          );
       } else {
         const isAuthorized = userLevel > 1 ||
           transition.context.user.userLevel > 1;
