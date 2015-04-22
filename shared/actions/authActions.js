@@ -42,7 +42,10 @@ export const logoutAction = ({dispatch}, payload, done) => {
     .end((err, res) => {
       debug('Response:', res);
       dispatch('LOGOUT');
-      dispatch('REDIRECT', {url: '/page/farts'});
+      dispatch('REDIRECT', {
+        url: '/',
+        flashMessage: 'Come back soon!'
+      });
       done && done();
     }
   );

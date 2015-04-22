@@ -20,13 +20,11 @@ export default (
     <Route name="signin" path="/signin" handler={SignIn}/>
     <Route name="admin" path="/admin/">
       <Redirect
-        from="adminUsers"
+        from="/admin/users/"
         to="adminUsersPaginated"
         params={{perpage: 20, pagenumber: 1}}
       />
 
-
-      <Route name="adminUsers" path="/admin/users/" handler={Users} />
       <Route name="createUser" path="/admin/users/create" handler={CreateUser} />
 
       <Route

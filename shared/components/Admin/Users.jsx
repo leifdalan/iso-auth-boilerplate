@@ -5,6 +5,7 @@ import ApplicationStore from '../../stores/ApplicationStore';
 import UserStore from '../../stores/UserStore';
 import navigateAction from '../../actions/navigate';
 import Paginator from './Paginator';
+import {CheckAdminMixin} from '../../mixins/authMixins';
 const debug = require('debug')('Component:Users');
 
 
@@ -15,7 +16,7 @@ export default React.createClass({
     router: React.PropTypes.func
   },
 
-  mixins: [FluxibleMixin],
+  mixins: [FluxibleMixin, CheckAdminMixin],
 
   statics: {
     storeListeners: [ApplicationStore, UserStore]

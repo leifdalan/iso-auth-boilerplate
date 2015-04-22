@@ -2,6 +2,7 @@
 import React from 'react';
 import {FluxibleMixin} from 'fluxible';
 import UserForm from './UserForm';
+import {CheckAdminMixin} from '../../mixins/authMixins';
 import {createUserAction} from '../../actions/userActions';
 
 export default React.createClass({
@@ -11,7 +12,7 @@ export default React.createClass({
     router: React.PropTypes.func
   },
 
-  mixins: [FluxibleMixin],
+  mixins: [FluxibleMixin, CheckAdminMixin],
 
   render() {
     return (

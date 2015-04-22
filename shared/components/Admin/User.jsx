@@ -3,6 +3,7 @@ import React from 'react';
 import {FluxibleMixin} from 'fluxible';
 import UserStore from '../../stores/UserStore';
 import UserForm from './UserForm';
+import {CheckAdminMixin} from '../../mixins/authMixins';
 import {editUserAction, deleteUserAction} from '../../actions/userActions';
 // const debug = require('debug')('Component:User');
 
@@ -10,7 +11,7 @@ import {editUserAction, deleteUserAction} from '../../actions/userActions';
 export default React.createClass({
   displayName: 'User',
 
-  mixins: [FluxibleMixin],
+  mixins: [FluxibleMixin, CheckAdminMixin],
 
   statics: {
     storeListeners: [UserStore]

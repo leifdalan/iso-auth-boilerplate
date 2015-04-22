@@ -12,7 +12,7 @@ body {
 
 .main-content {
   min-height: 200px;
-  background: rgba(255, 0, 0, .05);
+  position: relative;
 }
 
 .active {
@@ -88,7 +88,7 @@ body {
 
 .example-enter {
   opacity: 0.01;
-  transition:opacity .02s ease-in;
+  transition:opacity 2s ease-in;
   /* transform: scale(.1); */
   /* perspective: 800px; */
 }
@@ -99,15 +99,14 @@ body {
 }
 
 .example-leave {
-
+  position: absolute;
   opacity: 1;
-  transition:opacity .05s linear;
+  transition:opacity 2s linear;
   /* perspective: 800px; */
 
 }
 
 .example-leave.example-leave-active {
-  position: absolute;
   opacity: 0.01;
   /* transform: scale(1.5); */
 }
