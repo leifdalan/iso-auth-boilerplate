@@ -1,10 +1,16 @@
 import request from 'superagent';
 const debug = require('debug')('Action:authAction');
 
-export const loginAction = ({dispatch}, {email, password, user}, done) => {
+export const loginAction = (
+  {dispatch}, {
+    email,
+    password,
+    user,
+    reqAttempt
+  }, done) => {
 
   if (user) {
-    debug('LOGGING INTO APP WITH SERVER PASSALONG');
+    debug('SETTING LOGIN STATE PASSED FROM SERVER');
     debug(user);
     dispatch('LOGIN', user);
   } else {
@@ -21,7 +27,7 @@ export const loginAction = ({dispatch}, {email, password, user}, done) => {
         if (success) {
           dispatch('LOGIN', user);
           dispatch('REDIRECT', {
-            url: '/dashboard',
+            url: reqAttempt || '/dashboard',
             flashMessage: 'Welcome!'
           });
         } else {
@@ -65,7 +71,10 @@ export const signUpAction = ({dispatch}, {email, password, userLevel}, done) => 
       // debug(success, user);
       if (success) {
         dispatch('LOGIN', user);
-        dispatch('REDIRECT', {url: '/dashboard'});
+        dispatch('REDIRECT', {
+          url: '/dashboard',
+          flashMessage: 'Welcome to the site! Here\'s your dashboard.'
+        });
       } else {
         dispatch('FLASH_MESSAGE', message);
       }

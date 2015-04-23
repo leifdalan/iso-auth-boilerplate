@@ -107,13 +107,15 @@ export default React.createClass({
           </TransitionGroup>
           <div className="container">
             {Navigation}
-            <section className="main-content">
+
               <TransitionGroup component="div" transitionName="example">
-                <RouteHandler key={name} {...this.state} />
-                <button key={buttonName} onClick={this.log}>Log current application state</button>
-                {this.state.loggedIn && {loggedInForm}}
+                <section key={name} className="main-content" role="main">
+                  <RouteHandler key={name} {...this.state} />
+                  <button key={buttonName} onClick={this.log}>Log current application state</button>
+                  {this.state.loggedIn && {loggedInForm}}
+                </section>
               </TransitionGroup>
-            </section>
+
           </div>
         </div>
       </DocumentTitle>

@@ -19,15 +19,6 @@ export default React.createClass({
 
   handleSubmit(e) {
     e.preventDefault();
-    if (this.state.local &&
-        this.state.local.password === this.state.originalPassword) {
-      debug('Setting...');
-      this.setState({
-        local: {
-          email: this.state.local.email
-        }
-      });
-    }
     this.setState({
       lastUpdated: new Date()
     });
@@ -96,7 +87,7 @@ export default React.createClass({
             onChange={this.handleChange.bind(null, 'email')}
             value={this.state.local && this.state.local.email}
             />
-          <label htmlFor="password">password (encrypted)</label>
+          <label htmlFor="password">Change Password</label>
           <input
             type="text"
             id="password"
@@ -105,11 +96,13 @@ export default React.createClass({
             onChange={this.handleChange.bind(null, 'password')}
             value={this.state.local && this.state.local.password}
             />
+          <div>
           <button
             className="button-primary"
             type="submit">
-            {this.state.buttonText || 'Submit'}
+            {this.state.buttonText || 'Update User'}
           </button>
+          </div>
         </form>
       </div>
     );

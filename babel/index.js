@@ -22,6 +22,7 @@ import config from '../config';
 const {
   PUBLIC_PATH: PUBLICPATH,
   WEBPACK_DEV_SERVER_PORT: DEVSERVERPORT,
+  BROWSERSYNC_PORT: BSPORT,
   url: mongoUrl,
   HOSTNAME,
   PROTOCOL,
@@ -40,9 +41,10 @@ const PORT = process.env.PORT || DEVELOPMENT_PORT;
 debug('Environment Variables:');
 debug('REACT_CLIENT_RENDER: %s', process.env.REACT_CLIENT_RENDER);
 debug('REACT_SERVER_RENDER: %s', process.env.REACT_SERVER_RENDER);
-debug('WEBPACK_DEV_SERVER_PORT: %s', process.env.WEBPACK_DEV_SERVER_PORT);
 debug('NODE_ENV: %s', process.env.NODE_ENV);
 debug(`Dev server: ${PROTOCOL}${HOSTNAME}:${DEVSERVERPORT}${PUBLICPATH}`);
+debug(`Dev server: ${PROTOCOL}${HOSTNAME}:${BSPORT}`);
+
 // ----------------------------------------------------------------------------
 // Express middleware (order matters!)
 // ----------------------------------------------------------------------------
@@ -72,6 +74,24 @@ server.use(passport.session());
 // use connect-flash for flash messages stored in session
 server.use(flash());
 
+// Login into administrator automatically for certain development modes
+if (process.env.ALWAYS_ADMIN) {
+  let initialLogin = false;
+  server.use((req, res, next) => {
+    if (initialLogin) return next();
+    req.body = {email: 'admin', password: 'admin'};
+    passport.authenticate('local-login', (err, user) => {
+      req.logIn(user, function(loginErr) {
+        if (loginErr) {
+          return next(loginErr);
+        }
+        initialLogin = true;
+        next();
+      });
+    })(req, res, next);
+  })
+}
+
 // load our services and pass in our app and fully configured passport
 services(server);
 
@@ -94,24 +114,6 @@ server.use(favicon(path.join(__dirname, '../favicon.ico')));
 server.use(`${PUBLICPATH}`,
   express.static(path.join(__dirname, `../${PUBLICPATH}`))
 );
-//
-// if (process.env.ALWAYS_ADMIN) {
-//   let initialLogin = false;
-//   server.use((req, res, next) => {
-//     if (initialLogin) return next();
-//     req.body = {email: 'admin', password: 'admin'};
-//     passport.authenticate('local-login', (err, user) => {
-//
-//       req.logIn(user, function(loginErr) {
-//         if (loginErr) {
-//           return next(loginErr);
-//         }
-//         initialLogin = true;
-//         next();
-//       });
-//     })(req, res, next);
-//   })
-// }
 
 // Fluxible + react-router markup generator, attemps to send response.
 server.use(reactRender);
@@ -123,22 +125,37 @@ server.use((req, res) => {
   // failure or anything else that attaches abortNavigation to the
   // req object.
   // ---------------------------------------------------------------------------
-  if (req.abortNavigation) {
-    const {to, params, query} = req.abortNavigation;
-    debug('React aborting, attempting redirect.', to, params, query);
-    req.flash('flashMessage', CST[params.reason]);
-    to && res.redirect(to);
 
-    // TODO Make a sensible 500 page with React.renderToStaticMarkup.
-    const markup = `
-    <!DOCTYPE html>
-    <html>
-      <body>
-        <h1>Server error</h1>
-      </body>
+  // TODO Make a sensible 500 page with React.renderToStaticMarkup.
+  const markup500 = `
+  <!DOCTYPE html>
+  <html>
+    <body>
+      <h1>Server error</h1>
     </body>
-    `;
-    res.status(500).send(markup);
+  </body>
+  `;
+
+  if (req.abortNavigation) {
+    const {to, params, query, reactRenderError} = req.abortNavigation;
+    debug('React aborting, attempting redirect.', to, params, query);
+    if (params && params.reason) {
+      req.flash('flashMessage', CST[params.reason]);
+    }
+
+    debug('Attempted URL:', req.url);
+    req.flash('reqAttempt', req.url);
+
+    if (reactRenderError) {
+      res.status(500).send(markup500);
+    } else if (to) {
+      res.redirect(to);
+    }
+
+  } else {
+
+    // Everything is broken.
+    res.status(500).send(markup500);
   }
 });
 

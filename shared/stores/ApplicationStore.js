@@ -12,7 +12,8 @@ export default createStore({
     'CLEAR_REDIRECT': 'clearRedirect',
     'NAVIGATION_START': 'navigationStart',
     'NAVIGATION_ERROR': 'navigationError',
-    'FLASH_MESSAGE': 'flashMessagez'
+    'FLASH_MESSAGE': 'flashMessagez',
+    'SAVE_REQUEST_ATTEMPT': 'saveRequestAttempt'
   },
 
   navigationError() {
@@ -28,7 +29,12 @@ export default createStore({
     this.redirect = null;
     this.appIsLoading = null;
     this.flashMessage = null;
+    this.reqAttempt = null;
     this.userLevel = null;
+  },
+
+  saveRequestAttempt(message) {
+    this.reqAttempt = message;
   },
 
   flashMessagez(message) {
@@ -104,7 +110,8 @@ export default createStore({
       userLevel: this.userLevel,
       redirect: this.redirect,
       appIsLoading: this.appIsLoading,
-      flashMessage: this.flashMessage
+      flashMessage: this.flashMessage,
+      reqAttempt: this.reqAttempt
     };
   },
 
@@ -120,5 +127,6 @@ export default createStore({
     this.redirect = state.redirect;
     this.appIsLoading = state.appIsLoading;
     this.flashMessage = state.flashMessage;
+    this.reqAttempt = state.reqAttempt;
   }
 });

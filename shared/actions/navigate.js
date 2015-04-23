@@ -40,6 +40,9 @@ export default function ({dispatch}, payload, done) {
     if (resolution.flashMessage) {
       dispatch('FLASH_MESSAGE', resolution.flashMessage);
     }
+    if (resolution.reqAttempt) {
+      dispatch('SAVE_REQUEST_ATTEMPT', resolution.reqAttempt);
+    }
     done();
   }).catch((err) => {
     dispatch('NAVIGATION_ERROR', err);

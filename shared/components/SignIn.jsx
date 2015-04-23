@@ -25,7 +25,11 @@ export default React.createClass({
     debug('Logging in.');
     const {usernameValue: email, passwordValue: password} = this.state;
     if (!this.state.flashWarning) {
-      this.executeAction(loginAction, {email, password});
+      this.executeAction(loginAction, {
+        email,
+        password,
+        reqAttempt: this.state.reqAttempt
+      });
     }
   },
 

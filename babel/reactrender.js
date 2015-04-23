@@ -6,7 +6,7 @@ import app from '../shared/app';
 import Html from '../shared/components/Html';
 import DocumentTitle from 'react-document-title';
 import serialize from 'serialize-javascript';
-const debug = require('debug')('Fluxible-React-router');
+const debug = require('debug')('Server:ReactRouter');
 
 const htmlComponent = React.createFactory(Html);
 
@@ -39,6 +39,8 @@ export default function(req, res, next) {
   }
 
   debug('Prerender data:', req.preRender);
+
+
   const router = Router.create({
     routes: app.getComponent(),
     location: req.path,
@@ -64,68 +66,84 @@ export default function(req, res, next) {
     }
   });
 
-  router.run((Handler, routerState) => {
+  try {
+    router.run((Handler, routerState) => {
 
-    // Inject server data and login data for store consumption
-    routerState.preRender = req.preRender || {};
-    routerState.login = req.user;
+      // Inject server data and login data for store consumption
+      routerState.preRender = req.preRender || {};
+      routerState.login = req.user;
 
-    // Include flash messaging in initial server response
-    const flashMessage = req.flash('flashMessage');
-    if (flashMessage.length) {
-      debug('Flash message vvvvvvv');
-      debug(flashMessage);
-      routerState.preRender.flashMessage = flashMessage;
-    }
-
-    // Atempt fluxible action through the navigation flow
-    appContext.executeAction(navigateAction, routerState, (err) => {
-      if (err) {
-        debug('Navigate error:', err);
-        req.abortNavigation = true;
-        return next();
+      // Include flash messaging in initial server response
+      const flashMessage = req.flash('flashMessage');
+      if (flashMessage.length) {
+        debug('Flash message vvvvvvv');
+        debug(flashMessage);
+        routerState.preRender.flashMessage = flashMessage;
       }
 
-      // Passing window.App is the first part of the server/client relay
-      debug('Exposing appContext state');
-      const state = 'window.App=' + serialize(app.dehydrate(appContext)) + ';';
-      const component = React.createFactory(Handler);
-      const context = appContext.getComponentContext();
+      // Include "request attempt" for users who tried to navigate to an
+      // unauthorized route, which they may be able to return to after login.
+      const reqAttempt = req.flash('reqAttempt');
+      if (reqAttempt.length) {
+        routerState.preRender.reqAttempt = reqAttempt[0];
+      }
 
-      // Disable client rendering by not including script tag
-      const shouldClientRender = process.env.REACT_CLIENT_RENDER !== 'false';
-
-      // Only inject markup into the page when specified by REACT_SERVER_RENDER
-      let markup = '', title;
-      if (process.env.REACT_SERVER_RENDER !== 'false') {
-        if (!shouldClientRender) {
-
-          // Don't need data-react ids if there's no client code
-          markup = React.renderToStaticMarkup(component({context}));
-        } else {
-
-          // Include data-react-ids for client bootstrapping to prevent
-          // full client re-render on initialization.
-          markup = React.renderToString(component({context}));
-          title = DocumentTitle.rewind();
-          debug('DOCUMENT TITLE === %s', title);
+      // Atempt fluxible action through the navigation flow
+      appContext.executeAction(navigateAction, routerState, (err) => {
+        if (err) {
+          debug('Navigate error:', err);
+          req.abortNavigation = true;
+          return next();
         }
-      }
 
-      // Render document HTML
-      debug('Rendering Application component into HTML');
-      const html = React.renderToStaticMarkup(htmlComponent({
-        title,
-        markup,
-        state,
-        shouldClientRender
-      }));
+        // Passing window.App is the first part of the server/client relay
+        debug('Exposing appContext state');
+        const state = 'window.App=' + serialize(app.dehydrate(appContext)) + ';';
+        const component = React.createFactory(Handler);
+        const context = appContext.getComponentContext();
 
-      debug('Sending markup.');
-      res.send(
-        `<!DOCTYPE html>
-        ${html}`
-      );
-    }); // End appContext.executeAction
-  }); // End router.run
+        // Disable client rendering by not including script tag
+        const shouldClientRender = process.env.REACT_CLIENT_RENDER !== 'false';
+
+        // Only inject markup into the page when specified by REACT_SERVER_RENDER
+        let markup = '', title;
+        if (process.env.REACT_SERVER_RENDER !== 'false') {
+          if (!shouldClientRender) {
+
+            // Don't need data-react ids if there's no client code
+            markup = React.renderToStaticMarkup(component({context}));
+          } else {
+
+            // Include data-react-ids for client bootstrapping to prevent
+            // full client re-render on initialization.
+            markup = React.renderToString(component({context}));
+            title = DocumentTitle.rewind();
+            debug('DOCUMENT TITLE === %s', title);
+          }
+        }
+
+        // Render document HTML
+        debug('Rendering Application component into HTML');
+        const html = React.renderToStaticMarkup(htmlComponent({
+          title,
+          markup,
+          state,
+          shouldClientRender
+        }));
+
+        debug('Sending markup.');
+        res.send(
+          `<!DOCTYPE html>
+          ${html}`
+        );
+      }); // End appContext.executeAction
+    }); // End router.run
+  } catch(err) {
+    debug(err);
+    req.abortNavigation = {
+      error: err,
+      reactRenderError: true
+    }
+    next();
+  }
 };// server.use

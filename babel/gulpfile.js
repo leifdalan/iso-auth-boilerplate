@@ -9,7 +9,7 @@ import CST from '../shared/constants';
 import config from '../config';
 
 const debug = require('debug')('gulp:feedback');
-const $ = require('gulp-load-plugins')();
+const gp = require('gulp-load-plugins')();
 const {
   WEBPACK_DEV_SERVER_PORT: WPDEVPORT,
   DEVELOPMENT_PORT: DEVPORT,
@@ -18,7 +18,8 @@ const {
   PROTOCOL,
   BROWSER_RELOAD_TIMEOUT,
   DEBUG,
-  NODE_ENV
+  NODE_ENV,
+  PUBLIC_PATH
 } = config;
 const paths = {
   sharedJS: './shared/**/*',
@@ -36,37 +37,37 @@ gulp.task('server', (cb) => {
     }
   };
 
-  if ($.util.env.clientOnly) {
+  if (gp.util.env.clientOnly) {
     options.ignore = ['shared', 'src', 'node_modules', '!shared/routes.js'];
     options.env.REACT_CLIENT_RENDER = true;
     options.env.REACT_SERVER_RENDER = false;
-  } else if ($.util.env.serverOnly) {
+  } else if (gp.util.env.serverOnly) {
     options.ignore = ['node_modules'];
     options.env.REACT_SERVER_RENDER = true;
     options.env.REACT_CLIENT_RENDER = false;
-  } else if ($.util.env.iso) {
+  } else if (gp.util.env.iso) {
     options.ignore = ['node_modules'];
     options.env.REACT_SERVER_RENDER = true;
     options.env.REACT_CLIENT_RENDER = true;
   }
 
-  if ($.util.env.admin) {
+  if (gp.util.env.admin) {
     options.env.ALWAYS_ADMIN = true;
   }
 
-  if ($.util.env.ptod) {
+  if (gp.util.env.ptod) {
     options.env.NODE_ENV = 'production';
   }
 
   debug('NODEMON OPTIONS: ', options);
 
-  $.nodemon(options);
+  gp.nodemon(options);
   cb();
 });
 
 gulp.task('eslint', () => {
   return gulp.src([paths.sharedJS, paths.baseJS])
-    .pipe($.eslint({
+    .pipe(gp.eslint({
       globals: {
         document: true,
         console: true,
@@ -83,7 +84,7 @@ gulp.task('eslint', () => {
     .on('error', (error) => {
       debug(error);
     })
-    .pipe($.notify({
+    .pipe(gp.notify({
       message: (file) => {
         if (!file || !file.eslint || file.eslint.success || !file.eslint.messages.length) {
           // Don't show something if success
@@ -106,7 +107,7 @@ gulp.task('eslint', () => {
 gulp.task('devserver', (callback) => {
   // Start a webpack-dev-server
   new WebpackDevServer(webpack(webpackHotConfig), {
-    publicPath: '/dist/',
+    publicPath: `${PUBLIC_PATH}/`,
     hot: true,
     noInfo: true,
     stats: {
@@ -115,11 +116,11 @@ gulp.task('devserver', (callback) => {
   })
   .listen(WPDEVPORT, HOSTNAME, (err) => {
   if (err) {
-    $.notify(err);
-    throw new $.util.PluginError('webpack-dev-server', err);
+    gp.notify(err);
+    throw new gp.util.PluginError('webpack-dev-server', err);
 
   }
-  $.util.log('[webpack-dev-server]', webPackAddress);
+  gp.util.log('[webpack-dev-server]', webPackAddress);
   // keep the server alive or continue?
   callback();
   });
@@ -147,47 +148,47 @@ gulp.task('browser-reload', () => {
 gulp.task('less', (cb) => {
   debug('Lessing....');
   return gulp.src('src/less/main.less')
-    .pipe($.sourcemaps.init())
+    .pipe(gp.sourcemaps.init())
     .on('error', (err) => {
       debug(err);
       cb();
     })
-    .pipe($.less())
+    .pipe(gp.less())
     .on('error', (err) => {
-      $.notify(err);
+      gp.notify(err);
       debug(err);
       cb();
     })
-    .pipe($.sourcemaps.write({
+    .pipe(gp.sourcemaps.write({
       includeContent: false
     }))
     .on('error', (err) => {
       debug(err);
       cb();
     })
-    .pipe($.sourcemaps.init({
+    .pipe(gp.sourcemaps.init({
       loadMaps: true
     }))
     .on('error', (err) => {
       debug(err);
       cb();
     })
-    .pipe($.autoprefixer())
+    .pipe(gp.autoprefixer())
     .on('error', (err) => {
       debug(err);
       cb();
     })
-    .pipe($.sourcemaps.write('.'))
+    .pipe(gp.sourcemaps.write('.'))
     .on('error', (err) => {
       debug(err);
       cb();
     })
-    .pipe(gulp.dest('./dist'))
-    .pipe($.filter('**/*.css'))
+    .pipe(gulp.dest(`.${PUBLIC_PATH}`))
+    .pipe(gp.filter('**/*.css'))
     .pipe(browserSync.reload({
       stream: true
     }))
-    .pipe(gulp.dest('./dist')); // Copy to static dir
+    .pipe(gulp.dest(`.${PUBLIC_PATH}`)); // Copy to static dir
 });
 
 gulp.task('watch', () => {
@@ -203,8 +204,8 @@ gulp.task('clean', (cb) => {
 
 gulp.task('bundleJS', () => {
   return gulp.src('./client.js')
-    .pipe($.webpack(webpackConfig))
-    .pipe(gulp.dest('./dist/'));
+    .pipe(gp.webpack(webpackConfig))
+    .pipe(gulp.dest(`.${PUBLIC_PATH}/`));
 });
 
 gulp.task('dev', ['clean', 'watch', 'devserver', 'browser-sync', 'less', 'server']);
