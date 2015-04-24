@@ -19,11 +19,11 @@ export default React.createClass({
           <meta
             name="viewport"
             content="width=device-width, user-scalable=no" />
-          <link
+          {/* <link
             href="http://fonts.googleapis.com/css?family=Raleway"
             rel="stylesheet"
             type="text/css"
-          />
+          /> */}
           <link
             rel="stylesheet"
             href={`${PUBLIC_PATH}/main.css`}

@@ -1,11 +1,12 @@
 'use strict';
 import React from 'react';
 import {FluxibleMixin} from 'fluxible';
-import ApplicationStore from '../../stores/ApplicationStore';
 import UserStore from '../../stores/UserStore';
 import navigateAction from '../../actions/navigate';
 import Paginator from './Paginator';
 import {CheckAdminMixin} from '../../mixins/authMixins';
+import {searchUserAction} from '../../actions/userActions';
+import {isClient} from '../../../utils';
 const debug = require('debug')('Component:Users');
 
 
@@ -19,7 +20,7 @@ export default React.createClass({
   mixins: [FluxibleMixin, CheckAdminMixin],
 
   statics: {
-    storeListeners: [ApplicationStore, UserStore]
+    storeListeners: [UserStore]
   },
 
   getInitialState() {
@@ -29,12 +30,22 @@ export default React.createClass({
       return user;
     });
     state.users = users;
+    state.pageAdjustment && this._adjustPageBounds(state);
     return state;
   },
 
-  onChange() {
-    const state = this.getStore(UserStore).getState();
+  _adjustPageBounds(state) {
+    if (isClient()) {
+      const pathArray = window.location.pathname.split('/');
+      const queryString = window.location.search;
+      pathArray[5] = state.currentPageNumber;
+      window.history.replaceState({}, {}, `${pathArray.join('/')}${queryString}`);
+    }
+  },
 
+  onChange() {
+    let state = this.getStore(UserStore).getState();
+    state.pageAdjustment && this._adjustPageBounds(state);
     this.setState(state);
   },
 
@@ -57,6 +68,9 @@ export default React.createClass({
   handleButton(e) {
     e.preventDefault();
     const perpage = this.state.perPageInput || this.state.perpage;
+    if (this.state.searchValue && isClient()) {
+      window.history.pushState({}, {}, `?s=${this.state.search}`);
+    }
     this.context.router.transitionTo(
       `/admin/users/page/${perpage}/1`
     );
@@ -74,6 +88,22 @@ export default React.createClass({
       return user;
     });
     this.setState({users});
+  },
+
+  handleSearchInput(e) {
+    this.setState({
+      search: e.target.value
+    });
+
+    if (e.target.value.length === 0 && isClient()) {
+      // Remove query string if the search bar is empty. It's ugly.
+      window.history.replaceState({}, {}, window.location.href.split('?')[0]);
+    } else {
+      window.history.replaceState({}, {}, `?s=${e.target.value}`);
+    }
+
+    this.executeAction(searchUserAction, e.target.value);
+
   },
 
   handleCheck(_id) {
@@ -95,28 +125,30 @@ export default React.createClass({
       />
     );
 
-    return (
+    const noUsers = (
+      <h2>No users match{` "${this.state.search}"`}!</h2>
+    );
+
+    const userForm = (
       <div>
-        <h1>Users</h1>
-        <div>
-          <button
-            className="button-primary"
-            onClick={this.goToCreateUser}>
-            Create user
-          </button>
-        </div>
         <input
           type="number"
           onChange={this.handleNumberInput}
           value={this.state.perPageInput}
           placeholder={`Items per page (${this.state.perpage})`}
         />
-      <button
-        onClick={this.handleButton}>
-        Update Items/page
-      </button>
+        <button
+          onClick={this.handleButton}>
+          Update Items/page
+        </button>
 
         {paginator}
+
+        {this.state.search &&
+          <small>
+            {`"${this.state.search}" matches ${this.state.totalUsers} users`}
+          </small>
+        }
 
         <table className="user-table">
           <thead>
@@ -166,7 +198,29 @@ export default React.createClass({
         </table>
 
         {paginator}
+      </div>
+    );
 
+    const body = this.state.users.length ? userForm : noUsers;
+
+    return (
+      <div>
+        <h1>Users</h1>
+        <div>
+          <button
+            className="button-primary"
+            onClick={this.goToCreateUser}>
+            Create user
+          </button>
+            <input
+              className="user-search"
+              type="search"
+              onChange={this.handleSearchInput}
+              value={this.state.search}
+              placeholder={`Search for users`}
+            />
+        </div>
+        {body}
       </div>
     );
   }

@@ -31,11 +31,14 @@ export default React.createClass({
 
   navigate() {
     debug(`${this.props.pathBase}${this.props.perpage}/${this.props.pagenumber}`);
+    const query = window.location.href.split('?')[1] ?
+      `?${window.location.href.split('?')[1]}` :
+      ``;
     this
       .context
       .router
       .transitionTo(
-        `${this.props.pathBase}${this.props.perpage}/${this.props.pagenumber}`
+        `${this.props.pathBase}${this.props.perpage}/${this.props.pagenumber}${query}`
       );
   },
 

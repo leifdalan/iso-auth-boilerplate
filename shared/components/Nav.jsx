@@ -74,12 +74,8 @@ export default React.createClass({
               </Link>
             </li>
           }
-          {this.props.loggedIn &&
-            {loggedInLinks}
-          }
-          {this.props.userLevel > 1 &&
-            {adminLink}
-          }
+          {this.props.loggedIn && loggedInLinks}
+          {this.props.userLevel > 1 && adminLink}
 
         </ul>
       </div>

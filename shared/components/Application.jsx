@@ -3,6 +3,7 @@ import React from 'react';
 import Nav from './Nav';
 import AdminNav from './Admin/AdminNav';
 import ApplicationStore from '../stores/ApplicationStore';
+import UserStore from '../stores/UserStore';
 import {RouteHandler, Navigation} from 'react-router';
 import {loginAction, logoutAction} from '../actions/authActions';
 import clearRedirect from '../actions/clearRedirect';
@@ -62,6 +63,8 @@ export default React.createClass({
 
   log() {
     const state = this.getStore(ApplicationStore).getState();
+    const userState = this.getStore(UserStore).getState();
+    debug(userState);
     debug(state);
   },
 
@@ -112,7 +115,7 @@ export default React.createClass({
                 <section key={name} className="main-content" role="main">
                   <RouteHandler key={name} {...this.state} />
                   <button key={buttonName} onClick={this.log}>Log current application state</button>
-                  {this.state.loggedIn && {loggedInForm}}
+                  {this.state.loggedIn && loggedInForm}
                 </section>
               </TransitionGroup>
 

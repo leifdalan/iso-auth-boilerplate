@@ -3,7 +3,8 @@ import React from 'react';
 import {FluxibleMixin} from 'fluxible';
 import UserStore from '../../stores/UserStore';
 import PaginatorLink from './PaginatorLink';
-// const debug = require('debug')('Component:Paginator');
+let debug = require('debug');
+debug = debug('Component:Paginator');
 
 
 export default React.createClass({
@@ -35,22 +36,27 @@ export default React.createClass({
     return this.props.currentPageNumber > 1;
   },
 
-  componentWillMount() {
-    const {totalItems, perpage} = this.props;
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      totalPages: this._getTotalPages(nextProps)
+    });
+  },
+
+  _getTotalPages(props) {
+    const {totalItems, perpage} = props;
     let totalPages = totalItems / perpage;
     const remainder = totalItems % perpage;
     totalPages = remainder ? Math.floor(totalPages) + 1 : totalPages;
-
-    this.setState({totalPages});
+    return totalPages;
   },
 
   getInitialState() {
-
-    return this.getStore(UserStore).getState();
+    return {totalPages: this._getTotalPages(this.props)};
   },
 
   onChange() {
     const state = this.getStore(UserStore).getState();
+    this.forceUpdate();
     this.setState(state);
   },
 
@@ -66,6 +72,7 @@ export default React.createClass({
             currentPageNumber={this.props.currentPageNumber}
             pathBase={this.props.pathBase}
             pagenumber={i}
+            key={i}
             perpage={this.props.perpage}
           />
         );
@@ -77,12 +84,13 @@ export default React.createClass({
     }
 
     if (!atBeginning) {
-      middleMarkup.unshift(<span> ... </span>);
+      middleMarkup.unshift(<span key="begin"> ... </span>);
       middleMarkup.unshift(
         <PaginatorLink
           currentPageNumber={this.props.currentPageNumber}
           pathBase={this.props.pathBase}
           pagenumber={1}
+          key={1}
           perpage={this.props.perpage}
         />
       );
@@ -95,6 +103,7 @@ export default React.createClass({
             currentPageNumber={this.props.currentPageNumber}
             pathBase={this.props.pathBase}
             pagenumber={i}
+            key={i}
             perpage={this.props.perpage}
           />
         );
@@ -104,12 +113,13 @@ export default React.createClass({
       }
     }
     if (!atEnd) {
-      middleMarkup.push(<span> ... </span>);
+      middleMarkup.push(<span key="end"> ... </span>);
       middleMarkup.push(
         <PaginatorLink
           currentPageNumber={this.props.currentPageNumber}
           pathBase={this.props.pathBase}
           pagenumber={totalPages}
+          key={totalPages}
           perpage={this.props.perpage}
         />
       );
@@ -119,7 +129,6 @@ export default React.createClass({
   },
 
   render() {
-
     const shouldrender = this.state.totalPages > 1;
     return (
       <div className="paginator">

@@ -25,6 +25,29 @@ export const editUserAction = ({dispatch}, payload, done) => {
     }
   );
 };
+export const searchUserAction = ({dispatch}, payload, done) => {
+  request
+    .get(`?s=${payload}`)
+    .send(payload)
+    .set('Accept', 'application/json')
+    .set('X-Requested-With', 'XMLHttpRequest')
+    .end((xhrError, res) => {
+      const {success, error} = res.body;
+      if (xhrError || res.badRequest) {
+        debug(xhrError || res.badRequest);
+        dispatch('FLASH_MESSAGE', 'Bad Request.');
+      } else {
+        if (success) {
+          dispatch('adminUsersPaginated_PAYLOAD', res.body);
+        } else if (error) {
+          dispatch('adminUserEdit_FAILURE', error);
+          dispatch('FLASH_MESSAGE', error);
+        }
+      }
+      done && done();
+    }
+  );
+};
 
 export const deleteUserAction = ({dispatch}, payload, done) => {
   debug('Logging out.');

@@ -16,8 +16,10 @@ export default createStore({
     this.users = [];
     this.totalUsers = null;
     this.singleUser = null;
+    this.search = null;
     this.currentPageNumber = null;
     this.perpage = null;
+    this.pageAdjustment = null;
     this._lastValidSingleUser = null;
   },
 
@@ -27,6 +29,8 @@ export default createStore({
     this.totalUsers = payload.totalUsers;
     this.currentPageNumber = payload.currentPageNumber;
     this.perpage = payload.perpage;
+    this.pageAdjustment = payload.pageAdjustment;
+    this.search = payload.search;
     this.emitChange();
   },
 
@@ -51,6 +55,8 @@ export default createStore({
       singleUser: this.singleUser,
       perpage: this.perpage,
       currentPageNumber: this.currentPageNumber,
+      search: this.search,
+      pageAdjustment: this.pageAdjustment,
       totalUsers: this.totalUsers
     };
   },
@@ -64,6 +70,8 @@ export default createStore({
     this.totalUsers = state.totalUsers;
     this.singleUser = state.singleUser;
     this.perpage = state.perpage;
+    this.search = state.search;
+    this.pageAdjustment = state.pageAdjustment;
     this.currentPageNumber = state.currentPageNumber;
   }
 });

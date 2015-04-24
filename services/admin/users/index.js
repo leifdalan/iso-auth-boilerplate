@@ -39,34 +39,53 @@ export function create(req, res, next) {
 
 export function get(req, res, next) {
   const {perpage, currentPageNumber} = req.params;
-  let data;
+  debug(req.query.s);
+  const search = req.query.s;
+
+  let filter = {}, data;
+  if (search) {
+    filter = {
+      'local.email': new RegExp(search, 'i')
+    }
+  }
 
   // TODO use generators + Promises for multiple async
   // http://davidwalsh.name/async-generators
-  User.find({})
-    .limit(perpage)
-    .skip((currentPageNumber - 1) * perpage)
-    .exec((paginateError, users) => {
-      if (paginateError) {
+    User.count(filter, (countError, totalUsers) => {
+      if (countError) {
         data = {
           success: false,
-          error: paginateError
+          error: countError
         }
         sendData({data, req, res, next});
       } else {
-        User.count({}, (countError, totalUsers) => {
-          if (countError) {
+        if (totalUsers < currentPageNumber * perpage) {
+
+          var newPageNumber = Math.floor(totalUsers / Number(perpage) + 1);
+          debug('adjusting...', totalUsers, Number(perpage), newPageNumber);
+          var pageAdjustment = newPageNumber;
+        }
+        const pageNumber = newPageNumber || Number(currentPageNumber);
+        User.find(filter)
+          .limit(perpage)
+          .skip((pageNumber - 1) * perpage)
+          .exec((paginateError, users) => {
+
+          if (paginateError) {
             data = {
               success: false,
-              error: countError
+              error: paginateError
             }
+
           } else {
             data = {
               success: true,
               perpage: Number(perpage),
-              currentPageNumber: Number(currentPageNumber),
+              currentPageNumber: pageNumber,
+              search: req.query.s,
               users,
-              totalUsers
+              totalUsers,
+              pageAdjustment
             };
           }
           sendData({data, req, res, next});
