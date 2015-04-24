@@ -42,8 +42,9 @@ debug('Environment Variables:');
 debug('REACT_CLIENT_RENDER: %s', process.env.REACT_CLIENT_RENDER);
 debug('REACT_SERVER_RENDER: %s', process.env.REACT_SERVER_RENDER);
 debug('NODE_ENV: %s', process.env.NODE_ENV);
-debug(`Dev server: ${PROTOCOL}${HOSTNAME}:${DEVSERVERPORT}${PUBLICPATH}`);
-debug(`Dev server: ${PROTOCOL}${HOSTNAME}:${BSPORT}`);
+debug('ALWAYS_ADMIN: %s', process.env.ALWAYS_ADMIN);
+debug(`Webpack Dev Server: ${PROTOCOL}${HOSTNAME}:${DEVSERVERPORT}${PUBLICPATH}`);
+debug(`BrowserSync Dev Server: ${PROTOCOL}${HOSTNAME}:${BSPORT}`);
 
 // ----------------------------------------------------------------------------
 // Express middleware (order matters!)

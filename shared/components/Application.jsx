@@ -94,7 +94,7 @@ export default React.createClass({
                 key="flashMessage"
                 ref="flashMessage"
                 onClick={this.clearFlash}
-                className="u-full-width button-primary flash">
+                className="u-full-width button button-primary flash">
                 {this.state.flashMessage}
               </button>
             }

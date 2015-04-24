@@ -14,29 +14,36 @@ import CreateUser from './Admin/CreateUser';
 
 export default (
   <Route name="app" path="/" handler={Application}>
-    <Route name="about" static="true" handler={About}/>
+    <DefaultRoute name="home" handler={Home}/>
+    <Route name="about" handler={About}/>
     <Route name="page" path="/page/:id" handler={Page}/>
-    <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
-    <Route name="signin" path="/signin" handler={SignIn}/>
-    <Route name="admin" path="/admin">
-      <Redirect
-        from="/admin/users"
-        to="adminUsersPaginated"
-        params={{perpage: 20, pagenumber: 1}}
-      />
+    <Route name="dashboard" handler={Dashboard}/>
+    <Route name="signin" handler={SignIn}/>
 
-    <Route name="createUser" path="/admin/users/create" handler={CreateUser} />
-
-      <Route
-        name="adminUsersPaginated"
-        path="/admin/users/page/:perpage/:pagenumber"
-        handler={Users}
-      />
-      <Route name="adminUserEdit" path="/admin/users/:id" handler={User} />
+    <Route name="admin">
       <DefaultRoute name="adminDashboard" handler={AdminIndex}/>
+      <Route name="users">
+        <Route path="create" name="createUser" handler={CreateUser} />
+        <Route path=":id" name="adminUserEdit" handler={User} />
+
+        <Route path="page/:perpage/:pagenumber"
+          name="adminUsersPaginated"
+          handler={Users}
+        />
+        {/* Redirect users and users/page to paginated */}
+        <Redirect
+          from="/admin/users/?"
+          to="adminUsersPaginated"
+          params={{perpage: 20, pagenumber: 1}}
+        />
+        <Redirect
+          from="/admin/users/page/?"
+          to="adminUsersPaginated"
+          params={{perpage: 20, pagenumber: 1}}
+        />
+      </Route>
     </Route>
 
-    <DefaultRoute name="home" handler={Home}/>
     <NotFoundRoute handler={NotFound}/>
   </Route>
 );

@@ -9,22 +9,29 @@ export default function ({dispatch}, payload, done) {
 
   new RSVP.Promise((resolve, reject) => {
     if (payload.preRender) {
-      debug('preRendering...');
+      debug('PreRender data exists, attaching...');
       resolve(payload.preRender);
     } else {
-      dispatch('NAVIGATION_START');
+      dispatch('REQUEST_START');
       request
         .get(payload.path)
         .set('Accept', 'application/json')
         .set('X-Requested-With', 'XMLHttpRequest')
-        .end(function(err, res) {
-          if (err) {
-            debug(err);
-            reject(err);
+        .end(function(xhrError, res) {
+          const {error} = res;
+          if (xhrError || res.badRequest) {
+            debug(xhrError || res.badRequest);
+            reject(xhrError || res.badRequest);
           } else {
-            debug('Navigation Response--------');
-            debug(res);
-            resolve(res);
+            if (error) {
+              debug('Navigation error');
+              debug(error);
+              reject(error);
+            } else {
+              debug('Navigation response:');
+              debug(res);
+              resolve(res);
+            }
           }
       });
     }
@@ -45,6 +52,9 @@ export default function ({dispatch}, payload, done) {
     }
     done();
   }).catch((err) => {
-    dispatch('NAVIGATION_ERROR', err);
+    debug('Navigation error promise catch', err);
+    dispatch('NAVIGATION_ERROR',
+      `Oops, having problems navigating to ${payload.path}`
+    );
   });
 }

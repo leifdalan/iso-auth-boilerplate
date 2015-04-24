@@ -8,10 +8,18 @@ const debug = require('debug')('Routes');
 // whether its the first request or an in-app XHR.
 export function sendData({data, req, res, next}) {
   debug('Sending data:');
+  const {success, error, payload} = data;
   if (req.xhr) {
     debug('Via XHR');
-    res.status(200).json(data);
+    if (error) {
+      debug('Error sending data:', error);
+      res.status(400).json(data);
+    } else {
+      res.status(200).json(data);
+    }
+
   } else {
+    // TODO handle bad requests on the pass-a-long
     debug('Passing data along to server render.');
     req.preRender = data;
     next();
@@ -32,6 +40,8 @@ export default function(server) {
       next();
     }
   });
+
+
 
   // ----------------------------------------------------------------------------
   // Authorization endpoints
@@ -56,5 +66,16 @@ export default function(server) {
   server.get('/admin/users/:id', isLoggedIn, isAdmin, getOne);
   server.put('/admin/users/:id', isLoggedIn, isAdmin, update);
   server.delete('/admin/users/:id', isLoggedIn, isAdmin, deleteUser);
+
+  // Blacklist undefined http verbs routes
+  function fourHundred(req, res) {
+    res.status(400).json({
+      success: false,
+      error: 'Not allowed.'
+    });
+  }
+  server.delete('*', fourHundred)
+  server.put('*', fourHundred)
+  server.post('*', fourHundred)
 
 };

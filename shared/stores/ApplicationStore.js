@@ -10,15 +10,17 @@ export default createStore({
     'LOGOUT': 'logout',
     'REDIRECT': 'setRedirect',
     'CLEAR_REDIRECT': 'clearRedirect',
-    'NAVIGATION_START': 'navigationStart',
+    'REQUEST_START': 'requestStart',
+    'REQUEST_END': 'requestEnd',
     'NAVIGATION_ERROR': 'navigationError',
     'FLASH_MESSAGE': 'flashMessagez',
     'SAVE_REQUEST_ATTEMPT': 'saveRequestAttempt'
   },
 
-  navigationError() {
+  navigationError(payload) {
     this.setRedirect({
-      url: '/'
+      url: '/',
+      flashMessage: payload
     });
   },
 
@@ -45,8 +47,14 @@ export default createStore({
     this.emitChange();
   },
 
-  navigationStart() {
+  requestStart() {
     this.appIsLoading = true;
+    this.flashMessage = null;
+    this.emitChange();
+  },
+
+  requestEnd() {
+    this.appIsLoading = false;
     this.flashMessage = null;
     this.emitChange();
   },

@@ -64,7 +64,7 @@ export default React.createClass({
 
   goToCreateUser(e) {
     e.preventDefault();
-    this.context.router.transitionTo(`/admin/users/create`);
+    this.context.router.transitionTo('createUser');
   },
 
   handleCheckAll() {
@@ -130,7 +130,7 @@ export default React.createClass({
               <td>Username</td>
               <td>User Level</td>
               <td>
-                <button>
+                <button onClick={() => window.alert('Coming soon :)')}>
                   Bulk Edit
                 </button>
               </td>
@@ -155,7 +155,6 @@ export default React.createClass({
                 <td>{user.userLevel}</td>
                 <td>
                   <button
-
                     onClick={this.handleEditClick.bind(this, user._id)}>
                     Edit
                   </button>

@@ -24,6 +24,13 @@ body {
   background: #eee;
   position: fixed;
   top: 0;
+  z-index:1;
+}
+
+.flash {
+  white-space: normal;
+  height: auto;
+  border-radius: 0;
 }
 
 .main-nav {
@@ -157,7 +164,7 @@ body {
 
 
 .loading-bar {
-  background: #33C3F0;
+  background: red;
   height: 2px;
   position: fixed;
   top: 0;
@@ -169,7 +176,6 @@ body {
 
 .loading-enter {
   width: 0%;
-  background: #33C3F0;
   height: 2px;
   transition: width .2s ease-in;
 }
@@ -180,7 +186,6 @@ body {
 }
 
 .loading-leave {
-  background: #33C3F0;
   height: 2px;
   position: fixed;
   width: 90%;

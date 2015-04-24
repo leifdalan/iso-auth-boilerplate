@@ -18,6 +18,7 @@ export default React.createClass({
   mixins: [FluxibleMixin],
 
   handleSubmit(e) {
+    debug();
     e.preventDefault();
     this.setState({
       lastUpdated: new Date()
@@ -97,11 +98,11 @@ export default React.createClass({
             value={this.state.local && this.state.local.password}
             />
           <div>
-          <button
-            className="button-primary"
-            type="submit">
-            {this.state.buttonText || 'Update User'}
-          </button>
+            <button
+              className="button-primary"
+              type="submit">
+              {this.state.buttonText || 'Update User'}
+            </button>
           </div>
         </form>
       </div>

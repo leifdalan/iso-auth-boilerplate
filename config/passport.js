@@ -140,7 +140,7 @@ export default function(passport) {
             if (user) {
               debug('Signup Error, user already exists.');
               return done(
-                {message: 'User already exists.'}, false,
+                {message: `${email} already exists.`}, false,
                 req.flash('signupMessage', 'That email is already taken.'));
             } else {
 

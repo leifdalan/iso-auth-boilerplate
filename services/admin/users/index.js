@@ -14,79 +14,108 @@ export function redirect(req, res) {
 
 export function create(req, res, next) {
   debug('Creating user');
-  passport.authenticate('local-signup', (err, user) => {
-    let data = {};
-
-    const failMessage = {
-      success: false,
-      message: 'Well, that didn\'t work.'
-    };
-    if (err) {
-      return res.status(401).json(err);
+  passport.authenticate('local-signup', (error, user) => {
+    let data;
+    if (error) {
+      data = {
+        success: false,
+        error: error,
+        errorFor: error.errors
+      }
+    } else if (!user) {
+      data = {
+        success: false,
+        error: 'User couldn\'t be created.'
+      }
+    } else {
+      data = {
+        success: `User ${user.local.email} created successfully`,
+        user
+      }
     }
-    if (!user) {
-      return res.status(401).json(err);
-    }
-
-    res.status(200).send({
-      success: true,
-      message: `User ${user.local.email} created successfully`,
-      user
-    });
+    sendData({data, req, res, next});
   })(req, res, next);
 }
 
 export function get(req, res, next) {
   const {perpage, currentPageNumber} = req.params;
-  let data = {
-    perpage: Number(perpage),
-    currentPageNumber: Number(currentPageNumber)
-  };
+  let data;
 
   // TODO use generators + Promises for multiple async
   // http://davidwalsh.name/async-generators
   User.find({})
     .limit(perpage)
     .skip((currentPageNumber - 1) * perpage)
-    .exec((err, users) => {
-      User.count({}, (countError, totalUsers) => {
-        data.totalUsers = totalUsers;
-        if (err) {
-          debug('USER ERROR', err);
-          sendData({err, req, res, next});
-        } else {
-          data.users = users;
-          // debug('USERS', users);
-          sendData({data, req, res, next});
+    .exec((paginateError, users) => {
+      if (paginateError) {
+        data = {
+          success: false,
+          error: paginateError
         }
-      });
+        sendData({data, req, res, next});
+      } else {
+        User.count({}, (countError, totalUsers) => {
+          if (countError) {
+            data = {
+              success: false,
+              error: countError
+            }
+          } else {
+            data = {
+              success: true,
+              perpage: Number(perpage),
+              currentPageNumber: Number(currentPageNumber),
+              users,
+              totalUsers
+            };
+          }
+          sendData({data, req, res, next});
+        });
+      }
 
     });
 };
 
 export function getOne(req, res, next) {
   debug('GETTING USER');
-  User.findOne({
-    _id: req.params.id
-    },
-    (err, user) => {
-    if (err) {
-      err.success = false;
-      debug('USER ERROR', err);
-      sendData({data: err, req, res, next});
-    } else {
-      debug('USER:', user);
-      user.success = true;
-      sendData({data: user, req, res, next});
+  if (req.params.id === 'create') {
+    const data = {
+      success: true
     }
-  });
+    sendData({data, req, res, next});
+  } else {
+    User.findOne({_id: req.params.id}, (error, user) => {
+      let data;
+      if (error) {
+        data = {
+          success: false,
+          error
+        }
+        debug('USER ERROR', error);
+        sendData({data, req, res, next});
+      } else {
+        if (!user) {
+          data = {
+            success: false,
+            error: `No user found for ${req.params.id}`
+          }
+        } else {
+          data = user;
+          data.success = true
+        }
+        debug('USER DATA', data);
+        sendData({data: user, req, res, next});
+      }
+    });
+  }
 }
+
 
 export function update(req, res, next) {
   debug('SETTING USER');
 
   // Encrypt new password, if it exists in the req.body.
-  if (req.body.local.password) {
+  if (req.body && req.body.local && req.body.local.password) {
     let tempUser = new User();
     req.body.local.password = tempUser.generateHash(req.body.local.password);
   }
@@ -95,45 +124,48 @@ export function update(req, res, next) {
     {_id: req.params.id},
     req.body,
     {'new': true},
-    (err, user) => {
-      if (err) {
-        const data = {
-          error: err,
+    (error, user) => {
+      let data;
+      if (error) {
+        data = {
+          error,
           success: false
         };
-
-        debug('USER ERROR', err);
-        err.success = false;
-        sendData({data: data, req, res, next});
+        debug('USER ERROR', error);
+        sendData({data, req, res, next});
       } else {
-        const data = {
-          user,
-          success: {
-            message: 'User saved successfully.'
-          }
-        };
-
-        user.success = true;
-        // debug('USERS', user);
-        sendData({data: data, req, res, next});
+        if (!user) {
+          data = {
+            success: false,
+            error: `No user found for ${req.params.id}`
+          };
+        } else {
+          data = {
+            user,
+            success: {
+              message: `${user.local.email} saved successfully.`
+            }
+          };
+        }
+        sendData({data, req, res, next});
       }
     });
 }
 
 export function deleteUser(req, res, next) {
   debug('DELETING USER');
-  User.findByIdAndRemove(req.params.id, (err, user) => {
+  User.findByIdAndRemove(req.params.id, (error, user) => {
     let data = {};
-    if (err) {
+    if (error) {
       data = {
         success: false,
-        error: err
+        error
       };
       debug('Deletion error');
     } else {
       data = {
         success: {
-          message: `${user.local.email} deleted successfully`
+          message: `"${user.local.email}" deleted successfully`
         },
         user
       };
