@@ -56,7 +56,6 @@ export default React.createClass({
 
   onChange() {
     const state = this.getStore(UserStore).getState();
-    this.forceUpdate();
     this.setState(state);
   },
 

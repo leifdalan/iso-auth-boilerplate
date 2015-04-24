@@ -7,6 +7,7 @@ import Paginator from './Paginator';
 import {CheckAdminMixin} from '../../mixins/authMixins';
 import {searchUserAction} from '../../actions/userActions';
 import {isClient} from '../../../utils';
+import _ from 'lodash';
 const debug = require('debug')('Component:Users');
 
 
@@ -23,10 +24,27 @@ export default React.createClass({
     storeListeners: [UserStore]
   },
 
+  _setHighlightedMarkup(user, searchLetters) {
+    if (typeof user.local.email === 'string') {
+      let markup = [].map.call(user.local.email, (letter) =>
+        _.include(searchLetters, letter) ?
+          <span className="search-term">{letter}</span> :
+          <span>{letter}</span>
+      );
+      const userMarkup = <span>{markup}</span>;
+      user.local.email = userMarkup;
+
+    }
+  },
+
   getInitialState() {
     let state = this.getStore(UserStore).getState();
-    let users = state.users.map((user) => {
+    const users = state.users.map((user) => {
       user.selected = false;
+      const searchLetters = state.search.split('');
+      state.search &&
+
+        this._setHighlightedMarkup(user, searchLetters);
       return user;
     });
     state.users = users;
@@ -44,19 +62,14 @@ export default React.createClass({
   },
 
   onChange() {
+    debug('Changin...');
     let state = this.getStore(UserStore).getState();
+    if (state.search) {
+      const searchLetters = state.search.split('');
+      state.users.map((user) => this._setHighlightedMarkup(user, searchLetters));
+    }
     state.pageAdjustment && this._adjustPageBounds(state);
     this.setState(state);
-  },
-
-  handleClick(id, e) {
-    debug(id);
-    debug(e);
-  },
-
-  handleEditClick(id, e) {
-    e.preventDefault();
-    this.context.router.transitionTo(`/admin/users/${id}`);
   },
 
   handleNumberInput(e) {
@@ -187,7 +200,8 @@ export default React.createClass({
                 <td>{user.userLevel}</td>
                 <td>
                   <button
-                    onClick={this.handleEditClick.bind(this, user._id)}>
+                    onClick={() =>
+                      this.context.router.transitionTo(`/admin/users/${user._id}`)}>
                     Edit
                   </button>
                 </td>
