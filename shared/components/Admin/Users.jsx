@@ -41,10 +41,13 @@ export default React.createClass({
     let state = this.getStore(UserStore).getState();
     const users = state.users.map((user) => {
       user.selected = false;
-      const searchLetters = state.search.split('');
-      state.search &&
 
+      state.search {
+        const searchLetters = state.search.split('');
         this._setHighlightedMarkup(user, searchLetters);
+      }
+
+
       return user;
     });
     state.users = users;
