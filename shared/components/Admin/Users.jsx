@@ -326,9 +326,9 @@ export default React.createClass({
         {body}
 
         <Modal
-          title={`Bulk editing ${this.state.userCount} Users`}
+          title={`Bulkz editing ${this.state.userCount} Users`}
           show={this.state.show}
-          onHide={() => this.setState({show: false})}>
+          onHide={() => this.setState({show: false, showConfirm: false})}>
 
           <UserForm handleSubmit={() => this.setState({showConfirm: true})} />
           <ConfirmationPopup

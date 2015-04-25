@@ -16,6 +16,7 @@ export default React.createClass({
         <head>
           <meta charSet="utf-8" />
           <title>{this.props.title}</title>
+          <meta name="theme-color" content="#33C3F0" />
           <meta
             name="viewport"
             content="width=device-width, user-scalable=no" />
