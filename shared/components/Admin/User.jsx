@@ -35,10 +35,14 @@ export default React.createClass({
     this.executeAction(deleteUserAction, this.state);
   },
 
+  handleSubmit(formState) {
+    this.executeAction(editUserAction, formState);
+  },
+
   render() {
     return (
       <div>
-        <UserForm {...this.state} action={editUserAction} />
+        <UserForm {...this.state} handleSubmit={this.handleSubmit} />
 
         <button onClick={this.handleDelete}>Delete User</button>
       </div>

@@ -10,6 +10,8 @@ import {updateResultsAction, editManyUsersAction} from '../../actions/userAction
 import {isClient, upsertQuery} from '../../../utils';
 import Modal from 'react-bootstrap-modal';
 import UserForm from './UserForm';
+import ResultsTable from './ResultsTable';
+
 import _ from 'lodash';
 // const debug = require('debug')('Component:Users');
 
@@ -45,11 +47,11 @@ export default React.createClass({
     let state = this.getStore(UserStore).getState();
     const users = state.users.map((user) => {
       user.selected = false;
-
+      user.email = user.local.email;
       if (state.search) {
         const searchLetters = state.search.split('');
-        user.local.email =
-          this._setHighlightedMarkup(user.local.email, searchLetters);
+        user.email =
+          this._setHighlightedMarkup(user.email, searchLetters);
       }
 
       return user;
@@ -70,13 +72,17 @@ export default React.createClass({
 
   onChange() {
     let state = this.getStore(UserStore).getState();
-    if (state.search) {
-      const searchLetters = state.search.split('');
-      state.users.map((user) =>
-        user.local.email =
-          this._setHighlightedMarkup(user.local.email, searchLetters)
-      );
-    }
+    const users = state.users.map((user) => {
+      user.email = user.local.email;
+      if (state.search) {
+        const searchLetters = state.search.split('');
+        user.email =
+          this._setHighlightedMarkup(user.email, searchLetters);
+      }
+
+      return user;
+    });
+    state.users = users;
     state.pageAdjustment && this._adjustPageBounds(state);
     this.setState(state);
   },
@@ -100,8 +106,8 @@ export default React.createClass({
     this.context.router.transitionTo('createUser');
   },
 
-  handleCheckAll() {
-    const value = this.refs.globalSelector.getDOMNode().checked;
+  handleCheckAll(e) {
+    const value = e.target.checked;
     const users = this.state.users.map((user) => {
       user.selected = value;
       return user;
@@ -162,6 +168,16 @@ export default React.createClass({
   },
 
   render() {
+    const tableProps = [
+      {
+        label: 'Username',
+        valueProp: 'email'
+      },
+      {
+        label: 'User Level',
+        valueProp: 'userLevel'
+      }
+    ];
     const paginator = (
       <Paginator
         currentPageNumber={this.state.currentPageNumber}
@@ -210,55 +226,14 @@ export default React.createClass({
           </small>
         }
 
-        <table className="user-table">
-          <thead>
-            <tr>
-              <td>
-                <input
-                  ref="globalSelector"
-                  onChange={this.handleCheckAll}
-                  type="checkbox" />
-              </td>
-              <td>
-                Username
-              </td>
-              <td>User Level</td>
-              <td>
-                <button onClick={this.handleBulkEditClick}>
-                  Bulk Edit
-                </button>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.users.map(
-              (user, index) =>
-              <tr
-                key={user._id}
-                index={index}>
-
-                <td>
-                  <input
-                    onChange={this.handleCheck.bind(this, user._id)}
-                    type="checkbox"
-                    ref={user._id}
-                    checked={user.selected}
-                    />
-                </td>
-                <td>{user.local.email}</td>
-                <td>{user.userLevel}</td>
-                <td>
-                  <button
-                    onClick={() =>
-                      this.context.router.transitionTo(`/admin/users/${user._id}`)}>
-                    Edit
-                  </button>
-                </td>
-              </tr>
-              )
-            }
-          </tbody>
-        </table>
+        <ResultsTable
+          properties={tableProps}
+          collection={this.state.users}
+          handleCheckAll={this.handleCheckAll}
+          handleBulkEditClick={this.handleBulkEditClick}
+          handleCheck={this.handleCheck}
+          basePath="/admin/users/"
+        />
 
         {paginator}
       </div>
