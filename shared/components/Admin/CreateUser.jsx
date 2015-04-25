@@ -12,11 +12,15 @@ export default React.createClass({
     router: React.PropTypes.func
   },
 
+  handleSubmit(formValues) {
+    this.executeAction(createUserAction, formValues);
+  },
+
   mixins: [FluxibleMixin, CheckAdminMixin],
 
   render() {
     return (
-      <UserForm action={createUserAction} buttonText="Create" />
+      <UserForm handleSubmit={this.handleSubmit} buttonText="Create" />
     );
   }
 })

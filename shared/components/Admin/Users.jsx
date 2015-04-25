@@ -11,6 +11,7 @@ import {isClient, upsertQuery} from '../../../utils';
 import Modal from 'react-bootstrap-modal';
 import Checkbox from '../Checkbox';
 import UserForm from './UserForm';
+import moment from 'moment';
 import ResultsTable from './ResultsTable';
 
 import _ from 'lodash';
@@ -54,6 +55,8 @@ export default React.createClass({
         user.email =
           this._setHighlightedMarkup(user.email, searchLetters);
       }
+
+      user.lastUpdated = moment(user.lastUpdated).fromNow();
 
       return user;
     });
@@ -101,6 +104,7 @@ export default React.createClass({
     let state = this.getStore(UserStore).getState();
     const users = state.users.map((user) => {
       user.email = user.local.email;
+      user.lastUpdated = moment(user.lastUpdated).fromNow();
       if (state.search) {
         const searchLetters = state.search.split('');
         user.email =
@@ -148,6 +152,7 @@ export default React.createClass({
     });
 
     if (e.target.value.length === 0 && isClient()) {
+
       // Remove query string if the search bar is empty. It's ugly.
       window.history.replaceState({}, {}, window.location.href.split('?')[0]);
     } else {
@@ -240,7 +245,6 @@ export default React.createClass({
         </button>
 
         <div>
-
           <select id="sorting" onChange={this.handleSort}>
             <option value="noop">Sort by</option>
             {tableProps.map((propChoice) =>
@@ -257,10 +261,9 @@ export default React.createClass({
               </option>
               )
             }
-
-
           </select>
         </div>
+
         <div>
           <label htmlFor="tableColumns">Table columns:</label>
 

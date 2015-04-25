@@ -54,7 +54,7 @@ export default React.createClass({
         <form onSubmit={this.handleSubmit}>
           <label htmlFor="userLevel">userLevel</label>
           <input
-            type="text"
+            type="number"
             id="userLevel"
             name="userLevel"
             key="userLevel"

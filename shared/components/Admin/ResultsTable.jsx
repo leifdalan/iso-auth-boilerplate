@@ -28,10 +28,7 @@ export default React.createClass({
         <thead>
           <tr>
             <td>
-              <Checkbox
-                onChangeCallback={this.props.handleCheckAll}
-              />
-
+              <Checkbox onChangeCallback={this.props.handleCheckAll} />
             </td>
             {this.props.properties.map((prop, index) =>
               <td key={index}>

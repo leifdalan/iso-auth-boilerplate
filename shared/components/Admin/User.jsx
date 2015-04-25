@@ -32,6 +32,7 @@ export default React.createClass({
   handleDelete(e) {
     e.preventDefault();
     // TODO create an "Are you sure"
+
     this.executeAction(deleteUserAction, this.state);
   },
 
