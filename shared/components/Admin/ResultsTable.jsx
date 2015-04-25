@@ -28,10 +28,10 @@ export default React.createClass({
         <thead>
           <tr>
             <td>
-              <input
-                ref="globalSelector"
-                onChange={this.props.handleCheckAll}
-                type="checkbox" />
+              <Checkbox
+                onChangeCallback={this.props.handleCheckAll}
+              />
+
             </td>
             {this.props.properties.map((prop, index) =>
               <td key={index}>
@@ -50,18 +50,19 @@ export default React.createClass({
             (item, index) =>
             <tr
               key={item._id}
-              index={index}>
-
+              className={`selected-${item.selected}`}
+              index={index}
+              onClick={this.props.handleCheck.bind(null, item._id)}>
               <td>
 
                 <Checkbox
-                  onChange={this.props.handleCheck.bind(null, item._id)}
+                  onChangeCallback={this.props.handleCheck.bind(null, item._id)}
                   ref={item._id}
                   checked={item.selected}
                   />
               </td>
               {this.props.properties.map((prop, index) =>
-                <td key={index}>
+                <td key={`value${index}`}>
                   {/* Cast booleans to strings, as sometimes
                       we may have a react object.
                    */}

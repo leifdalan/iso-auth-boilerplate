@@ -70,13 +70,18 @@ export default React.createClass({
       },
       {
         label: 'User Level',
-        valueProp: 'userLevel'
+        valueProp: 'userLevel',
+        selected: true
       },
       {
         label: 'Is Validated',
         valueProp: 'isValidated'
+      },
+      {
+        label: 'Last Updated',
+        valueProp: 'lastUpdated'
       }
-    ]
+    ];
 
     state.users = users;
     state.pageAdjustment && this._adjustPageBounds(state);
@@ -163,8 +168,12 @@ export default React.createClass({
   },
 
   handleSort(e) {
-    const criteria = e.target.value;
+    let criteria = e.target.value;
+    if (criteria === 'noop') {
+      return;
+    }
     e.preventDefault();
+    debug(criteria);
     const query = upsertQuery('sort', criteria);
     window.history.replaceState({}, {}, query);
     this.executeAction(updateResultsAction, window.location.href);
@@ -189,14 +198,14 @@ export default React.createClass({
     }
   },
 
-  handleTablePropChange(valueProp, e) {
+  handleTablePropChange(valueProp) {
     const tablePropChoices = this.state.tablePropChoices.map((propChoice) => {
       if (propChoice.valueProp === valueProp) {
         propChoice.selected = !propChoice.selected;
       }
       return propChoice;
     });
-    this.setState({tablePropChoices})
+    this.setState({tablePropChoices});
   },
 
   render() {
@@ -217,7 +226,7 @@ export default React.createClass({
       <h2>No users match{` "${this.state.search}"`}!</h2>
     );
 
-    const userForm = (
+    const userTable = (
       <div>
         <input
           type="number"
@@ -231,14 +240,22 @@ export default React.createClass({
         </button>
 
         <div>
-          <label htmlFor="sorting">Sort by:</label>
 
           <select id="sorting" onChange={this.handleSort}>
+            <option value="noop">Sort by</option>
             {tableProps.map((propChoice) =>
-              <option value={`${propChoice.valueProp}|asc`}>{propChoice.label} &#9652;</option>)
+              <option
+                key={propChoice.valueProp}
+                value={`${propChoice.valueProp}|asc`}>{propChoice.label} &#9652;
+              </option>
+              )
             }
             {tableProps.map((propChoice) =>
-              <option value={`${propChoice.valueProp}|desc`}>{propChoice.label} &#9662;</option>)
+              <option
+                key={propChoice.valueProp}
+                value={`${propChoice.valueProp}|desc`}>{propChoice.label} &#9662;
+              </option>
+              )
             }
 
 
@@ -250,6 +267,7 @@ export default React.createClass({
           <div id="tableColumns" onChange={(e) => debug(e)}>
             {this.state.tablePropChoices.map((propChoice) =>
               <Checkbox
+                key={`Checkbox${propChoice.valueProp}`}
                 inputKey={propChoice.valueProp}
                 label={propChoice.label}
                 checked={propChoice.selected}
@@ -281,7 +299,7 @@ export default React.createClass({
       </div>
     );
 
-    const body = this.state.users.length ? userForm : noUsers;
+    const body = this.state.users.length ? userTable : noUsers;
 
     return (
       <div>
@@ -320,6 +338,7 @@ export default React.createClass({
             <Modal.Dismiss className='btn btn-default'>Cancel</Modal.Dismiss>
           </Modal.Footer>
         </Modal>
+
       </div>
     );
   }

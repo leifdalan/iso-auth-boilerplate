@@ -57,10 +57,10 @@ export function get(req, res, next) {
 
   let sortCriteria = {};
   if (sort) {
-    const sortAndDirection = sort.split('|'),
+    let sortAndDirection = sort.split('|'),
       sortTerm = sortAndDirection[0],
       sortDirection = sortAndDirection[1];
-
+    sortTerm = sortTerm === 'email' ? 'local.email' : sortTerm;
     const sortValue = sortDirection === 'asc' ? 1 : -1;
     sortCriteria = {
       [sortTerm] : sortValue
