@@ -78,7 +78,7 @@ export function get(req, res, next) {
       sendData({data, req, res, next});
     } else {
       if (totalUsers < currentPageNumber * perpage) {
-        
+
         // A search or filter query has deemed this page empty,
         // but let's return results and tell the client to update
         // the page number in the URL instead of redirecting or failing.
@@ -185,6 +185,44 @@ export function update(req, res, next) {
             user,
             success: {
               message: `${user.local.email} saved successfully.`
+            }
+          };
+        }
+        sendData({data, req, res, next});
+      }
+    });
+}
+export function updateMany(req, res, next) {
+  debug('SETTING USER');
+  const {users, formValues} = req.body;
+
+  User.update(
+    {_id: {$in: users}},
+    formValues,
+    {
+      'new': true,
+       multi: true
+    },
+    (error, user) => {
+      let data;
+      if (error) {
+        data = {
+          error,
+          success: false
+        };
+        debug('USER ERROR', error);
+        sendData({data, req, res, next});
+      } else {
+        if (!user) {
+          data = {
+            success: false,
+            error: `No user found for ${req.params.id}`
+          };
+        } else {
+          data = {
+            user,
+            success: {
+              message: `Updated all records.`
             }
           };
         }

@@ -40,6 +40,7 @@ export default createStore({
   },
 
   flashMessagez(message) {
+    debug('FLASHING');
     if (message instanceof Array) {
       message = message[0];
     }

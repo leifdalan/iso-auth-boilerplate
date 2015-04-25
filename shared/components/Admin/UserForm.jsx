@@ -24,7 +24,7 @@ export default React.createClass({
       lastUpdated: new Date()
     });
     debug('state', this.state);
-    this.executeAction(this.props.action, this.state);
+    this.props.handleSubmit(this.state);
   },
 
   handleChange(field, e) {

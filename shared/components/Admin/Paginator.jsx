@@ -23,10 +23,6 @@ export default React.createClass({
 
   mixins: [FluxibleMixin],
 
-  statics: {
-    storeListeners: [UserStore]
-  },
-
   _shouldShowNext() {
     const {currentPageNumber, neighborDepth} = this.props;
     return currentPageNumber < this.state.totalPages - neighborDepth;
@@ -37,9 +33,12 @@ export default React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      totalPages: this._getTotalPages(nextProps)
-    });
+    const totalPages = this._getTotalPages(nextProps);
+    if (totalPages) {
+      this.setState({
+        totalPages: this._getTotalPages(nextProps)
+      });
+    }
   },
 
   _getTotalPages(props) {
@@ -52,11 +51,6 @@ export default React.createClass({
 
   getInitialState() {
     return {totalPages: this._getTotalPages(this.props)};
-  },
-
-  onChange() {
-    const state = this.getStore(UserStore).getState();
-    this.setState(state);
   },
 
   _constructMiddle() {

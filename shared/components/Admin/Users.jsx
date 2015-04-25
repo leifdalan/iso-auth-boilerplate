@@ -3,12 +3,15 @@ import React from 'react';
 import {FluxibleMixin} from 'fluxible';
 import UserStore from '../../stores/UserStore';
 import navigateAction from '../../actions/navigate';
+import {flashMessageAction} from '../../actions/appActions';
 import Paginator from './Paginator';
 import {CheckAdminMixin} from '../../mixins/authMixins';
-import {updateResultsAction} from '../../actions/userActions';
+import {updateResultsAction, editManyUsersAction} from '../../actions/userActions';
 import {isClient, upsertQuery} from '../../../utils';
+import Modal from 'react-bootstrap-modal';
+import UserForm from './UserForm';
 import _ from 'lodash';
-const debug = require('debug')('Component:Users');
+// const debug = require('debug')('Component:Users');
 
 
 export default React.createClass({
@@ -24,17 +27,18 @@ export default React.createClass({
     storeListeners: [UserStore]
   },
 
-  _setHighlightedMarkup(user, searchLetters) {
-    if (typeof user.local.email === 'string') {
-      let markup = [].map.call(user.local.email, (letter) =>
+  _setHighlightedMarkup(string, searchLetters) {
+    if (typeof string === 'string') {
+      let markup = [].map.call(string, (letter) =>
         _.include(searchLetters, letter) ?
           <span className="search-term">{letter}</span> :
           <span>{letter}</span>
       );
       const userMarkup = <span>{markup}</span>;
-      user.local.email = userMarkup;
 
+      return userMarkup;
     }
+    return string;
   },
 
   getInitialState() {
@@ -44,7 +48,8 @@ export default React.createClass({
 
       if (state.search) {
         const searchLetters = state.search.split('');
-        this._setHighlightedMarkup(user, searchLetters);
+        user.local.email =
+          this._setHighlightedMarkup(user.local.email, searchLetters);
       }
 
       return user;
@@ -67,7 +72,10 @@ export default React.createClass({
     let state = this.getStore(UserStore).getState();
     if (state.search) {
       const searchLetters = state.search.split('');
-      state.users.map((user) => this._setHighlightedMarkup(user, searchLetters));
+      state.users.map((user) =>
+        user.local.email =
+          this._setHighlightedMarkup(user.local.email, searchLetters)
+      );
     }
     state.pageAdjustment && this._adjustPageBounds(state);
     this.setState(state);
@@ -134,6 +142,25 @@ export default React.createClass({
     this.executeAction(updateResultsAction, window.location.href);
   },
 
+  handleBulkEdit(formValues) {
+    const users = _.filter(this.state.users, (user) => user.selected);
+    this.executeAction(editManyUsersAction, {formValues, users});
+    this.setState({show: false});
+  },
+
+  handleBulkEditClick() {
+    const users = _.filter(this.state.users, (user) => user.selected);
+    if (users.length === 0) {
+      this.executeAction(flashMessageAction,
+        'Please select some users to bulk edit first.');
+    } else {
+      this.setState({
+        userCount: users.length,
+        show: true
+      });
+    }
+  },
+
   render() {
     const paginator = (
       <Paginator
@@ -197,7 +224,7 @@ export default React.createClass({
               </td>
               <td>User Level</td>
               <td>
-                <button onClick={() => window.alert('Coming soon :)')}>
+                <button onClick={this.handleBulkEditClick}>
                   Bulk Edit
                 </button>
               </td>
@@ -257,6 +284,23 @@ export default React.createClass({
             />
         </div>
         {body}
+        <Modal
+          show={this.state.show}
+          onHide={() => this.setState({show: false})}
+          aria-labelledby="ModalHeader">
+
+          <Modal.Header closeButton>
+            <Modal.Title id='ModalHeader'>
+              Bulk editing {this.state.userCount} Users
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <UserForm handleSubmit={this.handleBulkEdit} />
+          </Modal.Body>
+          <Modal.Footer>
+            <Modal.Dismiss className='btn btn-default'>Cancel</Modal.Dismiss>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }

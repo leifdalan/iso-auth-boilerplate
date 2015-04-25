@@ -25,7 +25,8 @@ export const editUserAction = ({dispatch}, payload, done) => {
     }
   );
 };
-export const updateResultsAction = ({dispatch}, payload, done) => {
+
+export function updateResultsAction({dispatch}, payload, done) {
   request
     .get(payload)
     .send(payload)
@@ -47,7 +48,33 @@ export const updateResultsAction = ({dispatch}, payload, done) => {
       done && done();
     }
   );
-};
+}
+
+export function editManyUsersAction(actionContext, payload, done) {
+  const {dispatch} = actionContext;
+  request
+    .put(`/admin/users/`)
+    .send(payload)
+    .set('Accept', 'application/json')
+    .set('X-Requested-With', 'XMLHttpRequest')
+    .end((xhrError, res) => {
+      const {success, error} = res.body;
+      if (xhrError || res.badRequest) {
+        debug(xhrError || res.badRequest);
+        dispatch('FLASH_MESSAGE', 'Bad Request.');
+      } else {
+        if (success) {
+          updateResultsAction(actionContext, window.location.href);
+          dispatch('FLASH_MESSAGE', success);
+        } else if (error) {
+          dispatch('adminUserEdit_FAILURE', error);
+          dispatch('FLASH_MESSAGE', error);
+        }
+      }
+      done && done();
+    }
+  );
+}
 
 export const deleteUserAction = ({dispatch}, payload, done) => {
   debug('Logging out.');
