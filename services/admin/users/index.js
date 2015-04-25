@@ -40,7 +40,7 @@ export function create(req, res, next) {
 export function get(req, res, next) {
   const {perpage, currentPageNumber} = req.params;
   debug(req.query.s);
-  const search = req.query.s;
+  const {s: search, sort} = req.query;
 
   let filter = {}, data;
   if (search) {
@@ -55,50 +55,66 @@ export function get(req, res, next) {
     }
   }
 
+  let sortCriteria = {};
+  if (sort) {
+    const sortAndDirection = sort.split('|'),
+      sortTerm = sortAndDirection[0],
+      sortDirection = sortAndDirection[1];
+
+    const sortValue = sortDirection === 'asc' ? 1 : -1;
+    sortCriteria = {
+      [sortTerm] : sortValue
+    }
+  }
+
   // TODO use generators + Promises for multiple async
   // http://davidwalsh.name/async-generators
-    User.count(filter, (countError, totalUsers) => {
-      if (countError) {
-        data = {
-          success: false,
-          error: countError
+  User.count(filter, (countError, totalUsers) => {
+    if (countError) {
+      data = {
+        success: false,
+        error: countError
+      }
+      sendData({data, req, res, next});
+    } else {
+      if (totalUsers < currentPageNumber * perpage) {
+        
+        // A search or filter query has deemed this page empty,
+        // but let's return results and tell the client to update
+        // the page number in the URL instead of redirecting or failing.
+        var newPageNumber = Math.floor(totalUsers / Number(perpage) + 1);
+        debug('adjusting...', totalUsers, Number(perpage), newPageNumber);
+        var pageAdjustment = newPageNumber;
+      }
+      const pageNumber = newPageNumber || Number(currentPageNumber);
+      User.find(filter)
+        .limit(perpage)
+        .skip((pageNumber - 1) * perpage)
+        .sort(sortCriteria)
+        .exec((paginateError, users) => {
+
+        if (paginateError) {
+          data = {
+            success: false,
+            error: paginateError
+          }
+
+        } else {
+          data = {
+            success: true,
+            perpage: Number(perpage),
+            currentPageNumber: pageNumber,
+            search: req.query.s,
+            users,
+            totalUsers,
+            pageAdjustment
+          };
         }
         sendData({data, req, res, next});
-      } else {
-        if (totalUsers < currentPageNumber * perpage) {
+      });
+    }
 
-          var newPageNumber = Math.floor(totalUsers / Number(perpage) + 1);
-          debug('adjusting...', totalUsers, Number(perpage), newPageNumber);
-          var pageAdjustment = newPageNumber;
-        }
-        const pageNumber = newPageNumber || Number(currentPageNumber);
-        User.find(filter)
-          .limit(perpage)
-          .skip((pageNumber - 1) * perpage)
-          .exec((paginateError, users) => {
-
-          if (paginateError) {
-            data = {
-              success: false,
-              error: paginateError
-            }
-
-          } else {
-            data = {
-              success: true,
-              perpage: Number(perpage),
-              currentPageNumber: pageNumber,
-              search: req.query.s,
-              users,
-              totalUsers,
-              pageAdjustment
-            };
-          }
-          sendData({data, req, res, next});
-        });
-      }
-
-    });
+  });
 };
 
 export function getOne(req, res, next) {

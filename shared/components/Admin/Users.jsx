@@ -5,8 +5,8 @@ import UserStore from '../../stores/UserStore';
 import navigateAction from '../../actions/navigate';
 import Paginator from './Paginator';
 import {CheckAdminMixin} from '../../mixins/authMixins';
-import {searchUserAction} from '../../actions/userActions';
-import {isClient} from '../../../utils';
+import {updateResultsAction} from '../../actions/userActions';
+import {isClient, upsertQuery} from '../../../utils';
 import _ from 'lodash';
 const debug = require('debug')('Component:Users');
 
@@ -82,11 +82,8 @@ export default React.createClass({
   handleButton(e) {
     e.preventDefault();
     const perpage = this.state.perPageInput || this.state.perpage;
-    if (this.state.searchValue && isClient()) {
-      window.history.pushState({}, {}, `?s=${this.state.search}`);
-    }
     this.context.router.transitionTo(
-      `/admin/users/page/${perpage}/1`
+      `/admin/users/page/${perpage}/1${window.location.search}`
     );
   },
 
@@ -113,10 +110,11 @@ export default React.createClass({
       // Remove query string if the search bar is empty. It's ugly.
       window.history.replaceState({}, {}, window.location.href.split('?')[0]);
     } else {
-      window.history.replaceState({}, {}, `?s=${e.target.value}`);
+      const query = upsertQuery('s', e.target.value);
+      window.history.replaceState({}, {}, query);
     }
 
-    this.executeAction(searchUserAction, e.target.value);
+    this.executeAction(updateResultsAction, window.location.href);
 
   },
 
@@ -126,6 +124,14 @@ export default React.createClass({
       return user;
     });
     this.setState({users});
+  },
+
+  handleSort(e) {
+    const criteria = e.target.value;
+    e.preventDefault();
+    const query = upsertQuery('sort', criteria);
+    window.history.replaceState({}, {}, query);
+    this.executeAction(updateResultsAction, window.location.href);
   },
 
   render() {
@@ -156,6 +162,19 @@ export default React.createClass({
           Update Items/page
         </button>
 
+        <div>
+          <label htmlFor="sorting">Sort by:</label>
+
+          <select id="sorting" onChange={this.handleSort}>
+            <option value="userLevel|asc">User Level &#9652;</option>
+            <option value="userLevel|desc">User Level &#9662;</option>
+            <option value="local.email|asc">User Name &#9652;</option>
+            <option value="local.email|desc">User Name &#9662;</option>
+            <option value="lastUpdated|asc">Last Edited &#9652;</option>
+            <option value="lastUpdated|desc">Last Edited &#9662;</option>
+          </select>
+        </div>
+
         {paginator}
 
         {this.state.search &&
@@ -173,7 +192,9 @@ export default React.createClass({
                   onChange={this.handleCheckAll}
                   type="checkbox" />
               </td>
-              <td>Username</td>
+              <td>
+                Username
+              </td>
               <td>User Level</td>
               <td>
                 <button onClick={() => window.alert('Coming soon :)')}>

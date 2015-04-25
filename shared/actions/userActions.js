@@ -25,9 +25,9 @@ export const editUserAction = ({dispatch}, payload, done) => {
     }
   );
 };
-export const searchUserAction = ({dispatch}, payload, done) => {
+export const updateResultsAction = ({dispatch}, payload, done) => {
   request
-    .get(`?s=${payload}`)
+    .get(payload)
     .send(payload)
     .set('Accept', 'application/json')
     .set('X-Requested-With', 'XMLHttpRequest')
