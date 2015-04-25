@@ -1,5 +1,6 @@
 'use strict';
 import React from 'react';
+import Checkbox from '../Checkbox';
 import {FluxibleMixin} from 'fluxible';
 
 const rpt = React.PropTypes;
@@ -52,16 +53,22 @@ export default React.createClass({
               index={index}>
 
               <td>
-                <input
+
+                <Checkbox
                   onChange={this.props.handleCheck.bind(null, item._id)}
-                  type="checkbox"
                   ref={item._id}
                   checked={item.selected}
                   />
               </td>
               {this.props.properties.map((prop, index) =>
                 <td key={index}>
-                  {item[prop.valueProp]}
+                  {/* Cast booleans to strings, as sometimes
+                      we may have a react object.
+                   */}
+                  {(typeof item[prop.valueProp] === 'boolean') ?
+                    `${item[prop.valueProp]}` :
+                    item[prop.valueProp]
+                  }
                 </td>
               )}
               <td>

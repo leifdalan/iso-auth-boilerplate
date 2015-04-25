@@ -9,11 +9,12 @@ import {CheckAdminMixin} from '../../mixins/authMixins';
 import {updateResultsAction, editManyUsersAction} from '../../actions/userActions';
 import {isClient, upsertQuery} from '../../../utils';
 import Modal from 'react-bootstrap-modal';
+import Checkbox from '../Checkbox';
 import UserForm from './UserForm';
 import ResultsTable from './ResultsTable';
 
 import _ from 'lodash';
-// const debug = require('debug')('Component:Users');
+const debug = require('debug')('Component:Users');
 
 
 export default React.createClass({
@@ -56,6 +57,27 @@ export default React.createClass({
 
       return user;
     });
+
+    state.tablePropChoices = [
+      {
+        label: 'Username',
+        valueProp: 'email',
+        selected: true
+      },
+      {
+        label: 'Login Token',
+        valueProp: 'loginToken'
+      },
+      {
+        label: 'User Level',
+        valueProp: 'userLevel'
+      },
+      {
+        label: 'Is Validated',
+        valueProp: 'isValidated'
+      }
+    ]
+
     state.users = users;
     state.pageAdjustment && this._adjustPageBounds(state);
     return state;
@@ -167,17 +189,17 @@ export default React.createClass({
     }
   },
 
-  render() {
-    const tableProps = [
-      {
-        label: 'Username',
-        valueProp: 'email'
-      },
-      {
-        label: 'User Level',
-        valueProp: 'userLevel'
+  handleTablePropChange(valueProp, e) {
+    const tablePropChoices = this.state.tablePropChoices.map((propChoice) => {
+      if (propChoice.valueProp === valueProp) {
+        propChoice.selected = !propChoice.selected;
       }
-    ];
+      return propChoice;
+    });
+    this.setState({tablePropChoices})
+  },
+
+  render() {
     const paginator = (
       <Paginator
         currentPageNumber={this.state.currentPageNumber}
@@ -187,6 +209,9 @@ export default React.createClass({
         pathBase="/admin/users/page/"
       />
     );
+
+    const tableProps =
+      this.state.tablePropChoices.filter((tableProp) => tableProp.selected);
 
     const noUsers = (
       <h2>No users match{` "${this.state.search}"`}!</h2>
@@ -209,13 +234,30 @@ export default React.createClass({
           <label htmlFor="sorting">Sort by:</label>
 
           <select id="sorting" onChange={this.handleSort}>
-            <option value="userLevel|asc">User Level &#9652;</option>
-            <option value="userLevel|desc">User Level &#9662;</option>
-            <option value="local.email|asc">User Name &#9652;</option>
-            <option value="local.email|desc">User Name &#9662;</option>
-            <option value="lastUpdated|asc">Last Edited &#9652;</option>
-            <option value="lastUpdated|desc">Last Edited &#9662;</option>
+            {tableProps.map((propChoice) =>
+              <option value={`${propChoice.valueProp}|asc`}>{propChoice.label} &#9652;</option>)
+            }
+            {tableProps.map((propChoice) =>
+              <option value={`${propChoice.valueProp}|desc`}>{propChoice.label} &#9662;</option>)
+            }
+
+
           </select>
+        </div>
+        <div>
+          <label htmlFor="tableColumns">Table columns:</label>
+
+          <div id="tableColumns" onChange={(e) => debug(e)}>
+            {this.state.tablePropChoices.map((propChoice) =>
+              <Checkbox
+                inputKey={propChoice.valueProp}
+                label={propChoice.label}
+                checked={propChoice.selected}
+                onChangeCallback={this.handleTablePropChange.bind(null, propChoice.valueProp)}
+              />
+            )}
+          </div>
+
         </div>
 
         {paginator}
@@ -258,7 +300,9 @@ export default React.createClass({
               placeholder={`Search for users`}
             />
         </div>
+
         {body}
+
         <Modal
           show={this.state.show}
           onHide={() => this.setState({show: false})}
