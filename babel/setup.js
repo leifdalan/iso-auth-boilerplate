@@ -206,46 +206,57 @@ Async.auto({
   }],
   generateABunchOfUsers: ['insertUsers', (done, results) => {
     const progressBar = new ProgressBar();
-    progressBar.setTotal(300);
+    progressBar.setTotal(999);
     let tick = 0;
     function makeid() {
       var text = "";
       var possible =
         "abcdefghijklmnopqrstuvwxyz0123456789";
 
-      for( var i=0; i < 5; i++ ) {
+      var charLength = Math.floor(Math.random() * 5 + 5);
+      for( var i=0; i < charLength; i++ ) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
       }
 
       return text;
     }
+    const users = [];
     function createUser(callback) {
-      const newUser = new User();
+      const newUser = {local: {}};
 
       newUser.local.email = makeid();
-      newUser.local.password = newUser.generateHash(results.regularUserPassword);
-      newUser.loginToken = newUser.generateToken();
+      newUser.local.password = 'meh.';
+      newUser.loginToken = 'token';
       newUser.userLevel = Math.floor(Math.random() * 3 + 1);
       tick++;
-      progressBar.step(`Adding user ${newUser.local.email}`)
-        .setTotal(300)
+      progressBar.step(`Adding user`)
+        .setTotal(999)
         .setTick(tick);
-      newUser.save((err) => {
-        if (err) {
-          debug('Error adding user.');
-          callback(err);
-        }
 
-        return callback();
-      });
+      users.push(newUser);
+      callback();
+      // newUser.save((err) => {
+      //   if (err) {
+      //     debug('Error adding user.');
+      //     callback(err);
+      //   }
+      //
+      //   return callback();
+      // });
     }
-    const numOfUsers = 300;
+    const numOfUsers = 999;
     const asyncArray = [];
-    for (var i = 0; i < 300; i++) {
+    for (var i = 0; i < 999; i++) {
       asyncArray.push(createUser);
     }
     Async.parallel(asyncArray, () => {
-      done();
+      debug('Inserting...', users.length);
+      User.collection.insert(users, (err, docs) => {
+        debug(err);
+        debug(`${users.length} inserted into Users collection`);
+        done();
+      });
+
     });
   }]
 }, function (err) {

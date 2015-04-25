@@ -64,7 +64,6 @@ export default React.createClass({
   },
 
   onChange() {
-    debug('Changin...');
     let state = this.getStore(UserStore).getState();
     if (state.search) {
       const searchLetters = state.search.split('');

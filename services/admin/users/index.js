@@ -44,8 +44,14 @@ export function get(req, res, next) {
 
   let filter = {}, data;
   if (search) {
+    let number = search.match(/\d/g);
+    number = number ? (Number(number.join(''))) : '';
+
     filter = {
-      'local.email': new RegExp(search, 'i')
+      $or: [
+        {'local.email': new RegExp(search, 'i')},
+        {'userLevel': number}
+      ]
     }
   }
 
