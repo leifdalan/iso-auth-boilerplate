@@ -3,6 +3,7 @@ import React from 'react';
 import {FluxibleMixin} from 'fluxible';
 import UserStore from '../../stores/UserStore';
 import UserForm from './UserForm';
+import ConfirmationPopup from './ConfirmationPopup';
 import {CheckAdminMixin} from '../../mixins/authMixins';
 import {editUserAction, deleteUserAction} from '../../actions/userActions';
 // const debug = require('debug')('Component:User');
@@ -31,9 +32,7 @@ export default React.createClass({
 
   handleDelete(e) {
     e.preventDefault();
-    // TODO create an "Are you sure"
-
-    this.executeAction(deleteUserAction, this.state);
+    this.setState({show: true});
   },
 
   handleSubmit(formState) {
@@ -46,6 +45,11 @@ export default React.createClass({
         <UserForm {...this.state} handleSubmit={this.handleSubmit} />
 
         <button onClick={this.handleDelete}>Delete User</button>
+        <ConfirmationPopup
+          show={this.state.show}
+          onHide={() => this.setState({show: false})}
+          onConfirm={() => this.executeAction(deleteUserAction, this.state)}
+        />
       </div>
     );
   }

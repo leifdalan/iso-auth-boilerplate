@@ -8,7 +8,8 @@ import Paginator from './Paginator';
 import {CheckAdminMixin} from '../../mixins/authMixins';
 import {updateResultsAction, editManyUsersAction} from '../../actions/userActions';
 import {isClient, upsertQuery} from '../../../utils';
-import Modal from 'react-bootstrap-modal';
+import Modal from '../Modal';
+import ConfirmationPopup from './ConfirmationPopup';
 import Checkbox from '../Checkbox';
 import UserForm from './UserForm';
 import moment from 'moment';
@@ -325,21 +326,20 @@ export default React.createClass({
         {body}
 
         <Modal
+          title={`Bulk editing ${this.state.userCount} Users`}
           show={this.state.show}
-          onHide={() => this.setState({show: false})}
-          aria-labelledby="ModalHeader">
+          onHide={() => this.setState({show: false})}>
 
-          <Modal.Header closeButton>
-            <Modal.Title id='ModalHeader'>
-              Bulk editing {this.state.userCount} Users
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <UserForm handleSubmit={this.handleBulkEdit} />
-          </Modal.Body>
-          <Modal.Footer>
-            <Modal.Dismiss className='btn btn-default'>Cancel</Modal.Dismiss>
-          </Modal.Footer>
+          <UserForm handleSubmit={() => this.setState({showConfirm: true})} />
+          <ConfirmationPopup
+            show={this.state.showConfirm}
+            onHide={() => this.setState({showConfirm: false})}
+            onConfirm={this.handleBulkEdit}
+            confirmationText={
+              `You sure you want to edit ${this.state.userCount} at a time?`
+            }
+          />
+
         </Modal>
 
       </div>
