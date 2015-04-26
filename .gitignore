@@ -5,3 +5,4 @@ dist
 public
 bower_components
 config/secrets.js
+rev-manifest.json

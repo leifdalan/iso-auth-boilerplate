@@ -8,8 +8,15 @@ import webpackConfig from '../webpack.config';
 import CST from '../shared/constants';
 import config from '../config';
 
+const aws = {
+  key: config.AWS_KEY,
+  secret: config.AWS_SECRET,
+  bucket: config.AWS_BUCKET,
+  region: 'us-west-2'
+}
+
 const debug = require('debug')('gulp:feedback');
-const gp = require('gulp-load-plugins')();
+const $ = require('gulp-load-plugins')();
 const {
   WEBPACK_DEV_SERVER_PORT: WPDEVPORT,
   DEVELOPMENT_PORT: DEVPORT,
@@ -37,37 +44,37 @@ gulp.task('server', (cb) => {
     }
   };
 
-  if (gp.util.env.clientOnly) {
+  if ($.util.env.clientOnly) {
     options.ignore = ['shared', 'src', 'node_modules', '!shared/routes.js'];
     options.env.REACT_CLIENT_RENDER = true;
     options.env.REACT_SERVER_RENDER = false;
-  } else if (gp.util.env.serverOnly) {
+  } else if ($.util.env.serverOnly) {
     options.ignore = ['node_modules'];
     options.env.REACT_SERVER_RENDER = true;
     options.env.REACT_CLIENT_RENDER = false;
-  } else if (gp.util.env.iso) {
+  } else if ($.util.env.iso) {
     options.ignore = ['node_modules'];
     options.env.REACT_SERVER_RENDER = true;
     options.env.REACT_CLIENT_RENDER = true;
   }
 
-  if (gp.util.env.admin) {
+  if ($.util.env.admin) {
     options.env.ALWAYS_ADMIN = true;
   }
 
-  if (gp.util.env.ptod) {
+  if ($.util.env.ptod) {
     options.env.NODE_ENV = 'production';
   }
 
   debug('NODEMON OPTIONS: ', options);
 
-  gp.nodemon(options);
+  $.nodemon(options);
   cb();
 });
 
 gulp.task('eslint', () => {
   return gulp.src([paths.sharedJS, paths.baseJS])
-    .pipe(gp.eslint({
+    .pipe($.eslint({
       globals: {
         document: true,
         console: true,
@@ -84,7 +91,7 @@ gulp.task('eslint', () => {
     .on('error', (error) => {
       debug(error);
     })
-    .pipe(gp.notify({
+    .pipe($.notify({
       message: (file) => {
         if (!file || !file.eslint || file.eslint.success || !file.eslint.messages.length) {
           // Don't show something if success
@@ -116,11 +123,11 @@ gulp.task('devserver', (callback) => {
   })
   .listen(WPDEVPORT, HOSTNAME, (err) => {
   if (err) {
-    gp.notify(err);
-    throw new gp.util.PluginError('webpack-dev-server', err);
+    $.notify(err);
+    throw new $.util.PluginError('webpack-dev-server', err);
 
   }
-  gp.util.log('[webpack-dev-server]', webPackAddress);
+  $.util.log('[webpack-dev-server]', webPackAddress);
   // keep the server alive or continue?
   callback();
   });
@@ -148,43 +155,43 @@ gulp.task('browser-reload', () => {
 gulp.task('less', (cb) => {
   debug('Lessing....');
   return gulp.src('src/less/main.less')
-    .pipe(gp.sourcemaps.init())
+    .pipe($.sourcemaps.init())
     .on('error', (err) => {
       debug(err);
       cb();
     })
-    .pipe(gp.less())
+    .pipe($.less())
     .on('error', (err) => {
-      gp.notify(err);
+      $.notify(err);
       debug(err);
       cb();
     })
-    .pipe(gp.sourcemaps.write({
+    .pipe($.sourcemaps.write({
       includeContent: false
     }))
     .on('error', (err) => {
       debug(err);
       cb();
     })
-    .pipe(gp.sourcemaps.init({
+    .pipe($.sourcemaps.init({
       loadMaps: true
     }))
     .on('error', (err) => {
       debug(err);
       cb();
     })
-    .pipe(gp.autoprefixer())
+    .pipe($.autoprefixer())
     .on('error', (err) => {
       debug(err);
       cb();
     })
-    .pipe(gp.sourcemaps.write('.'))
+    .pipe($.sourcemaps.write('.'))
     .on('error', (err) => {
       debug(err);
       cb();
     })
     .pipe(gulp.dest(`.${PUBLIC_PATH}`))
-    .pipe(gp.filter('**/*.css'))
+    .pipe($.filter('**/*.css'))
     .pipe(browserSync.reload({
       stream: true
     }))
@@ -204,12 +211,72 @@ gulp.task('clean', (cb) => {
 
 gulp.task('bundleJS', () => {
   return gulp.src('./client.js')
-    .pipe(gp.webpack(webpackConfig))
+    .pipe($.webpack(webpackConfig))
     .pipe(gulp.dest(`.${PUBLIC_PATH}/`));
 });
+
+// ----------------------------------------------------------------------------
+// Deployment Tasks
+// ----------------------------------------------------------------------------
+
+gulp.task('g-zip', ['rev'], function() {
+  return gulp.src([`.${PUBLIC_PATH}/**/*`])
+    .pipe($.gzip())
+    .pipe(gulp.dest(`.${PUBLIC_PATH}/`))
+});
+
+gulp.task('rev', ['build'], function() {
+  return gulp.src([`.${PUBLIC_PATH}/**/*`])
+    .pipe($.rev())
+    .pipe(gulp.dest(`.${PUBLIC_PATH}/`))
+    .pipe($.rev.manifest())
+    .pipe(gulp.dest('.'))
+});
+
+gulp.task('awsJS', function() {
+  return gulp.src(`.${PUBLIC_PATH}/**/*.js.gz`)
+    .pipe($.s3(aws, {
+      gzippedOnly: true,
+      headers: {
+        'Cache-Control': 'max-age=315360000, no-transform, public',
+        'Content-Type': 'application/javascript; charset=UTF-8',
+        'Vary': 'Accept-Encoding'
+      }
+    }));
+})
+
+
+gulp.task('awsCSS', function() {
+  return gulp.src(`.${PUBLIC_PATH}/**/*.css.gz`)
+    .pipe($.s3(aws, {
+      gzippedOnly: true,
+      headers: {
+        'Cache-Control': 'max-age=315360000, no-transform, public',
+        'Content-Type': 'text/css; charset=UTF-8',
+        'Vary': 'Accept-Encoding'
+      }
+    }));
+});
+
+gulp.task('aws', ['awsCSS', 'awsJS']);
+
+
 
 gulp.task('dev', ['clean', 'watch', 'devserver', 'browser-sync', 'less', 'server']);
 
 gulp.task('build', ['clean', 'less', 'bundleJS']);
 
 gulp.task('server-only', ['clean', 'watch', 'browser-sync', 'less', 'server']);
+;
+gulp.task('deploy', ['g-zip'], function() {
+  gulp.start('aws');
+  const manifest = require('../rev-manifest.json');
+  $.run(`heroku config:set CSS_PATH=${manifest['main.css']} ` +
+        `JS_PATH=${manifest['main.css']} ` +
+        `PUBLIC_PATH=${aws.bucket}.${aws.region}.amazonaws.com`).exec();
+  $.run(`git push heroku master`).exec();
+});
+
+gulp.task('run', function() {
+  $.run('echo hello');
+});

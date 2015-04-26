@@ -46,8 +46,9 @@
     "url": "^0.10.3",
     "uuid": "2.0.1",
     "webpack": "^1.8.4",
-    "webpack-dev-server": "^1.8.0",
-
+    "webpack-dev-server": "^1.8.0"
+  },
+  "devDependencies": {
     "autoprefixer-loader": "^1.2.0",
     "browser-sync": "^2.6.4",
     "compression-webpack-plugin": "^0.2.0",
@@ -57,12 +58,16 @@
     "gulp-autoprefixer": "^2.1.0",
     "gulp-eslint": "0.8.0",
     "gulp-filter": "^1.0.2",
-    "gulp-gzip": "0.0.8",
+    "gulp-gzip": "^1.1.0",
     "gulp-less": "^3.0.2",
     "gulp-load-plugins": "^0.9.0",
     "gulp-minify-css": "^0.3.11",
     "gulp-nodemon": "*",
     "gulp-notify": "^2.2.0",
+    "gulp-rev": "^3.0.1",
+    "gulp-run": "^1.6.7",
+    "gulp-s3": "^0.3.0",
+    "gulp-shell": "^0.4.1",
     "gulp-sourcemaps": "^1.2.7",
     "gulp-util": "^3.0.2",
     "gulp-webpack": "^1.3.2",
@@ -74,9 +79,6 @@
     "style-loader": "^0.8.3",
     "vinyl-source-stream": "^1.0.0",
     "webpack-dev-server": "1.6.4"
-
-  },
-  "devDependencies": {
   },
   "scripts": {
     "server-only": "DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp server-only --serverOnly",
