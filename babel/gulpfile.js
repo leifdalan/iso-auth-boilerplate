@@ -206,7 +206,7 @@ gulp.task('watch', () => {
 });
 
 gulp.task('clean', (cb) => {
-  del(['build'], cb);
+  del(['dist/*'], cb);
 });
 
 gulp.task('bundleJS', () => {
