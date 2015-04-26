@@ -15,8 +15,14 @@ var defaults = {
   DEBUG: '*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint*',
   JS_PATH: 'client.js',
   CSS_PATH: 'main.css',
+  AWS_KEY : '',
+  AWS_SECRET : '',
+  AWS_BUCKET : ''
 
 };
+
+// For deployment
+
 
 // Override defaults with environment variables
 if (process && process.env) {

@@ -43,8 +43,8 @@ export default React.createClass({
             dangerouslySetInnerHTML={{__html: this.props.markup}}>
           </div>
         </body>
-        {this.props.shouldClientRender && {clientScript}}
-        {this.props.shouldClientRender && {clientBootstrap}}
+        {this.props.shouldClientRender && clientScript}
+        {this.props.shouldClientRender && clientBootstrap}
       </html>
     );
   }
