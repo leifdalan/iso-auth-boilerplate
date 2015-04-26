@@ -1,5 +1,5 @@
 var defaults = {
-  url : '{{mongodbUrl}}',
+  MONGOLAB_URI : '{{mongodbUrl}}',
   clientDebug: '*,-socket.io-client*,-engine.io-client:*,-socket.io-parser*',
   serverDebug: '*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint*',
   PUBLIC_PATH: '/dist',

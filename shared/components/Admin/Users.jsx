@@ -326,7 +326,7 @@ export default React.createClass({
         {body}
 
         <Modal
-          title={`Bulkz editing ${this.state.userCount} Users`}
+          title={`Bulk editing ${this.state.userCount} Users`}
           show={this.state.show}
           onHide={() => this.setState({show: false, showConfirm: false})}>
 

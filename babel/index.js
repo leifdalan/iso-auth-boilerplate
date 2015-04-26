@@ -19,11 +19,14 @@ import passport from 'passport';
 import passportConfig from '../config/passport';
 import config from '../config';
 
+const config = process.env.NODE_ENV === 'production' ?
+  process.env || require('../config');
+
 const {
   PUBLIC_PATH: PUBLICPATH,
   WEBPACK_DEV_SERVER_PORT: DEVSERVERPORT,
   BROWSERSYNC_PORT: BSPORT,
-  url: mongoUrl,
+  MONGOLAB_URI,
   HOSTNAME,
   PROTOCOL,
   DEVELOPMENT_PORT
@@ -31,7 +34,7 @@ const {
 
 const debug = require('debug')('Server');
 
-mongoose.connect(mongoUrl);
+mongoose.connect(MONGOLAB_URI);
 
 passportConfig(passport);
 
