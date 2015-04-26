@@ -17,10 +17,9 @@ import reactRender from './reactrender';
 // Passport imports
 import passport from 'passport';
 import passportConfig from '../config/passport';
-import config from '../config';
 
 const config = process.env.NODE_ENV === 'production' ?
-  process.env || require('../config');
+  process.env : require('../config');
 
 const {
   PUBLIC_PATH: PUBLICPATH,
