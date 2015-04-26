@@ -260,11 +260,9 @@ gulp.task('awsCSS', function() {
 
 gulp.task('aws', ['awsCSS', 'awsJS']);
 
-
-
 gulp.task('dev', ['clean', 'watch', 'devserver', 'browser-sync', 'less', 'server']);
 
-gulp.task('build', ['less', 'bundleJS']);
+gulp.task('build', ['clean', 'less', 'bundleJS']);
 
 gulp.task('server-only', ['clean', 'watch', 'browser-sync', 'less', 'server']);
 ;
@@ -272,8 +270,9 @@ gulp.task('deploy', ['g-zip'], function() {
   gulp.start('aws');
   const manifest = require('../rev-manifest.json');
   $.run(`heroku config:set CSS_PATH=${manifest['main.css']} ` +
-        `JS_PATH=${manifest['main.js']} ` +
-        `PUBLIC_PATH=${aws.bucket}.${aws.region}.amazonaws.com`).exec();
+        `JS_PATH=${manifest['client.js']} ` +
+        `PUBLIC_ASSET_DOMAIN=s3-${aws.region}.amazonaws.com`
+        `PUBLIC_PATH=/${aws.bucket}`).exec();
   $.run(`git push heroku master`).exec();
 });
 

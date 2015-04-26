@@ -2,7 +2,7 @@
 var path = require('path');
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var CompressionPlugin = require('compression-webpack-plugin');
+// var CompressionPlugin = require('compression-webpack-plugin');
 require('strip-loader');
 
 module.exports = {
@@ -67,13 +67,6 @@ module.exports = {
         // Signal production mode for React JS libs.
         NODE_ENV: JSON.stringify('production')
       }
-    }),
-    new CompressionPlugin({
-      asset: '{file}',
-      algorithm: 'gzip',
-      regExp: /\.js$|\.html$|\.css$/,
-      threshold: 10240,
-      minRatio: 0.8
     })
   ]
 };

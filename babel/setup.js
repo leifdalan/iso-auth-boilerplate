@@ -95,7 +95,7 @@ Async.auto({
     const configTemplatePath = Path.resolve(
       __dirname, '../config', 'config.example'
     );
-    const configPath = Path.resolve(__dirname, '../config', 'index.js');
+    const configPath = Path.resolve(__dirname, '../config', 'secrets.js');
     const options = { encoding: 'utf-8' };
 
     Fs.readFile(configTemplatePath, options,  (err, source) => {

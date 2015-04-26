@@ -1,11 +1,18 @@
 'use strict';
 import React from 'react';
-import {PROTOCOL, PUBLIC_PATH, CSS_PATH, JS_PATH} from '../../config';
+import {
+  PROTOCOL,
+  PUBLIC_PATH,
+  PUBLIC_ASSET_DOMAIN,
+  CSS_PATH,
+  JS_PATH} from '../../config';
+
+const fullPublicPath = `${PROTOCOL}${PUBLIC_ASSET_DOMAIN}${PUBLIC_PATH}`;
 
 export default React.createClass({
   render() {
     const clientScript = (
-      <script src={`${PROTOCOL}${PUBLIC_PATH}/${JS_PATH}`} defer></script>
+      <script src={`${fullPublicPath}/${JS_PATH}`} defer></script>
     );
     const clientBootstrap = (
       <script dangerouslySetInnerHTML={{__html: this.props.state}}>
@@ -27,7 +34,7 @@ export default React.createClass({
           /> */}
           <link
             rel="stylesheet"
-            href={`${PROTOCOL}${PUBLIC_PATH}/${CSS_PATH}`}
+            href={`${fullPublicPath}/${CSS_PATH}`}
           />
         </head>
         <body>

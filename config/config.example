@@ -3,6 +3,7 @@ var defaults = {
   clientDebug: '*,-socket.io-client*,-engine.io-client:*,-socket.io-parser*',
   serverDebug: '*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint*',
   PUBLIC_PATH: '/dist',
+  PUBLIC_ASSET_DOMAIN: 'localhost:3000',
   WEBPACK_DEV_SERVER_PORT: 3002,
   DEVELOPMENT_PORT: 3030,
   BROWSERSYNC_PORT: 3000,
@@ -13,7 +14,8 @@ var defaults = {
   NODE_ENV: 'development',
   DEBUG: '*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint*',
   JS_PATH: 'client.js',
-  CSS_PATH: 'main.css'
+  CSS_PATH: 'main.css',
+
 };
 
 // Override defaults with environment variables

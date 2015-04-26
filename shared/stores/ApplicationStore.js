@@ -14,6 +14,7 @@ export default createStore({
     'REQUEST_END': 'requestEnd',
     'NAVIGATION_ERROR': 'navigationError',
     'FLASH_MESSAGE': 'flashMessagez',
+    'SET_PAGE_USER_PREF': 'setPageUserPref',
     'SAVE_REQUEST_ATTEMPT': 'saveRequestAttempt'
   },
 
@@ -33,6 +34,13 @@ export default createStore({
     this.flashMessage = null;
     this.reqAttempt = null;
     this.userLevel = null;
+    this.pageUserPref = null;
+  },
+
+  setPageUserPref({route, preference}) {
+    this.pageUserPref = {
+      [route]: preference
+    };
   },
 
   saveRequestAttempt(message) {
@@ -120,6 +128,7 @@ export default createStore({
       redirect: this.redirect,
       appIsLoading: this.appIsLoading,
       flashMessage: this.flashMessage,
+      pageUserPref: this.pageUserPref,
       reqAttempt: this.reqAttempt
     };
   },
@@ -136,6 +145,7 @@ export default createStore({
     this.redirect = state.redirect;
     this.appIsLoading = state.appIsLoading;
     this.flashMessage = state.flashMessage;
+    this.pageUserPref = state.pageUserPref;
     this.reqAttempt = state.reqAttempt;
   }
 });

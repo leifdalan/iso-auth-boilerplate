@@ -93,28 +93,23 @@ if (process.env.ALWAYS_ADMIN) {
   })
 }
 
-// load our services and pass in our app and fully configured passport
+// Load our services and pass in our app and fully configured passport
+// This is where all the routing for mongoDB service calls live.
 services(server);
 
 // Proxy public folder to WebPack's hot loading server during development
+// If not development, we're using an S3 bucket for static assets.
 if (process.env.NODE_ENV === 'development' &&
   process.env.REACT_CLIENT_RENDER !== 'false') {
   server.use(`${PUBLICPATH}`,
     proxy(url.parse(`${PROTOCOL}${HOSTNAME}:${DEVSERVERPORT}${PUBLICPATH}`))
   );
-} else {
-
-  // Signify gzipped assets on production
-  server.use(`${PUBLICPATH}/*.js`, (req, res, next) => {
-    res.set('Content-Encoding', 'gzip');
-    next();
-  });
+  server.use(`${PUBLICPATH}`,
+    express.static(path.join(__dirname, `../${PUBLICPATH}`))
+  );
 }
 
 server.use(favicon(path.join(__dirname, '../favicon.ico')));
-server.use(`${PUBLICPATH}`,
-  express.static(path.join(__dirname, `../${PUBLICPATH}`))
-);
 
 // Fluxible + react-router markup generator, attemps to send response.
 server.use(reactRender);

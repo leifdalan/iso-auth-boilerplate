@@ -2,8 +2,9 @@
 import React from 'react';
 import {FluxibleMixin} from 'fluxible';
 import UserStore from '../../stores/UserStore';
+import ApplicationStore from '../../stores/ApplicationStore';
 import navigateAction from '../../actions/navigate';
-import {flashMessageAction} from '../../actions/appActions';
+import {flashMessageAction, setPageUserPrefAction} from '../../actions/appActions';
 import Paginator from './Paginator';
 import {CheckAdminMixin} from '../../mixins/authMixins';
 import {updateResultsAction, editManyUsersAction} from '../../actions/userActions';
@@ -48,6 +49,7 @@ export default React.createClass({
 
   getInitialState() {
     let state = this.getStore(UserStore).getState();
+
     const users = state.users.map((user) => {
       user.selected = false;
       user.email = user.local.email;
@@ -62,30 +64,48 @@ export default React.createClass({
       return user;
     });
 
-    state.tablePropChoices = [
-      {
-        label: 'Username',
-        valueProp: 'email',
-        selected: true
-      },
-      {
-        label: 'Login Token',
-        valueProp: 'loginToken'
-      },
-      {
-        label: 'User Level',
-        valueProp: 'userLevel',
-        selected: true
-      },
-      {
-        label: 'Is Validated',
-        valueProp: 'isValidated'
-      },
-      {
-        label: 'Last Updated',
-        valueProp: 'lastUpdated'
-      }
-    ];
+    const appState = this.getStore(ApplicationStore).getState();
+    const routes = this.context.router.getCurrentRoutes();
+    const currentRouteName = routes[routes.length - 1].name;
+    debug('CurrentRoute', currentRouteName);
+
+    // TODO: there's gotta be a better way to do this.
+    if (appState.pageUserPref &&
+      appState.pageUserPref[currentRouteName] &&
+      appState.pageUserPref[currentRouteName].tablePropChoices) {
+      state.tablePropChoices =
+        appState.pageUserPref[currentRouteName].tablePropChoices;
+    } else {
+      const tablePropChoices = [
+        {
+          label: 'Username',
+          valueProp: 'email',
+          selected: true
+        },
+        {
+          label: 'Login Token',
+          valueProp: 'loginToken'
+        },
+        {
+          label: 'User Level',
+          valueProp: 'userLevel',
+          selected: true
+        },
+        {
+          label: 'Is Validated',
+          valueProp: 'isValidated'
+        },
+        {
+          label: 'Last Updated',
+          valueProp: 'lastUpdated'
+        }
+      ];
+      state.tablePropChoices = tablePropChoices;
+      this.executeAction(setPageUserPrefAction, {
+        route: currentRouteName,
+        preference: {tablePropChoices}
+      });
+    }
 
     state.users = users;
     state.pageAdjustment && this._adjustPageBounds(state);
@@ -212,6 +232,14 @@ export default React.createClass({
       return propChoice;
     });
     this.setState({tablePropChoices});
+
+    const routes = this.context.router.getCurrentRoutes();
+    const currentRouteName = routes[routes.length - 1].name;
+
+    this.executeAction(setPageUserPrefAction, {
+      route: currentRouteName,
+      preference: {tablePropChoices}
+    });
   },
 
   render() {
@@ -300,6 +328,7 @@ export default React.createClass({
         />
 
         {paginator}
+
       </div>
     );
 
