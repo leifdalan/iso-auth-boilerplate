@@ -4,4 +4,4 @@ npm-debug.log
 dist
 public
 bower_components
-config/index.js
+config/secrets.js

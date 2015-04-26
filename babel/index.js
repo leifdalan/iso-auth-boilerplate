@@ -17,8 +17,7 @@ import reactRender from './reactrender';
 // Passport imports
 import passport from 'passport';
 import passportConfig from '../config/passport';
-
-const config = process.env;
+import config from '../config';
 
 const {
   PUBLIC_PATH: PUBLICPATH,
