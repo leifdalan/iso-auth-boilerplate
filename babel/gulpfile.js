@@ -209,7 +209,7 @@ gulp.task('clean', (cb) => {
   del(['dist/*'], cb);
 });
 
-gulp.task('bundleJS', () => {
+gulp.task('bundleJS', ['clean'], () => {
   return gulp.src('./client.js')
     .pipe($.webpack(webpackConfig))
     .pipe(gulp.dest(`.${PUBLIC_PATH}/`));
@@ -264,7 +264,7 @@ gulp.task('aws', ['awsCSS', 'awsJS']);
 
 gulp.task('dev', ['clean', 'watch', 'devserver', 'browser-sync', 'less', 'server']);
 
-gulp.task('build', ['clean', 'less', 'bundleJS']);
+gulp.task('build', ['less', 'bundleJS']);
 
 gulp.task('server-only', ['clean', 'watch', 'browser-sync', 'less', 'server']);
 ;
@@ -272,7 +272,7 @@ gulp.task('deploy', ['g-zip'], function() {
   gulp.start('aws');
   const manifest = require('../rev-manifest.json');
   $.run(`heroku config:set CSS_PATH=${manifest['main.css']} ` +
-        `JS_PATH=${manifest['main.css']} ` +
+        `JS_PATH=${manifest['main.js']} ` +
         `PUBLIC_PATH=${aws.bucket}.${aws.region}.amazonaws.com`).exec();
   $.run(`git push heroku master`).exec();
 });
