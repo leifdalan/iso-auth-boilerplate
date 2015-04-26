@@ -46,9 +46,8 @@
     "url": "^0.10.3",
     "uuid": "2.0.1",
     "webpack": "^1.8.4",
-    "webpack-dev-server": "^1.8.0"
-  },
-  "devDependencies": {
+    "webpack-dev-server": "^1.8.0",
+
     "autoprefixer-loader": "^1.2.0",
     "browser-sync": "^2.6.4",
     "compression-webpack-plugin": "^0.2.0",
@@ -75,6 +74,9 @@
     "style-loader": "^0.8.3",
     "vinyl-source-stream": "^1.0.0",
     "webpack-dev-server": "1.6.4"
+
+  },
+  "devDependencies": {
   },
   "scripts": {
     "server-only": "DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp server-only --serverOnly",
