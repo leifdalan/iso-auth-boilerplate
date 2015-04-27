@@ -59,7 +59,10 @@ module.exports = {
     new webpack.NormalModuleReplacementPlugin(
       /debug/, process.cwd() + '/utils/noop.js'
     ),
-    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.DedupePlugin({
+      output: {comments: false},
+      comments: false
+    }),
     new webpack.optimize.UglifyJsPlugin(),
     new ExtractTextPlugin('[name].css'),
     new webpack.DefinePlugin({

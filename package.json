@@ -43,6 +43,7 @@
     "strip-loader": "^0.1.0",
     "superagent": "0.21.0",
     "through2": "^0.6.3",
+    "uglify-js": "^2.4.20",
     "url": "^0.10.3",
     "uuid": "2.0.1",
     "webpack": "^1.8.4",

@@ -6,6 +6,7 @@ import app from '../shared/app';
 import Html from '../shared/components/Html';
 import DocumentTitle from 'react-document-title';
 import serialize from 'serialize-javascript';
+import uglify from 'uglify-js';
 const debug = require('debug')('Server:ReactRouter');
 
 const htmlComponent = React.createFactory(Html);
@@ -98,7 +99,17 @@ export default function(req, res, next) {
 
         // Passing window.App is the first part of the server/client relay
         debug('Exposing appContext state');
-        const state = 'window.App=' + serialize(app.dehydrate(appContext)) + ';';
+        let state = 'window.App=' + serialize(app.dehydrate(appContext)) + ';';
+
+        // TODO: Uglifying takes ~150ms. There's comments and other crap in this
+        // dehydrated state if we don't, though!
+        // Maybe we need to look under the hood of Fluxible's
+        // dehydrate.
+
+        // // Let's uglify the state, it has comments, etc in it
+        // state = uglify.minify(state, {fromString: true});
+
+
         const component = React.createFactory(Handler);
         const context = appContext.getComponentContext();
 
@@ -125,9 +136,10 @@ export default function(req, res, next) {
         // Render document HTML
         debug('Rendering Application component into HTML');
         const html = React.renderToStaticMarkup(htmlComponent({
+          state,
           title,
           markup,
-          state,
+
           shouldClientRender
         }));
 
