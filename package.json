@@ -47,7 +47,8 @@
     "url": "^0.10.3",
     "uuid": "2.0.1",
     "webpack": "^1.8.4",
-    "webpack-dev-server": "^1.8.0"
+    "webpack-dev-server": "^1.8.0",
+    "xdate": "^0.8.0"
   },
   "devDependencies": {
     "autoprefixer-loader": "^1.2.0",

@@ -8,12 +8,12 @@ import {flashMessageAction, setPageUserPrefAction} from '../../actions/appAction
 import Paginator from './Paginator';
 import {CheckAdminMixin} from '../../mixins/authMixins';
 import {updateResultsAction, editManyUsersAction} from '../../actions/userActions';
-import {isClient, upsertQuery} from '../../../utils';
+import {isClient, upsertQuery, getTimeAgo} from '../../../utils';
 import Modal from '../Modal';
 import ConfirmationPopup from './ConfirmationPopup';
 import Checkbox from '../Checkbox';
 import UserForm from './UserForm';
-import moment from 'moment';
+
 import ResultsTable from './ResultsTable';
 
 import _ from 'lodash';
@@ -59,7 +59,7 @@ export default React.createClass({
           this._setHighlightedMarkup(user.email, searchLetters);
       }
 
-      user.lastUpdated = moment(user.lastUpdated).fromNow();
+      user.lastUpdated = getTimeAgo(user.lastUpdated);
 
       return user;
     });
@@ -91,13 +91,16 @@ export default React.createClass({
           valueProp: 'userLevel',
           selected: true
         },
+
+        // TODO: dates seem to be broken in the DB...
+        // {
+        //   label: 'Last Updated',
+        //   valueProp: 'lastUpdated'
+        // },
+
         {
           label: 'Is Validated',
           valueProp: 'isValidated'
-        },
-        {
-          label: 'Last Updated',
-          valueProp: 'lastUpdated'
         }
       ];
       state.tablePropChoices = tablePropChoices;
@@ -125,7 +128,7 @@ export default React.createClass({
     let state = this.getStore(UserStore).getState();
     const users = state.users.map((user) => {
       user.email = user.local.email;
-      user.lastUpdated = moment(user.lastUpdated).fromNow();
+      user.lastUpdated = getTimeAgo(user.lastUpdated);
       if (state.search) {
         const searchLetters = state.search.split('');
         user.email =
