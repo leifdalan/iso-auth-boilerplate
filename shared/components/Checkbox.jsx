@@ -1,8 +1,9 @@
 'use strict';
-import React from 'react';
+import React, {Component} from 'react';
 
-export default React.createClass({
-  displayName: 'CheckBox',
+export default class Checkbox extends Component {
+
+  static displayName = 'Checkbox'
 
   render() {
     let input;
@@ -31,4 +32,6 @@ export default React.createClass({
     }
     return input;
   }
-})
+}
+
+Checkbox.displayName = 'CheckBox';

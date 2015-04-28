@@ -87,15 +87,17 @@ export default createStore({
     // Preserve flash message if this is a redirect.
     if (this._redirectFlash) {
       this._redirectFlash = null;
-      this.flashMessage = null;
     }
   },
 
   setRedirect(payload) {
 
     // Preserve flash message if this is a redirect.
+
     this._redirectFlash = payload.flashMessage;
     this.redirect = payload.url;
+    debug(payload);
+    debug('SETTING REDURECT!!!', this.redirect);
     this.emitChange();
   },
 

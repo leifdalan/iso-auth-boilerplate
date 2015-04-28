@@ -3,7 +3,7 @@ import request from 'superagent';
 import RSVP from 'rsvp';
 const debug = require('debug')('Action:navigate');
 
-export default function ({dispatch}, payload, done) {
+export default function navigateAction({dispatch}, payload, done) {
   debug('Navigation Payload vvvvv');
   debug(payload);
 
