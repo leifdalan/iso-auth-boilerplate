@@ -145,7 +145,7 @@ export function getOne(req, res, next) {
           data.success = true
         }
         debug('USER DATA', data);
-        sendData({data: user, req, res, next});
+        sendData({data, req, res, next});
       }
     });
   }

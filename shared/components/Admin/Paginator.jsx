@@ -1,36 +1,41 @@
 'use strict';
-import React from 'react';
-import {FluxibleMixin} from 'fluxible';
-import UserStore from '../../stores/UserStore';
+
+import React, {Component, PropTypes as pt} from 'react';
+import {connectToStores} from 'fluxible/addons';
 import PaginatorLink from './PaginatorLink';
-let debug = require('debug');
-debug = debug('Component:Paginator');
+import {autoBindAll} from '../../../utils';
+const debug = require('debug')('Component:Paginator');
+debug();
 
+export default class Paginator extends Component {
 
-export default React.createClass({
-  displayName: 'Paginator',
+  constructor(props) {
+    super(props);
+    autoBindAll.call(this, [
+      '_getTotalPages',
+      '_shouldShowNext',
+      '_shouldShowPrev',
+      '_constructMiddle'
+    ]);
+    this.state = {
+      totalPages: this._getTotalPages(props)
+    };
+  }
 
-  contextTypes: {
-    router: React.PropTypes.func
-  },
+  static displayName = 'Paginator'
 
-  propTypes: {
-    currentPageNumber: React.PropTypes.number.isRequired,
-    totalItems: React.PropTypes.number.isRequired,
-    perpage: React.PropTypes.number.isRequired,
-    pathBase: React.PropTypes.string.isRequired
-  },
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
 
-  mixins: [FluxibleMixin],
-
-  _shouldShowNext() {
-    const {currentPageNumber, neighborDepth} = this.props;
-    return currentPageNumber < this.state.totalPages - neighborDepth;
-  },
-
-  _shouldShowPrev() {
-    return this.props.currentPageNumber > 1;
-  },
+  static propTypes = {
+    currentPageNumber: pt.number.isRequired,
+    totalItems: pt.number.isRequired,
+    perpage: pt.number.isRequired,
+    pathBase: pt.string.isRequired
+  }
 
   componentWillReceiveProps(nextProps) {
     const totalPages = this._getTotalPages(nextProps);
@@ -39,7 +44,7 @@ export default React.createClass({
         totalPages: this._getTotalPages(nextProps)
       });
     }
-  },
+  }
 
   _getTotalPages(props) {
     const {totalItems, perpage} = props;
@@ -47,11 +52,16 @@ export default React.createClass({
     const remainder = totalItems % perpage;
     totalPages = remainder ? Math.floor(totalPages) + 1 : totalPages;
     return totalPages;
-  },
+  }
 
-  getInitialState() {
-    return {totalPages: this._getTotalPages(this.props)};
-  },
+  _shouldShowNext() {
+    const {currentPageNumber, neighborDepth} = this.props;
+    return currentPageNumber < this.state.totalPages - neighborDepth;
+  }
+
+  _shouldShowPrev() {
+    return this.props.currentPageNumber > 1;
+  }
 
   _constructMiddle() {
     let atEnd, atBeginning, middleMarkup = [];
@@ -119,7 +129,7 @@ export default React.createClass({
     }
 
     return middleMarkup;
-  },
+  }
 
   render() {
     const shouldrender = this.state.totalPages > 1;
@@ -150,4 +160,4 @@ export default React.createClass({
       </div>
     );
   }
-})
+}

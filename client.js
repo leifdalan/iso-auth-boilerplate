@@ -4,8 +4,10 @@ import React from 'react';
 import debug from 'debug';
 import app from './shared/app';
 import Router, {HistoryLocation} from 'react-router';
+import {provideContext} from 'fluxible/addons';
 import navigateAction from './shared/actions/navigate';
 import config from './config';
+import FluxibleComponent from 'fluxible/addons/FluxibleComponent';
 
 const bootstrapDebug = debug('Bootstrapping App:');
 
@@ -27,12 +29,22 @@ app.rehydrate(dehydratedState, (err, context) => {
   const renderApp = (context, Handler) => {
     bootstrapDebug('React Rendering');
     const mountNode = document.getElementById('app');
+
+    // wrap the root element to provide children with access to the context
     const component = React.createFactory(Handler);
-    React.render(
-      component({
-        context: context.getComponentContext()
-      }), mountNode, () => {
-        bootstrapDebug('React Rendered');
+    React.render(React.createElement(
+      FluxibleComponent,
+      {context: context.getComponentContext()},
+      component()
+    ), mountNode, () => {
+    //   bootstrapDebug('React Rendered');
+    // }
+
+      // component({
+      //   context: context.getComponentContext()
+      // }), mountNode, () => {
+      //   bootstrapDebug('React Rendered');
+      // }
       }
     );
   };

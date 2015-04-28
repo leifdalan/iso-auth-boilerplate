@@ -1,22 +1,19 @@
 'use strict';
-import React from 'react';
-import Modal from 'react-bootstrap-modal';
-const rpt = React.PropTypes;
+import React, {Component, PropTypes as rpt} from 'react';
+import Modal, {Body, Header, Title, Footer, Dismiss} from 'react-bootstrap-modal';
+const debug = require('debug')('Component:ModalWrapper');
+debug();
 
+export default class ModalWrapper extends Component {
 
-export default React.createClass({
-  displayName: 'Modal',
+  static defaultProps = {
+    ariaLabel: 'ModalHeader'
+  }
 
-  getDefaultProps() {
-    return {
-      ariaLabel: 'ModalHeader'
-    };
-  },
-
-  propTypes: {
+  static propTypes = {
     show: rpt.bool.isRequired,
     onHide: rpt.func.isRequired
-  },
+  }
 
   render() {
     return (
@@ -25,21 +22,20 @@ export default React.createClass({
         onHide={this.props.onHide}
         aria-labelledby={this.props.ariaLabel}>
 
-        <Modal.Header closeButton>
-        {this.props.title &&
-          <Modal.Title id={this.props.ariaLabel}>
-            {this.props.title}
-          </Modal.Title>
-        }
-        </Modal.Header>
-        <Modal.Body>
+        <Header closeButton>
+          {this.props.title &&
+            <Title id={this.props.ariaLabel}>
+              {this.props.title}
+            </Title>
+          }
+        </Header>
+        <Body>
           {this.props.children}
-        </Modal.Body>
-        <Modal.Footer>
-          <Modal.Dismiss>Cancel</Modal.Dismiss>
-        </Modal.Footer>
+        </Body>
+        <Footer>
+          <Dismiss>Cancel</Dismiss>
+        </Footer>
       </Modal>
-
     );
   }
-})
+}

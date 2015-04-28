@@ -1,21 +1,29 @@
 'use strict';
-import React from 'react';
-import {FluxibleMixin} from 'fluxible';
+
+import React, {Component, PropTypes as pt} from 'react';
+import {connectToStores} from 'fluxible/addons';
+import {autoBindAll} from '../../../utils';
 const debug = require('debug')('Component:UserForm');
+debug();
 
+export default class UserForm extends Component {
 
-export default React.createClass({
-  displayName: 'UserForm',
+  constructor(props) {
+    super(props);
+    autoBindAll.call(this, [
+      'handleSubmit',
+      'handleChange'
+    ]);
+    this.state = props;
+  }
 
-  contextTypes: {
-    router: React.PropTypes.func
-  },
+  static displayName = 'UserForm'
 
-  getInitialState() {
-    return this.props;
-  },
-
-  mixins: [FluxibleMixin],
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
 
   handleSubmit(e) {
     debug();
@@ -25,7 +33,7 @@ export default React.createClass({
     });
     debug('state', this.state);
     this.props.handleSubmit(this.state);
-  },
+  }
 
   handleChange(field, e) {
     if (field === 'email' || field === 'password') {
@@ -46,7 +54,7 @@ export default React.createClass({
         [field]: e.target.value
       });
     }
-  },
+  }
 
   render() {
     return (
@@ -106,6 +114,7 @@ export default React.createClass({
           </div>
         </form>
       </div>
+
     );
   }
-})
+}

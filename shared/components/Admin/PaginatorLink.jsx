@@ -1,33 +1,35 @@
 'use strict';
-import React from 'react';
-import {FluxibleMixin} from 'fluxible';
+
+import React, {Component, PropTypes as pt} from 'react';
+import {autoBindAll} from '../../../utils';
 import classnames from 'classnames';
-import UserStore from '../../stores/UserStore';
 const debug = require('debug')('Component:PaginatorLink');
+debug();
 
-export default React.createClass({
-  displayName: 'PaginatorLink',
+export default class PaginatorLink extends Component {
 
-  contextTypes: {
-    router: React.PropTypes.func
-  },
+  constructor(props) {
+    super(props);
+    autoBindAll.call(this, [
+      'navigate'
+    ]);
+    this.state = props.store;
+  }
 
-  propTypes: {
+  static displayName = 'PaginatorLink'
+
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
+
+  static propTypes = {
     pathBase: React.PropTypes.string.isRequired,
     pagenumber: React.PropTypes.number.isRequired,
     perpage: React.PropTypes.number.isRequired,
     currentPageNumber: React.PropTypes.number.isRequired
-  },
-
-  mixins: [FluxibleMixin],
-
-  statics: {
-    storeListeners: [UserStore]
-  },
-
-  getInitialState() {
-    return this.getStore(UserStore).getState();
-  },
+  }
 
   navigate() {
     debug(`${this.props.pathBase}${this.props.perpage}/${this.props.pagenumber}`);
@@ -40,21 +42,17 @@ export default React.createClass({
       .transitionTo(
         `${this.props.pathBase}${this.props.perpage}/${this.props.pagenumber}${query}`
       );
-  },
-
-  onChange() {
-    const state = this.getStore(UserStore).getState();
-    this.setState(state);
-  },
+  }
 
   render() {
     const classes = classnames({
       'button-primary': this.props.pagenumber === this.props.currentPageNumber
     });
+
     return (
-        <button className={classes} onClick={this.navigate}>
-          {this.props.children || this.props.pagenumber}
-        </button>
+      <button className={classes} onClick={this.navigate}>
+        {this.props.children || this.props.pagenumber}
+      </button>
     );
   }
-})
+}

@@ -1,4 +1,3 @@
-'use strict';
 import Fluxible from 'fluxible';
 
 const app = new Fluxible({

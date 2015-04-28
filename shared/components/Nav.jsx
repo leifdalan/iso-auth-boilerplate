@@ -1,29 +1,46 @@
 'use strict';
-import React from 'react';
+
+import React, {Component, PropTypes as pt} from 'react';
 import {Link} from 'react-router';
 import classnames from 'classnames';
+import {autoBindAll} from '../../utils';
+const debug = require('debug')('Component:Nav');
+debug();
 
-export default React.createClass({
-  contextTypes: {
-    router: React.PropTypes.func.isRequired
-  },
-  getInitialState() {
-    return {
+export default class Nav extends Component {
+
+  constructor(props) {
+    super(props);
+    autoBindAll.call(this, [
+      'mouseOverLink'
+    ]);
+    this.state = {
       isHovering: false
     };
-  },
+  }
+
+  static displayName = 'Nav'
+
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
+
   mouseOverLink(e) {
     e.target.classList.add('hovering');
     this.setState({
       isHovering: true
     });
-  },
+  }
+
   mouseOut(e) {
     e.target.classList.remove('hovering');
     this.setState({
       isHovering: false
     });
-  },
+  }
+
   render() {
     const classes = classnames({
       'is-hovered': this.state.isHovering
@@ -81,4 +98,4 @@ export default React.createClass({
       </div>
     );
   }
-});
+}

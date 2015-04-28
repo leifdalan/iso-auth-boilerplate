@@ -1,29 +1,48 @@
 'use strict';
-import React from 'react';
-import {Link} from 'react-router';
-import classnames from 'classnames';
 
-export default React.createClass({
-  contextTypes: {
-    router: React.PropTypes.func.isRequired
-  },
-  getInitialState() {
-    return {
+import React, {Component, PropTypes as pt} from 'react';
+import {connectToStores} from 'fluxible/addons';
+import {autoBindAll} from '../../../utils';
+import classnames from 'classnames';
+import {Link} from 'react-router';
+const debug = require('debug')('Component:AdminLink');
+debug();
+
+export default class AdminNav extends Component {
+
+  constructor(props) {
+    super(props);
+    autoBindAll.call(this, [
+      'mouseOverLink',
+      'mouseOut'
+    ]);
+    this.state = {
       isHovering: false
     };
-  },
+  }
+
+  static displayName = 'AdminNav'
+
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
+
   mouseOverLink(e) {
     e.target.classList.add('hovering');
     this.setState({
       isHovering: true
     });
-  },
+  }
+
   mouseOut(e) {
     e.target.classList.remove('hovering');
     this.setState({
       isHovering: false
     });
-  },
+  }
+
   render() {
     const classes = classnames({
       'is-hovered': this.state.isHovering
@@ -60,4 +79,4 @@ export default React.createClass({
       </div>
     );
   }
-});
+}

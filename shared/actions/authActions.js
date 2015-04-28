@@ -1,4 +1,5 @@
 import request from 'superagent';
+import {warn} from '../../utils';
 const debug = require('debug')('Action:authAction');
 
 export const loginAction = (
@@ -6,7 +7,8 @@ export const loginAction = (
     email,
     password,
     user,
-    reqAttempt
+    reqAttempt,
+    router
   }, done) => {
 
   if (user) {
@@ -26,10 +28,8 @@ export const loginAction = (
         // debug(success, user);
         if (success) {
           dispatch('LOGIN', user);
-          dispatch('REDIRECT', {
-            url: reqAttempt || '/dashboard',
-            flashMessage: 'Welcome!'
-          });
+          router.transitionTo(reqAttempt || '/dashboard');
+          dispatch('FLASH_MESSAGE', 'Welcome!');
         } else {
           dispatch('FLASH_MESSAGE', message);
         }
@@ -39,7 +39,7 @@ export const loginAction = (
   }
 };
 
-export const logoutAction = ({dispatch}, payload, done) => {
+export const logoutAction = ({dispatch}, {router}, done) => {
   debug('Logging out.');
   request
     .post('/logout')
@@ -48,16 +48,18 @@ export const logoutAction = ({dispatch}, payload, done) => {
     .end((err, res) => {
       debug('Response:', res);
       dispatch('LOGOUT');
-      dispatch('REDIRECT', {
-        url: '/',
-        flashMessage: 'Come back soon!'
-      });
+      router.transitionTo('/');
+      warn('Redirecting...')
+      dispatch('FLASH_MESSAGE', 'Come back soon!');
       done && done();
     }
   );
 };
 
-export const signUpAction = ({dispatch}, {email, password, userLevel}, done) => {
+export const signUpAction = (
+  {dispatch},
+  {email, password, userLevel, router},
+  done) => {
   debug('SignUpAction');
   request
     .post('/signup')
@@ -68,13 +70,10 @@ export const signUpAction = ({dispatch}, {email, password, userLevel}, done) => 
       const {success, user, message} = body;
       debug('RESPONSE?!');
       debug(err);
-      // debug(success, user);
       if (success) {
         dispatch('LOGIN', user);
-        dispatch('REDIRECT', {
-          url: '/dashboard',
-          flashMessage: 'Welcome to the site! Here\'s your dashboard.'
-        });
+        router.transitionTo('/dashboard');
+        dispatch('FLASH_MESSAGE', 'Welcome to the site! Here\'s your dashboard.');
       } else {
         dispatch('FLASH_MESSAGE', message);
       }

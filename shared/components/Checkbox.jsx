@@ -1,8 +1,12 @@
 'use strict';
-import React from 'react';
+import React, {Component} from 'react';
+const debug = require('debug')('Component:Checkbox');
+debug();
 
-export default React.createClass({
-  displayName: 'CheckBox',
+
+export default class Checkbox extends Component {
+
+  static displayName = 'Checkbox'
 
   render() {
     let input;
@@ -31,4 +35,4 @@ export default React.createClass({
     }
     return input;
   }
-})
+}

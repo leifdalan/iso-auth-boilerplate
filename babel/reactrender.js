@@ -8,7 +8,7 @@ import DocumentTitle from 'react-document-title';
 import serialize from 'serialize-javascript';
 import uglify from 'uglify-js';
 const debug = require('debug')('Server:ReactRouter');
-
+import FluxibleComponent from 'fluxible/addons/FluxibleComponent';
 const htmlComponent = React.createFactory(Html);
 
 // ----------------------------------------------------------------------------
@@ -127,7 +127,13 @@ export default function(req, res, next) {
 
             // Include data-react-ids for client bootstrapping to prevent
             // full client re-render on initialization.
-            markup = React.renderToString(component({context}));
+            markup = React.renderToString(React.createElement(
+              FluxibleComponent,
+              {context},
+              component()
+              )
+            );
+
             title = DocumentTitle.rewind();
             debug('DOCUMENT TITLE === %s', title);
           }

@@ -92,10 +92,8 @@ export const deleteUserAction = ({dispatch}, payload, done) => {
       } else {
         if (success) {
           debug('Deleting: ', success, user);
-          dispatch('REDIRECT', {
-            url: `/admin/users/page/20/1`,
-            flashMessage: success
-          });
+          dispatch('FLASH_MESSAGE', success);
+          payload.router.transitionTo('/admin/users/page/20/1')
         } else {
           dispatch('FLASH_MESSAGE', error);
         }
@@ -105,11 +103,11 @@ export const deleteUserAction = ({dispatch}, payload, done) => {
   );
 };
 
-export const createUserAction = ({dispatch}, payload, done) => {
+export const createUserAction = ({dispatch}, {formValues, router}, done) => {
   debug('createUser');
-  if (payload.local && payload.local.email && payload.local.password) {
-    payload.email = payload.local.email;
-    payload.password = payload.local.password;
+  if (formValues.local && formValues.local.email && formValues.local.password) {
+    formValues.email = formValues.local.email;
+    formValues.password = formValues.local.password;
   } else {
     dispatch('FLASH_MESSAGE', 'Need email and password fields.');
     return done();
@@ -119,7 +117,7 @@ export const createUserAction = ({dispatch}, payload, done) => {
     .post('/admin/users')
     .set('Accept', 'application/json')
     .set('X-Requested-With', 'XMLHttpRequest')
-    .send(payload)
+    .send(formValues)
     .end((xhrError, res) => {
       dispatch('REQUEST_END');
       debug('Response:');
@@ -128,16 +126,11 @@ export const createUserAction = ({dispatch}, payload, done) => {
       if (xhrError || res.badRequest) {
         debug(res);
         dispatch('FLASH_MESSAGE', error);
-        // if (error && error.errorFor) {
-        //   dispatch('ERROR_FIELDS', error.errorFor);
-        // }
       } else {
         if (success) {
           debug('Created: ', success, user);
-          dispatch('REDIRECT', {
-            url: `/admin/users/${user._id}`,
-            flashMessage: success
-          });
+          dispatch('FLASH_MESSAGE', success);
+          router.transitionTo(`/admin/users/${user._id}`)
         } else {
           dispatch('FLASH_MESSAGE', error);
         }

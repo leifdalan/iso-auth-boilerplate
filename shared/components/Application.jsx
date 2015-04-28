@@ -1,84 +1,75 @@
 'use strict';
-import React from 'react';
-import Nav from './Nav';
-import AdminNav from './Admin/AdminNav';
+import React, {Component, PropTypes as pt} from 'react';
+import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../stores/ApplicationStore';
 import UserStore from '../stores/UserStore';
+import {autoBindAll, warn, error} from '../../utils';
+import Nav from './Nav';
+import AdminNav from './Admin/AdminNav';
 import {RouteHandler, Navigation} from 'react-router';
-import {loginAction, logoutAction} from '../actions/authActions';
-import clearRedirect from '../actions/clearRedirect';
+import {logoutAction} from '../actions/authActions';
 import DocumentTitle from 'react-document-title';
+import {clearFlashAction} from '../actions/appActions';
 import TransitionGroup from 'react/lib/ReactCSSTransitionGroup';
-import {FluxibleMixin} from 'fluxible';
-
 const debug = require('debug')('Component:Application');
 
-export default React.createClass({
-  contextTypes: {
-    router: React.PropTypes.func
-  },
+class Application extends Component {
 
-  mixins: [FluxibleMixin],
+  constructor(props) {
+    super(props);
+    autoBindAll.call(this, [
+      'logout',
+      'clearFlash',
+      'log'
+    ]);
+    this.state = props.appStore;
+  }
 
-  statics: {
-    storeListeners: [ApplicationStore]
-  },
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
 
-  logout(e) {
-    e.preventDefault();
-    this.executeAction(logoutAction);
-  },
-
-  getInitialState() {
-    return this.getStore(ApplicationStore).getState();
-  },
-
-  onChange() {
-    var state = this.getStore(ApplicationStore).getState();
-
-    if (state.redirect) {
-      this.executeAction(clearRedirect);
-      this.context.router.transitionTo(state.redirect);
-    } else {
-      this.setState(state);
-    }
-
-    clearTimeout(this._flashTimeout);
-    if (this.state.flashMessage) {
-
+  componentWillReceiveProps(nextProps) {
+    const newState = nextProps.appStore;
+    if (this.state.flashMessage !== newState.flashMessage) {
+      this._flashTimeout && clearTimeout(this._flashTimeout);
       this._flashTimeout = setTimeout(() => {
-        debug('Clearing...');
         this.clearFlash();
       }, 5000);
     }
+    this.setState(newState);
+  }
 
-  },
+  logout(e) {
+    e.preventDefault();
+    const {router} = this.context;
+    this.context.executeAction(logoutAction, {router});
+  }
 
   clearFlash(e) {
     e && e.preventDefault();
-    this.setState({
-      flashMessage: ''
-    });
-  },
+    this._flashTimeout && clearTimeout(this._flashTimeout);
+    this.context.executeAction(clearFlashAction);
+  }
 
   log() {
-    const state = this.getStore(ApplicationStore).getState();
-    const userState = this.getStore(UserStore).getState();
+    const state = this.context.getStore(ApplicationStore).getState();
+    const userState = this.context.getStore(UserStore).getState();
     debug(userState);
     debug(state);
-  },
+  }
 
   componentWillUnmount() {
-    window.clearTimeout(this._flashTimeout);
-  },
+    // window.clearTimeout(this._flashTimeout);
+  }
 
   render() {
     const name = this.context.router.getCurrentPath();
-    debug(name);
-    const buttonName = `button${name}`;
-    const formName = `form${name}`;
+
     const loggedInForm = (
-      <form key={formName} action="/logout" method="POST">
+      <form key={`form${name}`} action="/logout" method="POST">
         <button type="submit" onClick={this.logout}>Log out</button>
       </form>
     );
@@ -102,26 +93,42 @@ export default React.createClass({
               </button>
             }
           </TransitionGroup>
+
           <TransitionGroup component="div" transitionName="loading">
-          {this.state.appIsLoading &&
-            <div
-              className="loading-bar" key="loading"></div>
-          }
+            {this.state.appIsLoading &&
+              <div
+                className="loading-bar"
+                key="loading-bar">
+              </div>
+            }
           </TransitionGroup>
           <div className="container">
+
             {Navigation}
 
-              <TransitionGroup component="div" transitionName="example">
-                <section key={name} className="main-content" role="main">
-                  <RouteHandler key={name} {...this.state} />
-                  <button key={buttonName} onClick={this.log}>Log current application state</button>
-                  {this.state.loggedIn && loggedInForm}
-                </section>
-              </TransitionGroup>
+            <TransitionGroup component="div" transitionName="example">
+              <section key={name} className="main-content" role="main">
+                <RouteHandler key={name} {...this.state} />
+                <button
+                  key={`button${name}`}
+                  onClick={this.log}>
+                  Log current application state
+                </button>
+                {this.state.loggedIn && loggedInForm}
+              </section>
+            </TransitionGroup>
 
           </div>
         </div>
       </DocumentTitle>
     );
   }
+}
+
+Application = connectToStores(Application, [ApplicationStore], (stores) => {
+  return {
+    appStore: stores.ApplicationStore.getState()
+  }
 });
+
+export default Application;
