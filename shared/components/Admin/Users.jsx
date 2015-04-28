@@ -4,7 +4,7 @@ import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../../stores/ApplicationStore';
 import UserStore from '../../stores/UserStore';
-import {isClient, upsertQuery, getTimeAgo, autoBindAll, warn} from '../../../utils';
+import {isClient, upsertQuery, getTimeAgo, autoBindAll, warn, error} from '../../../utils';
 import _ from 'lodash';
 import navigateAction from '../../actions/navigate';
 import {flashMessageAction, setPageUserPrefAction} from '../../actions/appActions';
@@ -35,6 +35,7 @@ class AdminItemBrowser extends Component {
       'handleCheck',
       'handleSort',
       'handleBulkEdit',
+      'handleBulkEditConfirmation',
       'handleBulkEditClick',
       'handleTablePropChange'
     ]);
@@ -230,9 +231,21 @@ class AdminItemBrowser extends Component {
   }
 
   handleBulkEdit(formValues) {
+    error(formValues);
+    this.setState({
+      showConfirm: true,
+      bulkEditFormValues: formValues
+    })
+  }
+
+  handleBulkEditConfirmation() {
     const users = _.filter(this.state.users, (user) => user.selected);
+    const formValues = this.state.bulkEditFormValues;
     this.context.executeAction(editManyUsersAction, {formValues, users});
-    this.setState({show: false});
+    this.setState({
+      show: false,
+      showConfirm: false
+    });
   }
 
   handleBulkEditClick() {
@@ -383,11 +396,11 @@ class AdminItemBrowser extends Component {
           show={this.state.show}
           onHide={() => this.setState({show: false, showConfirm: false})}>
 
-          <UserForm handleSubmit={() => this.setState({showConfirm: true})} />
+          <UserForm handleSubmit={this.handleBulkEdit} />
           <ConfirmationPopup
             show={this.state.showConfirm}
             onHide={() => this.setState({showConfirm: false})}
-            onConfirm={this.handleBulkEdit}
+            onConfirm={this.handleBulkEditConfirmation}
             confirmationText={
               `You sure you want to edit ${this.state.userCount} at a time?`
             }
