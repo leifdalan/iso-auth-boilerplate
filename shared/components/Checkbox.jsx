@@ -1,5 +1,8 @@
 'use strict';
 import React, {Component} from 'react';
+const debug = require('debug')('Component:Checkbox');
+debug();
+
 
 export default class Checkbox extends Component {
 
@@ -33,5 +36,3 @@ export default class Checkbox extends Component {
     return input;
   }
 }
-
-Checkbox.displayName = 'CheckBox';

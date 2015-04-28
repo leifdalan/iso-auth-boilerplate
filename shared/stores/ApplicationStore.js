@@ -8,12 +8,11 @@ export default createStore({
     'CHANGE_ROUTE': 'handleNavigate',
     'LOGIN': 'login',
     'LOGOUT': 'logout',
-    'REDIRECT': 'setRedirect',
-    'CLEAR_REDIRECT': 'clearRedirect',
     'REQUEST_START': 'requestStart',
     'REQUEST_END': 'requestEnd',
     'NAVIGATION_ERROR': 'navigationError',
-    'FLASH_MESSAGE': 'flashMessagez',
+    'FLASH_MESSAGE': 'setFlashMessage',
+    'CLEAR_FLASH_MESSAGE': 'clearFlashMessage',
     'SET_PAGE_USER_PREF': 'setPageUserPref',
     'SAVE_REQUEST_ATTEMPT': 'saveRequestAttempt'
   },
@@ -47,8 +46,7 @@ export default createStore({
     this.reqAttempt = message;
   },
 
-  flashMessagez(message) {
-    debug('FLASHING');
+  setFlashMessage(message) {
     if (message instanceof Array) {
       message = message[0];
     }
@@ -56,15 +54,18 @@ export default createStore({
     this.emitChange();
   },
 
+  clearFlashMessage() {
+    this.flashMessage = null;
+    this.emitChange();
+  },
+
   requestStart() {
     this.appIsLoading = true;
-    this.flashMessage = null;
     this.emitChange();
   },
 
   requestEnd() {
     this.appIsLoading = false;
-    this.flashMessage = null;
     this.emitChange();
   },
 
@@ -77,32 +78,7 @@ export default createStore({
       return;
     }
 
-    // Preserve flash message if this is a redirect.
-    if (this._redirectFlash) {
-      this.flashMessage = this._redirectFlash;
-    }
     this.currentRoute = route;
-    this.emitChange();
-
-    // Preserve flash message if this is a redirect.
-    if (this._redirectFlash) {
-      this._redirectFlash = null;
-    }
-  },
-
-  setRedirect(payload) {
-
-    // Preserve flash message if this is a redirect.
-
-    this._redirectFlash = payload.flashMessage;
-    this.redirect = payload.url;
-    debug(payload);
-    debug('SETTING REDURECT!!!', this.redirect);
-    this.emitChange();
-  },
-
-  clearRedirect() {
-    this.redirect = null;
     this.emitChange();
   },
 
@@ -127,7 +103,6 @@ export default createStore({
       loggedIn: this.loggedIn,
       email: this.email,
       userLevel: this.userLevel,
-      redirect: this.redirect,
       appIsLoading: this.appIsLoading,
       flashMessage: this.flashMessage,
       pageUserPref: this.pageUserPref,
@@ -144,7 +119,6 @@ export default createStore({
     this.loggedIn = state.loggedIn;
     this.email = state.email;
     this.userLevel = state.userLevel;
-    this.redirect = state.redirect;
     this.appIsLoading = state.appIsLoading;
     this.flashMessage = state.flashMessage;
     this.pageUserPref = state.pageUserPref;

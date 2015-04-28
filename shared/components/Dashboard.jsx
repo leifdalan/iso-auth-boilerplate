@@ -1,55 +1,36 @@
 'use strict';
-import React from 'react'
-import {FluxibleMixin} from 'fluxible'
-import ApplicationStore from '../stores/ApplicationStore'
-import {CheckLoginMixin} from '../mixins/authMixins';
-import debug from 'debug';
+
+import React, {Component, PropTypes as pt} from 'react';
+import {connectToStores} from 'fluxible/addons';
+import {autoBindAll} from '../../utils';
+import {CheckLoginWillTransitionTo} from '../mixins/authMixins';
 import DocumentTitle from 'react-document-title';
-debug('Component:Dashboard');
+const debug = require('debug')('Component:Dashboard');
+debug();
 
-export default React.createClass({
+export default class Dashboard extends Component {
 
-  displayName: 'Dashboard',
+  constructor(props) {
+    super(props);
+  }
 
-  mixins: [FluxibleMixin, CheckLoginMixin],
+  static displayName = 'Dashboard'
 
-  statics: {
-    storeListeners: [ApplicationStore]
-  },
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
 
-  componentDidMount() {
-    let timer = 0;
-    this.interval = setInterval(() => {
-      timer++;
-      this.setState({
-        title: `${timer} Look the title changes!!!`
-      });
-    }, 250);
-  },
-
-  getInitialState() {
-    let state = this.getStore(ApplicationStore).getState();
-    state.title = 'Dashboard';
-    return state;
-  },
-
-  onChange() {
-    var state = this.getStore(ApplicationStore).getState();
-    this.setState(state);
-  },
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  },
+  static willTransitionTo = CheckLoginWillTransitionTo
 
   render() {
     return (
-      <DocumentTitle title={this.state.title}>
+      <DocumentTitle title="Dashboard">
         <div>
           <p>Here's your dashboard!</p>
-          <p>I think your user name is: {this.state.email}</p>
         </div>
       </DocumentTitle>
     );
   }
-})
+}

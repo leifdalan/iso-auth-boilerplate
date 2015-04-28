@@ -1,6 +1,8 @@
 'use strict';
 import React, {Component, PropTypes as rpt} from 'react';
 import Modal, {Body, Header, Title, Footer, Dismiss} from 'react-bootstrap-modal';
+const debug = require('debug')('Component:ModalWrapper');
+debug();
 
 export default class ModalWrapper extends Component {
 

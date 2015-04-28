@@ -1,54 +1,47 @@
 'use strict';
-import React from 'react';
-import {FluxibleMixin} from 'fluxible';
-import UserStore from '../../stores/UserStore';
+
+import React, {Component, PropTypes as pt} from 'react';
+import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../../stores/ApplicationStore';
+import UserStore from '../../stores/UserStore';
+import {isClient, upsertQuery, getTimeAgo, autoBindAll, warn} from '../../../utils';
+import _ from 'lodash';
 import navigateAction from '../../actions/navigate';
 import {flashMessageAction, setPageUserPrefAction} from '../../actions/appActions';
-import Paginator from './Paginator';
-import {CheckAdminMixin} from '../../mixins/authMixins';
 import {updateResultsAction, editManyUsersAction} from '../../actions/userActions';
-import {isClient, upsertQuery, getTimeAgo} from '../../../utils';
-import Modal from '../Modal';
+import {CheckAdminWillTransitionTo} from '../../mixins/authMixins';
+import Paginator from './Paginator';
+import ModalWrapper from '../Modal';
 import ConfirmationPopup from './ConfirmationPopup';
 import Checkbox from '../Checkbox';
 import UserForm from './UserForm';
-
 import ResultsTable from './ResultsTable';
-
-import _ from 'lodash';
 const debug = require('debug')('Component:Users');
+debug();
 
+class AdminItemBrowser extends Component {
 
-export default React.createClass({
-  displayName: 'Users',
+  constructor(props) {
+    super(props);
+    autoBindAll.call(this, [
+      '_setHighlightedMarkup',
+      '_setHighlightedMarkup',
+      '_adjustPageBounds',
+      'handleNumberInput',
+      'handleButton',
+      'goToCreateUser',
+      'handleCheckAll',
+      'handleSearchInput',
+      'handleCheck',
+      'handleSort',
+      'handleBulkEdit',
+      'handleBulkEditClick',
+      'handleTablePropChange'
+    ]);
 
-  contextTypes: {
-    router: React.PropTypes.func
-  },
+    warn(props);
 
-  mixins: [FluxibleMixin, CheckAdminMixin],
-
-  statics: {
-    storeListeners: [UserStore]
-  },
-
-  _setHighlightedMarkup(string, searchLetters) {
-    if (typeof string === 'string') {
-      let markup = [].map.call(string, (letter) =>
-        _.include(searchLetters, letter) ?
-          <span className="search-term">{letter}</span> :
-          <span>{letter}</span>
-      );
-      const userMarkup = <span>{markup}</span>;
-
-      return userMarkup;
-    }
-    return string;
-  },
-
-  getInitialState() {
-    let state = this.getStore(UserStore).getState();
+    let state = props.userStore;
 
     const users = state.users.map((user) => {
       user.selected = false;
@@ -64,19 +57,37 @@ export default React.createClass({
       return user;
     });
 
-    const appState = this.getStore(ApplicationStore).getState();
-    const routes = this.context.router.getCurrentRoutes();
+    state.users = users;
+    state.pageAdjustment && this._adjustPageBounds(state);
+    this.state = state;
+
+  }
+
+  static displayName = 'AdminItemBrowser'
+
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
+
+  static willTransitionTo = CheckAdminWillTransitionTo
+
+  componentWillMount() {
+    const appState = this.props.appStore;
+    const routes = appState.route.routes;
     const currentRouteName = routes[routes.length - 1].name;
+    let tablePropChoices;
     debug('CurrentRoute', currentRouteName);
 
     // TODO: there's gotta be a better way to do this.
     if (appState.pageUserPref &&
       appState.pageUserPref[currentRouteName] &&
       appState.pageUserPref[currentRouteName].tablePropChoices) {
-      state.tablePropChoices =
+      tablePropChoices =
         appState.pageUserPref[currentRouteName].tablePropChoices;
     } else {
-      const tablePropChoices = [
+      tablePropChoices = [
         {
           label: 'Username',
           valueProp: 'email',
@@ -103,29 +114,18 @@ export default React.createClass({
           valueProp: 'isValidated'
         }
       ];
-      state.tablePropChoices = tablePropChoices;
-      this.executeAction(setPageUserPrefAction, {
+
+      this.context.executeAction(setPageUserPrefAction, {
         route: currentRouteName,
         preference: {tablePropChoices}
       });
     }
+    this.setState({tablePropChoices});
+  }
 
-    state.users = users;
-    state.pageAdjustment && this._adjustPageBounds(state);
-    return state;
-  },
+  componentWillReceiveProps(nextProps) {
 
-  _adjustPageBounds(state) {
-    if (isClient()) {
-      const pathArray = window.location.pathname.split('/');
-      const queryString = window.location.search;
-      pathArray[5] = state.currentPageNumber;
-      window.history.replaceState({}, {}, `${pathArray.join('/')}${queryString}`);
-    }
-  },
-
-  onChange() {
-    let state = this.getStore(UserStore).getState();
+    let state = nextProps.userStore;
     const users = state.users.map((user) => {
       user.email = user.local.email;
       user.lastUpdated = getTimeAgo(user.lastUpdated);
@@ -140,13 +140,37 @@ export default React.createClass({
     state.users = users;
     state.pageAdjustment && this._adjustPageBounds(state);
     this.setState(state);
-  },
+
+  }
+
+  _setHighlightedMarkup(string, searchLetters) {
+    if (typeof string === 'string') {
+      let markup = [].map.call(string, (letter) =>
+        _.include(searchLetters, letter) ?
+          <span className="search-term">{letter}</span> :
+          <span>{letter}</span>
+      );
+      const userMarkup = <span>{markup}</span>;
+
+      return userMarkup;
+    }
+    return string;
+  }
+
+  _adjustPageBounds(state) {
+    if (isClient()) {
+      const pathArray = window.location.pathname.split('/');
+      const queryString = window.location.search;
+      pathArray[5] = state.currentPageNumber;
+      window.history.replaceState({}, {}, `${pathArray.join('/')}${queryString}`);
+    }
+  }
 
   handleNumberInput(e) {
     this.setState({
       perPageInput: e.target.value > 200 ? 200 : e.target.value
     });
-  },
+  }
 
   handleButton(e) {
     e.preventDefault();
@@ -154,12 +178,12 @@ export default React.createClass({
     this.context.router.transitionTo(
       `/admin/users/page/${perpage}/1${window.location.search}`
     );
-  },
+  }
 
   goToCreateUser(e) {
     e.preventDefault();
     this.context.router.transitionTo('createUser');
-  },
+  }
 
   handleCheckAll(e) {
     const value = e.target.checked;
@@ -168,7 +192,7 @@ export default React.createClass({
       return user;
     });
     this.setState({users});
-  },
+  }
 
   handleSearchInput(e) {
     this.setState({
@@ -184,9 +208,8 @@ export default React.createClass({
       window.history.replaceState({}, {}, query);
     }
 
-    this.executeAction(updateResultsAction, window.location.href);
-
-  },
+    this.context.executeAction(updateResultsAction, window.location.href);
+  }
 
   handleCheck(_id) {
     const users = this.state.users.map((user) => {
@@ -194,7 +217,7 @@ export default React.createClass({
       return user;
     });
     this.setState({users});
-  },
+  }
 
   handleSort(e) {
     let criteria = e.target.value;
@@ -205,19 +228,19 @@ export default React.createClass({
     debug(criteria);
     const query = upsertQuery('sort', criteria);
     window.history.replaceState({}, {}, query);
-    this.executeAction(updateResultsAction, window.location.href);
-  },
+    this.context.executeAction(updateResultsAction, window.location.href);
+  }
 
   handleBulkEdit(formValues) {
     const users = _.filter(this.state.users, (user) => user.selected);
-    this.executeAction(editManyUsersAction, {formValues, users});
+    this.context.executeAction(editManyUsersAction, {formValues, users});
     this.setState({show: false});
-  },
+  }
 
   handleBulkEditClick() {
     const users = _.filter(this.state.users, (user) => user.selected);
     if (users.length === 0) {
-      this.executeAction(flashMessageAction,
+      this.context.executeAction(flashMessageAction,
         'Please select some users to bulk edit first.');
     } else {
       this.setState({
@@ -225,7 +248,7 @@ export default React.createClass({
         show: true
       });
     }
-  },
+  }
 
   handleTablePropChange(valueProp) {
     const tablePropChoices = this.state.tablePropChoices.map((propChoice) => {
@@ -239,11 +262,11 @@ export default React.createClass({
     const routes = this.context.router.getCurrentRoutes();
     const currentRouteName = routes[routes.length - 1].name;
 
-    this.executeAction(setPageUserPrefAction, {
+    this.context.executeAction(setPageUserPrefAction, {
       route: currentRouteName,
       preference: {tablePropChoices}
     });
-  },
+  }
 
   render() {
     const paginator = (
@@ -357,8 +380,8 @@ export default React.createClass({
 
         {body}
 
-        <Modal
-          title={`Bulkz editing ${this.state.userCount} Users`}
+        <ModalWrapper
+          title={`Bulk editing ${this.state.userCount} Users`}
           show={this.state.show}
           onHide={() => this.setState({show: false, showConfirm: false})}>
 
@@ -372,9 +395,18 @@ export default React.createClass({
             }
           />
 
-        </Modal>
+      </ModalWrapper>
 
       </div>
     );
   }
-})
+}
+
+AdminItemBrowser = connectToStores(AdminItemBrowser, [ApplicationStore, UserStore], (stores) => {
+  return {
+    appStore: stores.ApplicationStore.getState(),
+    userStore: stores.UserStore.getState()
+  }
+});
+
+export default AdminItemBrowser;

@@ -1,6 +1,8 @@
 'use strict';
 import React, {Component} from 'react';
 import DocumentTitle from 'react-document-title';
+const debug = require('debug')('Component:Home');
+debug();
 
 
 export default class Home extends Component {

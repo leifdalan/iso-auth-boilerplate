@@ -1,26 +1,31 @@
 'use strict';
-import React from 'react';
+
+import React, {Component, PropTypes as pt} from 'react';
 import Checkbox from '../Checkbox';
-import {FluxibleMixin} from 'fluxible';
+const debug = require('debug')('Component:ResultsTable');
+debug();
 
-const rpt = React.PropTypes;
+export default class ResultsTable extends Component {
 
-export default React.createClass({
-  displayName: 'ResultsTable',
+  constructor(props) {
+    super(props);
+  }
 
-  contextTypes: {
-    router: React.PropTypes.func
-  },
+  static displayName = 'ResultsTable'
 
-  propTypes: {
-    properties: rpt.arrayOf(rpt.object).isRequired,
-    collection: rpt.arrayOf(rpt.object).isRequired,
-    handleCheckAll: rpt.func.isRequired,
-    handleBulkEditClick: rpt.func.isRequired,
-    handleCheck: rpt.func.isRequired
-  },
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
 
-  mixins: [FluxibleMixin],
+  static propTypes = {
+    properties: pt.arrayOf(pt.object).isRequired,
+    collection: pt.arrayOf(pt.object).isRequired,
+    handleCheckAll: pt.func.isRequired,
+    handleBulkEditClick: pt.func.isRequired,
+    handleCheck: pt.func.isRequired
+  }
 
   render() {
     return (
@@ -85,4 +90,4 @@ export default React.createClass({
       </table>
     );
   }
-})
+}

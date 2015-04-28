@@ -70,7 +70,6 @@ class Signin extends Component {
     const username = this.state.usernameValue;
     const password = this.state.passwordValue;
     const number = this.state.numberValue;
-    debug('SIGNUP ROUTER', this.context.router);
     !this.state.flashWarning &&
     this.context.executeAction(signUpAction, {
       email: username,

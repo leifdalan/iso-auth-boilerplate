@@ -1,26 +1,37 @@
 'use strict';
-import React from 'react';
-import Modal from '../Modal';
-const rpt = React.PropTypes;
 
+import React, {Component, PropTypes as pt} from 'react';
+import {connectToStores} from 'fluxible/addons';
+import ModalWrapper from '../Modal';
+const debug = require('debug')('Component:ConfirmationPopup');
+debug();
 
-export default React.createClass({
-  displayName: 'ConfirmationPopup',
+export default class ConfirmationPopup extends Component {
 
-  getDefaultProps() {
-    return {
-      confirmationText: 'Are you sure?',
-      confirmationButton: 'Yes'
-    };
-  },
+  constructor(props) {
+    super(props);
+  }
 
-  propTypes: {
-    onConfirm: rpt.func.isRequired
-  },
+  static displayName = 'ConfirmationPopup'
+
+  static defaultProps = {
+    confirmationText: 'Are you sure?',
+    confirmationButton: 'Yes'
+  }
+
+  static propTypes = {
+    onConfirm: pt.func.isRequired
+  }
+
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
 
   render() {
     return (
-      <Modal
+      <ModalWrapper
         title="Confirm"
         show={this.props.show}
         onHide={this.props.onHide}>
@@ -29,8 +40,7 @@ export default React.createClass({
         <button className="warning" onClick={this.props.onConfirm}>
           {this.props.confirmationButton}
         </button>
-      </Modal>
-
+      </ModalWrapper>
     );
   }
-})
+}

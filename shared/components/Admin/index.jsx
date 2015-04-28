@@ -1,32 +1,39 @@
 'use strict';
-import React from 'react';
-import {FluxibleMixin} from 'fluxible';
-import ApplicationStore from '../../stores/ApplicationStore'
-import debug from 'debug';
-import {CheckAdminMixin} from '../../mixins/authMixins';
-debug('Component:Admin');
 
-export default React.createClass({
-  displayName: 'AdminPage',
+import React, {Component, PropTypes as pt} from 'react';
+import {connectToStores} from 'fluxible/addons';
+import UserStore from '../../stores/UserStore';
+import {autoBindAll} from '../../../utils';
+import {CheckAdminWillTransitionTo} from '../../mixins/authMixins';
+const debug = require('debug')('Component:AdminDashboard');
+debug();
 
-  mixins: [FluxibleMixin, CheckAdminMixin],
+class AdminDashboard extends Component {
 
-  statics: {
-    storeListeners: [ApplicationStore]
-  },
+  constructor(props) {
+    super(props);
+  }
 
-  getInitialState() {
-    return this.getStore(ApplicationStore).getState();
-  },
+  static displayName = 'AdminDashboard'
 
-  onChange() {
-    const state = this.getStore(ApplicationStore).getState();
-    this.setState(state);
-  },
+  static contextTypes = {
+    router: pt.func.isRequired,
+    getStore: pt.func.isRequired,
+    executeAction: pt.func.isRequired
+  }
+
+  static willTransitionTo = CheckAdminWillTransitionTo
+
+  componentWillReceiveProps(nextProps) {
+    const newState = nextProps.store;
+    this.setState(newState);
+  }
 
   render() {
     return (
-        <div>Only LEVEL 2 or ABOVE can see this!!! MUHAHAHA</div>
+      <div>Only users at level 3 or above...</div>
     );
   }
-})
+}
+
+export default AdminDashboard;

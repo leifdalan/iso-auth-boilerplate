@@ -1,23 +1,16 @@
 'use strict';
-
-'use strict';
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../stores/ApplicationStore';
-
+import UserStore from '../stores/UserStore';
 import {autoBindAll, warn, error} from '../../utils';
-
 import Nav from './Nav';
 import AdminNav from './Admin/AdminNav';
-
-import UserStore from '../stores/UserStore';
 import {RouteHandler, Navigation} from 'react-router';
-import {loginAction, logoutAction} from '../actions/authActions';
-import clearRedirect from '../actions/clearRedirect';
+import {logoutAction} from '../actions/authActions';
 import DocumentTitle from 'react-document-title';
+import {clearFlashAction} from '../actions/appActions';
 import TransitionGroup from 'react/lib/ReactCSSTransitionGroup';
-
-
 const debug = require('debug')('Component:Application');
 
 class Application extends Component {
@@ -39,14 +32,14 @@ class Application extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const state = nextProps.appStore;
-    if (this.state.flashMessage) {
+    const newState = nextProps.appStore;
+    if (this.state.flashMessage !== newState.flashMessage) {
+      this._flashTimeout && clearTimeout(this._flashTimeout);
       this._flashTimeout = setTimeout(() => {
-        warn('Clearing flash message.');
         this.clearFlash();
       }, 5000);
     }
-    this.setState(state);
+    this.setState(newState);
   }
 
   logout(e) {
@@ -57,9 +50,8 @@ class Application extends Component {
 
   clearFlash(e) {
     e && e.preventDefault();
-    this.setState({
-      flashMessage: ''
-    });
+    this._flashTimeout && clearTimeout(this._flashTimeout);
+    this.context.executeAction(clearFlashAction);
   }
 
   log() {
@@ -70,7 +62,7 @@ class Application extends Component {
   }
 
   componentWillUnmount() {
-    window.clearTimeout(this._flashTimeout);
+    // window.clearTimeout(this._flashTimeout);
   }
 
   render() {
@@ -134,9 +126,9 @@ class Application extends Component {
 }
 
 Application = connectToStores(Application, [ApplicationStore], (stores) => {
-    return {
-      appStore: stores.ApplicationStore.getState()
-    }
+  return {
+    appStore: stores.ApplicationStore.getState()
+  }
 });
 
 export default Application;
