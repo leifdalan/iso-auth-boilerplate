@@ -155,12 +155,21 @@ export function autoBindAll(arrayOfFuncStrings) {
 
 export function warn(...args) {
   /*eslint-disable*/
-  window.console.warn(...args);
+  if (typeof window !== 'undefined' && window.console && window.console.warn) {
+    window.console.warn(...args);
+  } else {
+    debug('Warn', ...args);
+  }
+
   /*eslint-enable*/
 }
 
 export function error(...args) {
   /*eslint-disable*/
-  window.console.error(...args);
+  if (typeof window !== 'undefined' && window.console && window.console.warn) {
+    window.console.error(...args);
+  } else {
+    debug('Error', ...args);
+  }
   /*eslint-enable*/
 }

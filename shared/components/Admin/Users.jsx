@@ -39,8 +39,6 @@ class AdminItemBrowser extends Component {
       'handleTablePropChange'
     ]);
 
-    warn(props);
-
     let state = props.userStore;
 
     const users = state.users.map((user) => {

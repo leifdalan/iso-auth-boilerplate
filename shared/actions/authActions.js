@@ -49,7 +49,6 @@ export const logoutAction = ({dispatch}, {router}, done) => {
       debug('Response:', res);
       dispatch('LOGOUT');
       router.transitionTo('/');
-      warn('Redirecting...')
       dispatch('FLASH_MESSAGE', 'Come back soon!');
       done && done();
     }
