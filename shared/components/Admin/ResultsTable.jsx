@@ -3,6 +3,7 @@
 import React, {Component, PropTypes as pt} from 'react';
 import Checkbox from '../Checkbox';
 import {autoBindAll} from '../../../utils';
+import {get} from 'lodash';
 const debug = require('debug')('Component:ResultsTable');
 debug();
 
@@ -75,13 +76,7 @@ export default class ResultsTable extends Component {
               </td>
               {this.props.properties.map((prop, index) =>
                 <td key={`value${index}`}>
-                  {/* Cast booleans to strings, as sometimes
-                      we may have a react object.
-                   */}
-                  {(typeof item[prop.valueProp] === 'boolean') ?
-                    `${item[prop.valueProp]}` :
-                    item[prop.valueProp]
-                  }
+                  {get(item, prop.valueProp)}
                 </td>
               )}
               <td>

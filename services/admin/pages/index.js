@@ -5,7 +5,7 @@ import {sendData} from '../../../services';
 const debug = require('debug')('Routes:AdminPageCRUD');
 
 // ----------------------------------------------------------------------------
-// Admin Users CRUD
+// Admin Pages CRUD
 // ----------------------------------------------------------------------------
 
 export function redirectPage(req, res) {
@@ -14,6 +14,7 @@ export function redirectPage(req, res) {
 
 export function createPage(req, res, next) {
   debug('CREATING PAGE');
+  req.body.user = req.user;
   Page.create(req.body, (error, page) => {
     let data = {};
     if (error) {
@@ -82,6 +83,7 @@ export function getPages(req, res, next) {
       }
       const pageNumber = newPageNumber || Number(currentPageNumber);
       Page.find(filter)
+        .populate('user')
         .limit(perpage)
         .skip((pageNumber - 1) * perpage)
         .sort(sortCriteria)

@@ -7,7 +7,7 @@ import PageStore from '../../../stores/PageStore';
 import {
   isClient, upsertQuery, getTimeAgo, autoBindAll, warn, error, trace
 } from '../../../../utils';
-import _, {merge} from 'lodash';
+import _, {merge, get} from 'lodash';
 import navigateAction from '../../../actions/navigate';
 import {flashMessageAction, setPageUserPrefAction} from '../../../actions/appActions';
 import {updateResultsAction, editManyPagesAction} from '../../../actions/pageActions';
@@ -64,7 +64,7 @@ class AdminItemBrowser extends Component {
     });
 
     state.pageAdjustment && this._adjustPageBounds(state);
-
+    debug('PAGE STATE', state);
     this.state = state;
 
   }
@@ -103,7 +103,12 @@ class AdminItemBrowser extends Component {
         {
           label: 'Last Updated',
           valueProp: 'lastUpdated'
+        },
+        {
+          label: 'Created By',
+          valueProp: 'user.local.email'
         }
+
 
       ];
 

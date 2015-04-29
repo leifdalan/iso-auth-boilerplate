@@ -34,6 +34,10 @@ export default class ResultsNavigator extends Component {
     this.setState(newState);
   }
 
+  _shouldShowItemsPerPage() {
+    return this.props.totalItems > this.props.perpage;
+  }
+
   render() {
 
     const paginator = (
@@ -56,16 +60,20 @@ export default class ResultsNavigator extends Component {
 
     const resultsNavigator = (
       <div>
-        <input
-          type="number"
-          onChange={this.props.handlePerPageInput}
-          value={this.props.perPageValue}
-          placeholder={this.props.perPagePlaceholder}
-        />
-        <button
-          onClick={this.props.handlePerPageButton}>
-          {`Update ${this.props.label}/page`}
-        </button>
+        {this._shouldShowItemsPerPage() &&
+          <div>
+            <input
+              type="number"
+              onChange={this.props.handlePerPageInput}
+              value={this.props.perPageValue}
+              placeholder={this.props.perPagePlaceholder}
+            />
+            <button
+              onClick={this.props.handlePerPageButton}>
+              {`Update ${this.props.label}/page`}
+            </button>
+          </div>
+        }
 
         <div>
           <select id="sorting" onChange={this.props.handleSort}>
