@@ -2,20 +2,22 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
-import ApplicationStore from '../../stores/ApplicationStore';
-import UserStore from '../../stores/UserStore';
-import {isClient, upsertQuery, getTimeAgo, autoBindAll, warn, error} from '../../../utils';
-import _ from 'lodash';
-import navigateAction from '../../actions/navigate';
-import {flashMessageAction, setPageUserPrefAction} from '../../actions/appActions';
-import {updateResultsAction, editManyUsersAction} from '../../actions/userActions';
-import {CheckAdminWillTransitionTo} from '../../mixins/authMixins';
-import Paginator from './Paginator';
-import ModalWrapper from '../Modal';
-import ConfirmationPopup from './ConfirmationPopup';
-import Checkbox from '../Checkbox';
+import ApplicationStore from '../../../stores/ApplicationStore';
+import UserStore from '../../../stores/UserStore';
+import {
+  isClient, upsertQuery, getTimeAgo, autoBindAll, warn, error, trace
+} from '../../../../utils';
+import _, {merge} from 'lodash';
+import navigateAction from '../../../actions/navigate';
+import {flashMessageAction, setPageUserPrefAction} from '../../../actions/appActions';
+import {updateResultsAction, editManyUsersAction} from '../../../actions/userActions';
+import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
+
+import ModalWrapper from '../../Modal';
+import ConfirmationPopup from '../ConfirmationPopup';
 import UserForm from './UserForm';
-import ResultsTable from './ResultsTable';
+
+import ResultsNavigator from '../ResultsNavigator';
 const debug = require('debug')('Component:Users');
 debug();
 
@@ -23,12 +25,13 @@ class AdminItemBrowser extends Component {
 
   constructor(props) {
     super(props);
+    debug(this);
     autoBindAll.call(this, [
       '_setHighlightedMarkup',
       '_setHighlightedMarkup',
       '_adjustPageBounds',
-      'handleNumberInput',
-      'handleButton',
+      'handlePerPageInput',
+      'handlePerPageButton',
       'goToCreateUser',
       'handleCheckAll',
       'handleSearchInput',
@@ -56,8 +59,14 @@ class AdminItemBrowser extends Component {
       return user;
     });
 
-    state.users = users;
+    state = merge(state, {
+      users,
+      showConfirm: false,
+      show: false
+    });
+
     state.pageAdjustment && this._adjustPageBounds(state);
+
     this.state = state;
 
   }
@@ -73,6 +82,7 @@ class AdminItemBrowser extends Component {
   static willTransitionTo = CheckAdminWillTransitionTo
 
   componentWillMount() {
+    trace(this);
     const appState = this.props.appStore;
     const routes = appState.route.routes;
     const currentRouteName = routes[routes.length - 1].name;
@@ -88,7 +98,7 @@ class AdminItemBrowser extends Component {
     } else {
       tablePropChoices = [
         {
-          label: 'Username',
+          label: 'Name',
           valueProp: 'email',
           selected: true
         },
@@ -97,7 +107,7 @@ class AdminItemBrowser extends Component {
           valueProp: 'loginToken'
         },
         {
-          label: 'User Level',
+          label: 'Level',
           valueProp: 'userLevel',
           selected: true
         },
@@ -109,7 +119,7 @@ class AdminItemBrowser extends Component {
         // },
 
         {
-          label: 'Is Validated',
+          label: 'Validated?',
           valueProp: 'isValidated'
         }
       ];
@@ -161,19 +171,21 @@ class AdminItemBrowser extends Component {
       const pathArray = window.location.pathname.split('/');
       const queryString = window.location.search;
       pathArray[5] = state.currentPageNumber;
+
       window.history.replaceState({}, {}, `${pathArray.join('/')}${queryString}`);
     }
   }
 
-  handleNumberInput(e) {
+  handlePerPageInput(e) {
     this.setState({
       perPageInput: e.target.value > 200 ? 200 : e.target.value
     });
   }
 
-  handleButton(e) {
+  handlePerPageButton(e) {
     e.preventDefault();
     const perpage = this.state.perPageInput || this.state.perpage;
+
     this.context.router.transitionTo(
       `/admin/users/page/${perpage}/1${window.location.search}`
     );
@@ -280,96 +292,6 @@ class AdminItemBrowser extends Component {
   }
 
   render() {
-    const paginator = (
-      <Paginator
-        currentPageNumber={this.state.currentPageNumber}
-        totalItems={this.state.totalUsers}
-        perpage={this.state.perpage}
-        neighborDepth={1}
-        pathBase="/admin/users/page/"
-      />
-    );
-
-    const tableProps =
-      this.state.tablePropChoices.filter((tableProp) => tableProp.selected);
-
-    const noUsers = (
-      <h2>No users match{` "${this.state.search}"`}!</h2>
-    );
-
-    const userTable = (
-      <div>
-        <input
-          type="number"
-          onChange={this.handleNumberInput}
-          value={this.state.perPageInput}
-          placeholder={`Items per page (${this.state.perpage})`}
-        />
-        <button
-          onClick={this.handleButton}>
-          Update Items/page
-        </button>
-
-        <div>
-          <select id="sorting" onChange={this.handleSort}>
-            <option value="noop">Sort by</option>
-            {tableProps.map((propChoice) =>
-              <option
-                key={propChoice.valueProp}
-                value={`${propChoice.valueProp}|asc`}>{propChoice.label} &#9652;
-              </option>
-              )
-            }
-            {tableProps.map((propChoice) =>
-              <option
-                key={propChoice.valueProp}
-                value={`${propChoice.valueProp}|desc`}>{propChoice.label} &#9662;
-              </option>
-              )
-            }
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="tableColumns">Table columns:</label>
-
-          <div id="tableColumns" onChange={(e) => debug(e)}>
-            {this.state.tablePropChoices.map((propChoice) =>
-              <Checkbox
-                key={`Checkbox${propChoice.valueProp}`}
-                inputKey={propChoice.valueProp}
-                label={propChoice.label}
-                checked={propChoice.selected}
-                onChangeCallback={this.handleTablePropChange.bind(null, propChoice.valueProp)}
-              />
-            )}
-          </div>
-
-        </div>
-
-        {paginator}
-
-        {this.state.search &&
-          <small>
-            {`"${this.state.search}" matches ${this.state.totalUsers} users`}
-          </small>
-        }
-
-        <ResultsTable
-          properties={tableProps}
-          collection={this.state.users}
-          handleCheckAll={this.handleCheckAll}
-          handleBulkEditClick={this.handleBulkEditClick}
-          handleCheck={this.handleCheck}
-          basePath="/admin/users/"
-        />
-
-        {paginator}
-
-      </div>
-    );
-
-    const body = this.state.users.length ? userTable : noUsers;
 
     return (
       <div>
@@ -380,16 +302,30 @@ class AdminItemBrowser extends Component {
             onClick={this.goToCreateUser}>
             Create user
           </button>
-            <input
-              className="user-search"
-              type="search"
-              onChange={this.handleSearchInput}
-              value={this.state.search}
-              placeholder={`Search for users`}
-            />
         </div>
 
-        {body}
+        <ResultsNavigator
+          label="Users"
+          handleSearchInput={this.handleSearchInput}
+          searchValue={this.state.search}
+          handlePerPageInput={this.handlePerPageInput}
+          perPageValue={this.state.perPageInput}
+          perPagePlaceholder={`Users per page (${this.state.perpage})`}
+          handlePerPageButton={this.handlePerPageButton}
+          handleSort={this.handleSort}
+          tablePropChoices={this.state.tablePropChoices}
+          handleTablePropChange={this.handleTablePropChange}
+          currentPageNumber={this.state.currentPageNumber}
+          totalItems={this.state.totalUsers}
+          perpage={this.state.perpage}
+          neighborDepth={1}
+          pathBase="/admin/users/page/"
+          collection={this.state.users}
+          handleCheckAll={this.handleCheckAll}
+          handleBulkEditClick={this.handleBulkEditClick}
+          handleCheck={this.handleCheck}
+          basePath="/admin/users/"
+        />
 
         <ModalWrapper
           title={`Bulk editing ${this.state.userCount} Users`}
@@ -397,8 +333,9 @@ class AdminItemBrowser extends Component {
           onHide={() => this.setState({show: false, showConfirm: false})}>
 
           <UserForm handleSubmit={this.handleBulkEdit} />
+
           <ConfirmationPopup
-            show={this.state.showConfirm}
+            show={!!this.state.showConfirm}
             onHide={() => this.setState({showConfirm: false})}
             onConfirm={this.handleBulkEditConfirmation}
             confirmationText={

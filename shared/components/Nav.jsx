@@ -12,7 +12,8 @@ export default class Nav extends Component {
   constructor(props) {
     super(props);
     autoBindAll.call(this, [
-      'mouseOverLink'
+      'mouseOverLink',
+      'mouseOut'
     ]);
     this.state = {
       isHovering: false

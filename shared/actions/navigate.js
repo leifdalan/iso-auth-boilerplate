@@ -1,9 +1,11 @@
 'use strict';
 import request from 'superagent';
 import RSVP from 'rsvp';
+import {trace} from '../../utils';
 const debug = require('debug')('Action:navigate');
 
 export default function navigateAction({dispatch}, payload, done) {
+  trace('Navigation trace');
   debug('Navigation Payload vvvvv');
   debug(payload);
 

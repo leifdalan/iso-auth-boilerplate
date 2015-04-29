@@ -2,10 +2,10 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
-import {autoBindAll} from '../../../utils';
+import {autoBindAll} from '../../../../utils';
 import UserForm from './UserForm';
-import {CheckAdminWillTransitionTo} from '../../mixins/authMixins';
-import {createUserAction} from '../../actions/userActions';
+import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
+import {createUserAction} from '../../../actions/userActions';
 
 const debug = require('debug')('Component:CreateUser');
 debug();

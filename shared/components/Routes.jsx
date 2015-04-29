@@ -8,9 +8,9 @@ import Dashboard from './Dashboard';
 import SignIn from './SignIn';
 import AdminIndex from './Admin';
 import Users from './Admin/Users';
-import User from './Admin/User';
+import User from './Admin/Users/User';
 import NotFound from './NotFound';
-import CreateUser from './Admin/CreateUser';
+import CreateUser from './Admin/Users/CreateUser';
 
 export default (
   <Route name="app" path="/" handler={Application}>
@@ -29,6 +29,7 @@ export default (
         <Route path="page/:perpage/:pagenumber"
           name="adminUsersPaginated"
           handler={Users}
+          ignoreScrollBehavior
         />
         {/* Redirect users and users/page to paginated */}
         <Redirect

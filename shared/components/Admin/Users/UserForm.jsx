@@ -2,7 +2,7 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
-import {autoBindAll} from '../../../utils';
+import {autoBindAll} from '../../../../utils';
 const debug = require('debug')('Component:UserForm');
 debug();
 

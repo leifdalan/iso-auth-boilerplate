@@ -2,6 +2,7 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import Checkbox from '../Checkbox';
+import {autoBindAll} from '../../../utils';
 const debug = require('debug')('Component:ResultsTable');
 debug();
 
@@ -9,6 +10,9 @@ export default class ResultsTable extends Component {
 
   constructor(props) {
     super(props);
+    autoBindAll.call(this, [
+      'handleEditClick'
+    ]);
   }
 
   static displayName = 'ResultsTable'
@@ -25,6 +29,13 @@ export default class ResultsTable extends Component {
     handleCheckAll: pt.func.isRequired,
     handleBulkEditClick: pt.func.isRequired,
     handleCheck: pt.func.isRequired
+  }
+
+  handleEditClick(item, e) {
+    e.stopPropagation();
+    this.context.router.transitionTo(
+      `${this.props.basePath}${item._id}`
+    )
   }
 
   render() {
@@ -56,7 +67,6 @@ export default class ResultsTable extends Component {
               index={index}
               onClick={this.props.handleCheck.bind(null, item._id)}>
               <td>
-
                 <Checkbox
                   onChangeCallback={this.props.handleCheck.bind(null, item._id)}
                   ref={item._id}
@@ -76,10 +86,7 @@ export default class ResultsTable extends Component {
               )}
               <td>
                 <button
-                  onClick={() =>
-                    this.context.router.transitionTo(
-                      `${this.props.basePath}${item._id}`
-                    )}>
+                  onClick={this.handleEditClick.bind(null, item)}>
                   Edit
                 </button>
               </td>

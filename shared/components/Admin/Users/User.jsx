@@ -2,12 +2,12 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
-import UserStore from '../../stores/UserStore';
+import UserStore from '../../../stores/UserStore';
 import UserForm from './UserForm';
-import {autoBindAll} from '../../../utils';
-import {CheckAdminWillTransitionTo} from '../../mixins/authMixins';
-import ConfirmationPopup from './ConfirmationPopup';
-import {editUserAction, deleteUserAction} from '../../actions/userActions';
+import {autoBindAll} from '../../../../utils';
+import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
+import ConfirmationPopup from '../ConfirmationPopup';
+import {editUserAction, deleteUserAction} from '../../../actions/userActions';
 const debug = require('debug')('Component:User');
 debug();
 

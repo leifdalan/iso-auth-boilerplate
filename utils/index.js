@@ -166,8 +166,18 @@ export function warn(...args) {
 
 export function error(...args) {
   /*eslint-disable*/
-  if (typeof window !== 'undefined' && window.console && window.console.warn) {
+  if (typeof window !== 'undefined' && window.console && window.console.error) {
     window.console.error(...args);
+  } else {
+    debug('Error', ...args);
+  }
+  /*eslint-enable*/
+}
+
+export function trace(...args) {
+  /*eslint-disable*/
+  if (typeof window !== 'undefined' && window.console && window.console.trace) {
+    window.console.trace(...args);
   } else {
     debug('Error', ...args);
   }
