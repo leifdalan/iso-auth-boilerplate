@@ -1,13 +1,21 @@
 import User from '../models/user';
 import {signUp, logOut, login, isAdmin, isLoggedIn} from './authentication';
 import {
-  redirect,
-  get,
-  getOne,
-  update,
-  create,
+  redirectUser,
+  getUsers,
+  getOneUser,
+  updateUser,
+  createUser,
   deleteUser,
-  updateMany} from './admin/users';
+  updateManyUsers} from './admin/users';
+import {
+  redirectPage,
+  getPages,
+  getOnePage,
+  updatePage,
+  createPage,
+  deletePage,
+  updateManyPages} from './admin/pages';
 import adminUserServices from './admin/users';
 const debug = require('debug')('Routes');
 
@@ -62,18 +70,35 @@ export default function(server) {
   // Admin Users CRUD (/admin/users)
   // ----------------------------------------------------------------------------
 
-  server.get('/admin/users/', isLoggedIn, isAdmin, redirect);
+  server.get('/admin/users/', isLoggedIn, isAdmin, redirectUser);
   server.get(
     '/admin/users/page/:perpage/:currentPageNumber',
     isLoggedIn,
     isAdmin,
-    get
+    getUsers
   );
-  server.post('/admin/users/', isLoggedIn, isAdmin, create);
-  server.put('/admin/users/', isLoggedIn, isAdmin, updateMany);
-  server.get('/admin/users/:id', isLoggedIn, isAdmin, getOne);
-  server.put('/admin/users/:id', isLoggedIn, isAdmin, update);
+  server.post('/admin/users/', isLoggedIn, isAdmin, createUser);
+  server.put('/admin/users/', isLoggedIn, isAdmin, updateManyUsers);
+  server.get('/admin/users/:id', isLoggedIn, isAdmin, getOneUser);
+  server.put('/admin/users/:id', isLoggedIn, isAdmin, updateUser);
   server.delete('/admin/users/:id', isLoggedIn, isAdmin, deleteUser);
+
+  // ----------------------------------------------------------------------------
+  // Admin Pages CRUD (/admin/pages)
+  // ----------------------------------------------------------------------------
+
+  server.get('/admin/pages/', isLoggedIn, isAdmin, redirectPage);
+  server.get(
+    '/admin/pages/page/:perpage/:currentPageNumber',
+    isLoggedIn,
+    isAdmin,
+    getPages
+  );
+  server.post('/admin/pages/', isLoggedIn, isAdmin, createPage);
+  server.put('/admin/pages/', isLoggedIn, isAdmin, updateManyPages);
+  server.get('/admin/pages/:id', isLoggedIn, isAdmin, getOnePage);
+  server.put('/admin/pages/:id', isLoggedIn, isAdmin, updatePage);
+  server.delete('/admin/pages/:id', isLoggedIn, isAdmin, deletePage);
 
   // Blacklist undefined http verbs routes
   function fourHundred(req, res) {

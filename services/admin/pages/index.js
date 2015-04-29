@@ -1,56 +1,50 @@
 import passport from 'passport';
-import User from '../../../models/user';
+import Page from '../../../models/page';
 import {login, isAdmin, isLogged} from '../../authentication';
 import {sendData} from '../../../services';
-const debug = require('debug')('Routes:AdminUserCRUD');
+const debug = require('debug')('Routes:AdminPageCRUD');
 
 // ----------------------------------------------------------------------------
 // Admin Users CRUD
 // ----------------------------------------------------------------------------
 
-export function redirectUser(req, res) {
-  res.redirect('/admin/users/page/20/1');
+export function redirectPage(req, res) {
+  res.redirect('/admin/pages/page/20/1');
 };
 
-export function createUser(req, res, next) {
-  debug('Creating user');
-  passport.authenticate('local-signup', (error, user) => {
-    let data;
+export function createPage(req, res, next) {
+  debug('CREATING PAGE');
+  Page.create(req.body, (error, page) => {
+    let data = {};
     if (error) {
       data = {
         success: false,
-        error: error,
-        errorFor: error.errors
-      }
-    } else if (!user) {
-      data = {
-        success: false,
-        error: 'User couldn\'t be created.'
-      }
+        error
+      };
+      debug('Creation error');
     } else {
       data = {
-        success: `User ${user.local.email} created successfully`,
-        user
-      }
+        success: {
+          message: `"${page.title}" creation successfully`
+        },
+        page
+      };
     }
     sendData({data, req, res, next});
-  })(req, res, next);
+  });
 }
 
-export function getUsers(req, res, next) {
+export function getPages(req, res, next) {
   const {perpage, currentPageNumber} = req.params;
   debug(req.query.s);
   const {s: search, sort} = req.query;
 
   let filter = {}, data;
   if (search) {
-    let number = search.match(/\d/g);
-    number = number ? (Number(number.join(''))) : '';
-
     filter = {
       $or: [
-        {'local.email': new RegExp(search, 'i')},
-        {'userLevel': number}
+        {'title': new RegExp(search, 'i')},
+        {'content': new RegExp(search, 'i')}
       ]
     }
   }
@@ -60,7 +54,7 @@ export function getUsers(req, res, next) {
     let sortAndDirection = sort.split('|'),
       sortTerm = sortAndDirection[0],
       sortDirection = sortAndDirection[1];
-    sortTerm = sortTerm === 'email' ? 'local.email' : sortTerm;
+
     const sortValue = sortDirection === 'asc' ? 1 : -1;
     sortCriteria = {
       [sortTerm] : sortValue
@@ -69,7 +63,7 @@ export function getUsers(req, res, next) {
 
   // TODO use generators + Promises for multiple async
   // http://davidwalsh.name/async-generators
-  User.count(filter, (countError, totalUsers) => {
+  Page.count(filter, (countError, totalPages) => {
     if (countError) {
       data = {
         success: false,
@@ -77,21 +71,21 @@ export function getUsers(req, res, next) {
       }
       sendData({data, req, res, next});
     } else {
-      if (totalUsers < currentPageNumber * perpage) {
+      if (totalPages < currentPageNumber * perpage) {
 
         // A search or filter query has deemed this page empty,
         // but let's return results and tell the client to update
         // the page number in the URL instead of redirecting or failing.
-        var newPageNumber = Math.floor(totalUsers / Number(perpage) + 1);
-        debug('adjusting...', totalUsers, Number(perpage), newPageNumber);
+        var newPageNumber = Math.floor(totalPages / Number(perpage) + 1);
+        debug('adjusting...', totalPages, Number(perpage), newPageNumber);
         var pageAdjustment = newPageNumber;
       }
       const pageNumber = newPageNumber || Number(currentPageNumber);
-      User.find(filter)
+      Page.find(filter)
         .limit(perpage)
         .skip((pageNumber - 1) * perpage)
         .sort(sortCriteria)
-        .exec((paginateError, users) => {
+        .exec((paginateError, pages) => {
 
         if (paginateError) {
           data = {
@@ -105,8 +99,8 @@ export function getUsers(req, res, next) {
             perpage: Number(perpage),
             currentPageNumber: pageNumber,
             search: req.query.s,
-            users,
-            totalUsers,
+            pages,
+            totalPages,
             pageAdjustment
           };
         }
@@ -117,34 +111,34 @@ export function getUsers(req, res, next) {
   });
 };
 
-export function getOneUser(req, res, next) {
-  debug('GETTING USER');
+export function getOnePage(req, res, next) {
+  debug('GETTING PAGE');
   if (req.params.id === 'create') {
     const data = {
       success: true
     }
     sendData({data, req, res, next});
   } else {
-    User.findOne({_id: req.params.id}, (error, user) => {
+    Page.findOne({_id: req.params.id}, (error, page) => {
       let data;
       if (error) {
         data = {
           success: false,
           error
         }
-        debug('USER ERROR', error);
+        debug('PAGE ERROR', error);
         sendData({data, req, res, next});
       } else {
-        if (!user) {
+        if (!page) {
           data = {
             success: false,
-            error: `No user found for ${req.params.id}`
+            error: `No page found for ${req.params.id}`
           }
         } else {
-          data = user;
+          data = page;
           data.success = true
         }
-        debug('USER DATA', data);
+        debug('PAGE DATA', data);
         sendData({data, req, res, next});
       }
     });
@@ -152,39 +146,33 @@ export function getOneUser(req, res, next) {
 }
 
 
-export function updateUser(req, res, next) {
-  debug('SETTING USER');
+export function updatePage(req, res, next) {
+  debug('SETTING PAGE');
 
-  // Encrypt new password, if it exists in the req.body.
-  if (req.body && req.body.local && req.body.local.password) {
-    let tempUser = new User();
-    req.body.local.password = tempUser.generateHash(req.body.local.password);
-  }
-
-  User.findOneAndUpdate(
+  Page.findOneAndUpdate(
     {_id: req.params.id},
     req.body,
     {'new': true},
-    (error, user) => {
+    (error, page) => {
       let data;
       if (error) {
         data = {
           error,
           success: false
         };
-        debug('USER ERROR', error);
+        debug('PAGE ERROR', error);
         sendData({data, req, res, next});
       } else {
-        if (!user) {
+        if (!page) {
           data = {
             success: false,
-            error: `No user found for ${req.params.id}`
+            error: `No page found for ${req.params.id}`
           };
         } else {
           data = {
-            user,
+            page,
             success: {
-              message: `${user.local.email} saved successfully.`
+              message: `${page.title} saved successfully.`
             }
           };
         }
@@ -192,35 +180,35 @@ export function updateUser(req, res, next) {
       }
     });
 }
-export function updateManyUsers(req, res, next) {
-  debug('SETTING USER');
-  const {users, formValues} = req.body;
+export function updateManyPages(req, res, next) {
+  debug('SETTING PAGE');
+  const {pages, formValues} = req.body;
 
-  User.update(
-    {_id: {$in: users}},
+  Page.update(
+    {_id: {$in: pages}},
     formValues,
     {
       'new': true,
        multi: true
     },
-    (error, user) => {
+    (error, page) => {
       let data;
       if (error) {
         data = {
           error,
           success: false
         };
-        debug('USER ERROR', error);
+        debug('PAGE ERROR', error);
         sendData({data, req, res, next});
       } else {
-        if (!user) {
+        if (!page) {
           data = {
             success: false,
-            error: `No user found for ${req.params.id}`
+            error: `No page found for ${req.params.id}`
           };
         } else {
           data = {
-            user,
+            page,
             success: {
               message: `Updated all records.`
             }
@@ -231,9 +219,9 @@ export function updateManyUsers(req, res, next) {
     });
 }
 
-export function deleteUser(req, res, next) {
-  debug('DELETING USER');
-  User.findByIdAndRemove(req.params.id, (error, user) => {
+export function deletePage(req, res, next) {
+  debug('DELETING PAGE');
+  Page.findByIdAndRemove(req.params.id, (error, page) => {
     let data = {};
     if (error) {
       data = {
@@ -244,9 +232,9 @@ export function deleteUser(req, res, next) {
     } else {
       data = {
         success: {
-          message: `"${user.local.email}" deleted successfully`
+          message: `"${page.title}" deleted successfully`
         },
-        user
+        page
       };
     }
     sendData({data, req, res, next});
