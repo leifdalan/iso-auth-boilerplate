@@ -6,6 +6,7 @@ const pageSchema = mongoose.Schema({
   isPublished: { type: Boolean, default: true },
   created: { type: Date, default: Date.now },
   lastUpdated: { type: Date, default: Date.now },
+  slug: { type: String},
   content: {
     type: String,
     default: '',

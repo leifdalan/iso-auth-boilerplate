@@ -105,8 +105,13 @@ class AdminItemBrowser extends Component {
           valueProp: 'lastUpdated'
         },
         {
+          label: 'Slug',
+          valueProp: 'slug'
+        },
+        {
           label: 'Created By',
-          valueProp: 'user.local.email'
+          valueProp: 'user.local.email',
+          selected: true
         }
 
 
@@ -130,11 +135,12 @@ class AdminItemBrowser extends Component {
         page.title =
           this._setHighlightedMarkup(page.title, searchLetters);
       }
-
+      page.lastUpdated = getTimeAgo(page.lastUpdated);
       return page;
     });
     state.pages = pages;
     state.pageAdjustment && this._adjustPageBounds(state);
+
     this.setState(state);
 
   }
@@ -194,7 +200,8 @@ class AdminItemBrowser extends Component {
 
   handleSearchInput(e) {
     this.setState({
-      search: e.target.value
+      search: e.target.value,
+      searchValue: e.target.value
     });
 
     if (e.target.value.length === 0 && isClient()) {
@@ -206,7 +213,10 @@ class AdminItemBrowser extends Component {
       window.history.replaceState({}, {}, query);
     }
 
-    this.context.executeAction(updateResultsAction, window.location.href);
+    this.context.executeAction(updateResultsAction, {
+      url: window.location.href,
+      loadingProperty: 'search'
+    });
   }
 
   handleCheck(_id) {
@@ -226,7 +236,10 @@ class AdminItemBrowser extends Component {
     debug(criteria);
     const query = upsertQuery('sort', criteria);
     window.history.replaceState({}, {}, query);
-    this.context.executeAction(updateResultsAction, window.location.href);
+    this.context.executeAction(updateResultsAction, {
+      url: window.location.href,
+      loadingProperty: 'sort'
+    });
   }
 
   handleBulkEdit(formValues) {
@@ -292,9 +305,11 @@ class AdminItemBrowser extends Component {
         </div>
 
         <ResultsNavigator
+          loadingProperties={this.props.appStore.inPageLoadingProperties}
           label="Pages"
           handleSearchInput={this.handleSearchInput}
-          searchValue={this.state.search}
+          searchValue={this.state.searchValue}
+          search={this.props.pageStore.search}
           handlePerPageInput={this.handlePerPageInput}
           perPageValue={this.state.perPageInput}
           perPagePlaceholder={`Pages per page (${this.state.perpage})`}

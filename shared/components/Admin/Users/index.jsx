@@ -152,6 +152,7 @@ class AdminItemBrowser extends Component {
 
   }
 
+  //
   _setHighlightedMarkup(string, searchLetters) {
     if (typeof string === 'string') {
       let markup = [].map.call(string, (letter) =>
@@ -176,12 +177,13 @@ class AdminItemBrowser extends Component {
     }
   }
 
+  //
   handlePerPageInput(e) {
     this.setState({
       perPageInput: e.target.value > 200 ? 200 : e.target.value
     });
   }
-
+  //
   handlePerPageButton(e) {
     e.preventDefault();
     const perpage = this.state.perPageInput || this.state.perpage;
@@ -196,6 +198,7 @@ class AdminItemBrowser extends Component {
     this.context.router.transitionTo('createUser');
   }
 
+  //
   handleCheckAll(e) {
     const value = e.target.checked;
     const users = this.state.users.map((user) => {
@@ -205,9 +208,10 @@ class AdminItemBrowser extends Component {
     this.setState({users});
   }
 
+  //
   handleSearchInput(e) {
     this.setState({
-      search: e.target.value
+      searchValue: e.target.value
     });
 
     if (e.target.value.length === 0 && isClient()) {
@@ -219,9 +223,13 @@ class AdminItemBrowser extends Component {
       window.history.replaceState({}, {}, query);
     }
 
-    this.context.executeAction(updateResultsAction, window.location.href);
+    this.context.executeAction(updateResultsAction, {
+      url: window.location.href,
+      loadingProperty: 'search'
+    });
   }
 
+  //
   handleCheck(_id) {
     const users = this.state.users.map((user) => {
       user.selected = user._id === _id ? !user.selected : user.selected;
@@ -230,6 +238,7 @@ class AdminItemBrowser extends Component {
     this.setState({users});
   }
 
+//
   handleSort(e) {
     let criteria = e.target.value;
     if (criteria === 'noop') {
@@ -239,9 +248,12 @@ class AdminItemBrowser extends Component {
     debug(criteria);
     const query = upsertQuery('sort', criteria);
     window.history.replaceState({}, {}, query);
-    this.context.executeAction(updateResultsAction, window.location.href);
+    this.context.executeAction(updateResultsAction, {
+      url: window.location.href,
+      loadingProperty: 'sort'
+    });
   }
-
+//
   handleBulkEdit(formValues) {
     error(formValues);
     this.setState({
@@ -306,25 +318,34 @@ class AdminItemBrowser extends Component {
 
         <ResultsNavigator
           label="Users"
+          itemStore={this.props.userStore}
+          collection={this.state.users}
+          tablePropChoices={this.state.tablePropChoices}
+          pathBase="/admin/users/page/"
+          basePath="/admin/users/"
+
+
+          loadingProperties={this.props.appStore.inPageLoadingProperties}
           handleSearchInput={this.handleSearchInput}
-          searchValue={this.state.search}
+          searchValue={this.state.searchValue}
+          search={this.props.userStore.search}
           handlePerPageInput={this.handlePerPageInput}
           perPageValue={this.state.perPageInput}
           perPagePlaceholder={`Users per page (${this.state.perpage})`}
           handlePerPageButton={this.handlePerPageButton}
           handleSort={this.handleSort}
-          tablePropChoices={this.state.tablePropChoices}
+
           handleTablePropChange={this.handleTablePropChange}
           currentPageNumber={this.state.currentPageNumber}
           totalItems={this.state.totalUsers}
           perpage={this.state.perpage}
           neighborDepth={1}
-          pathBase="/admin/users/page/"
-          collection={this.state.users}
+
+
           handleCheckAll={this.handleCheckAll}
           handleBulkEditClick={this.handleBulkEditClick}
           handleCheck={this.handleCheck}
-          basePath="/admin/users/"
+
         />
 
         <ModalWrapper

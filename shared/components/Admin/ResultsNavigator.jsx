@@ -4,6 +4,8 @@ import React, {Component, PropTypes as pt} from 'react';
 import Checkbox from '../Checkbox';
 import Paginator from './Paginator';
 import ResultsTable from './ResultsTable';
+import {includes} from 'lodash';
+import Spinner from '../Spinner';
 // import {connectToStores} from 'fluxible/addons';
 // import asdf from '../stores/asdf';
 // import {autoBindAll} from '../../utils';
@@ -54,7 +56,13 @@ export default class ResultsNavigator extends Component {
       this.props.tablePropChoices.filter((tableProp) => tableProp.selected);
 
     const noUsers = (
-      <h2>No users match{` "${this.state.search}"`}!</h2>
+      <div>
+        {this.props.search ?
+          <h2>No users match{` "${this.props.search}"`}!</h2> :
+          <h2>No {this.props.label} have been made yet. Create one!</h2>
+        }
+      </div>
+
     );
 
 
@@ -93,6 +101,9 @@ export default class ResultsNavigator extends Component {
               )
             }
           </select>
+          {includes(this.props.loadingProperties, 'sort') &&
+            <Spinner className='sort-spinner' />
+          }
         </div>
 
         <div>
@@ -116,9 +127,9 @@ export default class ResultsNavigator extends Component {
 
         {paginator}
 
-        {this.state.search &&
+        {this.props.search &&
           <small>
-            {`"${this.state.search}" matches ${this.state.totalItems} ${this.props.label}`}
+            {`"${this.props.search}" matches ${this.props.totalItems} ${this.props.label}`}
           </small>
         }
 
@@ -144,9 +155,13 @@ export default class ResultsNavigator extends Component {
           className="user-search"
           type="search"
           onChange={this.props.handleSearchInput}
-          value={this.props.searchValue}
+          value={this.props.searchValue ||  this.props.search}
           placeholder={`Search for ${this.props.label}`}
         />
+        {includes(this.props.loadingProperties, 'search') &&
+          <Spinner className='search-spinner' />
+        }
+
         {body}
       </div>
 

@@ -24,8 +24,9 @@ class Page extends Component {
     debug(props);
 
     let state = props.store.singlePage;
-
+    state.show = false;
     this.state = state;
+
   }
 
   static displayName = 'Page'
@@ -61,7 +62,7 @@ class Page extends Component {
   render() {
     return (
       <div>
-        <PageForm {...this.state} handleSubmit={this.handleSubmit.bind(this)} />
+        <PageForm {...this.state} handleSubmit={this.handleSubmit} />
 
         <button onClick={this.handleDelete}>Delete Page</button>
         <ConfirmationPopup

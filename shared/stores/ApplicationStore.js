@@ -1,5 +1,6 @@
 'use strict';
 import {createStore} from 'fluxible/addons';
+import {pull} from 'lodash';
 const debug = require('debug')('Store:ApplicationStore');
 
 export default createStore({
@@ -14,7 +15,9 @@ export default createStore({
     'FLASH_MESSAGE': 'setFlashMessage',
     'CLEAR_FLASH_MESSAGE': 'clearFlashMessage',
     'SET_PAGE_USER_PREF': 'setPageUserPref',
-    'SAVE_REQUEST_ATTEMPT': 'saveRequestAttempt'
+    'SAVE_REQUEST_ATTEMPT': 'saveRequestAttempt',
+    'IN_PAGE_REQUEST_START': 'inPageRequestStart',
+    'IN_PAGE_REQUEST_END': 'inPageRequestEnd'
   },
 
   navigationError(payload) {
@@ -33,6 +36,7 @@ export default createStore({
     this.flashMessage = null;
     this.reqAttempt = null;
     this.userLevel = null;
+    this.inPageLoadingProperties = [];
     this.pageUserPref = null;
   },
 
@@ -69,7 +73,7 @@ export default createStore({
     this.emitChange();
   },
 
-  handleNavigate(route) {
+  handleNavigate({payload: route, resolution}) {
     this.appIsLoading = false;
     debug('HANDLING NAVIGATE vvvvvvv');
     debug(route);
@@ -83,7 +87,6 @@ export default createStore({
   },
 
   login({userLevel=1, local}) {
-    debug('logging in');
     this.loggedIn = true;
     this.email = local.email;
     this.userLevel = userLevel;
@@ -97,6 +100,17 @@ export default createStore({
     this.emitChange();
   },
 
+  inPageRequestStart(payload) {
+    this.inPageLoadingProperties = this.inPageLoadingProperties || [];
+    this.inPageLoadingProperties.push(payload);
+    this.emitChange();
+  },
+
+  inPageRequestEnd(payload) {
+    pull(this.inPageLoadingProperties, payload);
+    this.emitChange();
+  },
+
   getState() {
     return {
       route: this.currentRoute,
@@ -106,6 +120,7 @@ export default createStore({
       appIsLoading: this.appIsLoading,
       flashMessage: this.flashMessage,
       pageUserPref: this.pageUserPref,
+      inPageLoadingProperties: this.inPageLoadingProperties,
       reqAttempt: this.reqAttempt
     };
   },
@@ -122,6 +137,7 @@ export default createStore({
     this.appIsLoading = state.appIsLoading;
     this.flashMessage = state.flashMessage;
     this.pageUserPref = state.pageUserPref;
+    this.inPageLoadingProperties = state.inPageLoadingProperties;
     this.reqAttempt = state.reqAttempt;
   }
 });

@@ -1,10 +1,10 @@
 'use strict';
 
-import React, {Component, PropTypes as pt} from 'react';
+import React, {Component, PropTypes as pt, findDOMNode} from 'react';
 import {connectToStores} from 'fluxible/addons';
 import {autoBindAll} from '../../../../utils';
+import {merge} from 'lodash';
 const debug = require('debug')('Component:PageForm');
-debug();
 
 export default class PageForm extends Component {
 
@@ -14,7 +14,9 @@ export default class PageForm extends Component {
       'handleSubmit',
       'handleChange'
     ]);
+
     this.state = props;
+    this.state.content = this.state.content || '';
   }
 
   static displayName = 'PageForm'
@@ -26,34 +28,38 @@ export default class PageForm extends Component {
   }
 
   handleSubmit(e) {
-    debug();
     e.preventDefault();
+    const content = findDOMNode(this.refs.content).innerHTML,
+      lastUpdated = new Date();
     this.setState({
-      lastUpdated: new Date()
+      content,
+      lastUpdated
     });
-    debug('state', this.state);
-    this.props.handleSubmit(this.state);
+
+    // setState is not gauranteed to be synchronous
+    const formValues = merge(this.state, {
+      content,
+      lastUpdated
+    });
+    this.props.handleSubmit(formValues);
   }
 
   handleChange(field, e) {
-    if (field === 'email' || field === 'password') {
-      if (!this.state.local) {
-        this.setState({
-          local: {}
-        });
-      }
-      this.setState({
-        local: {
-          email: this.state.local.email,
-          password: this.state.local.password,
-          [field]: e.target.value
-        }
-      });
-    } else {
-      this.setState({
-        [field]: e.target.value
-      });
+    this.setState({
+      [field]: e.target.value
+    });
+  }
+
+  componentDidMount() {
+    if (window && window.document) {
+      const MediumEditor = require('medium-editor-webpack');
+      this.mediumEditor = new MediumEditor(findDOMNode(this.refs.content));
     }
+
+  }
+
+  componentWillUnmount() {
+    this.mediumEditor.destroy();
   }
 
   render() {
@@ -69,14 +75,24 @@ export default class PageForm extends Component {
             onChange={this.handleChange.bind(null, 'title')}
             value={this.state.title}
             />
+          <label htmlFor="slug">Slug</label>
+          <input
+            type="text"
+            id="slug"
+            name="slug"
+            key="slug"
+            onChange={this.handleChange.bind(null, 'slug')}
+            value={this.state.slug}
+            />
           <label htmlFor="content">content</label>
-          <textarea
+          <div
             id="content"
             name="content"
             key="content"
-            onChange={this.handleChange.bind(null, 'content')}
-            value={this.state.content}
-            />
+            ref="content"
+            dangerouslySetInnerHTML={{__html: this.state.content}}
+          />
+
           <div>
             <button
               className="button-primary"
@@ -84,6 +100,7 @@ export default class PageForm extends Component {
               {this.state.buttonText || 'Update User'}
             </button>
           </div>
+
         </form>
       </div>
 

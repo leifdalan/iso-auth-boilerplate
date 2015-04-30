@@ -3,6 +3,7 @@ import {Route, DefaultRoute, NotFoundRoute, Redirect} from 'react-router';
 import Application from './Application';
 import About from './About';
 import Home from './Home';
+import WildCard from './WildCard';
 import Dashboard from './Dashboard';
 import SignIn from './SignIn';
 import AdminIndex from './Admin';
@@ -71,6 +72,10 @@ export default (
       </Route>
 
     </Route>
+    {/*
+
+       */}
+       <Route path="*" name="wildCard" handler={WildCard} />
 
     <NotFoundRoute handler={NotFound}/>
   </Route>

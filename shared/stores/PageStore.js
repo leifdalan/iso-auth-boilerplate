@@ -9,7 +9,16 @@ export default createStore({
   handlers: {
     'adminPagesPaginated_PAYLOAD': 'handlePayload',
     'adminPageEdit_PAYLOAD': 'handleEditPayload',
-    'adminPageEdit_FAILURE': 'handleEditFailure'
+    'adminPageEdit_FAILURE': 'handleEditFailure',
+    'CHANGE_ROUTE': 'handleNavigate',
+  },
+
+  handleNavigate({payload, resolution}) {
+    debug(payload);
+    debug('==========================');
+    debug(resolution);
+    this.singlePage = resolution;
+    this.emitChange();
   },
 
   initialize() {

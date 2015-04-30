@@ -88,7 +88,7 @@ export default class Nav extends Component {
               <Link
                 onMouseOver={this.mouseOverLink}
                 onMouseOut={this.mouseOut}
-                to='/signIn'>SignIn
+                to='signin'>SignIn
               </Link>
             </li>
           }

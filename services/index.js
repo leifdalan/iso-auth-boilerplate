@@ -1,4 +1,5 @@
 import User from '../models/user';
+import Page from '../models/page';
 import {signUp, logOut, login, isAdmin, isLoggedIn} from './authentication';
 import {
   redirectUser,
@@ -99,6 +100,34 @@ export default function(server) {
   server.get('/admin/pages/:id', isLoggedIn, isAdmin, getOnePage);
   server.put('/admin/pages/:id', isLoggedIn, isAdmin, updatePage);
   server.delete('/admin/pages/:id', isLoggedIn, isAdmin, deletePage);
+
+  // ----------------------------------------------------------------------------
+  // Page resolution
+  // ----------------------------------------------------------------------------
+
+  // server.get('*', (req, res, next) => {
+  //   debug('Looking for', req.path);
+  //   if (req.preRender) {
+  //
+  //     next();
+  //   } else {
+  //     if (req.path.split('/')[1] === 'dist') {
+  //       next();
+  //     } else {
+  //       Page.findOne({slug: req.path.substring(1)}, (err, page) => {
+  //         if (err) {
+  //           next();
+  //         }
+  //         if (page) {
+  //           req.preRender = page;
+  //           next();
+  //         } else {
+  //           next();
+  //         }
+  //       });
+  //     }
+  //   }
+  // });
 
   // Blacklist undefined http verbs routes
   function fourHundred(req, res) {

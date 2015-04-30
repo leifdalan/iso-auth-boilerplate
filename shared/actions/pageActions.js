@@ -27,8 +27,9 @@ export const editPageAction = ({dispatch}, payload, done) => {
 };
 
 export function updateResultsAction({dispatch}, payload, done) {
+  dispatch('IN_PAGE_REQUEST_START', payload.loadingProperty);
   request
-    .get(payload)
+    .get(payload.url)
     .send(payload)
     .set('Accept', 'application/json')
     .set('X-Requested-With', 'XMLHttpRequest')
@@ -45,6 +46,8 @@ export function updateResultsAction({dispatch}, payload, done) {
           dispatch('FLASH_MESSAGE', error);
         }
       }
+
+      dispatch('IN_PAGE_REQUEST_END', payload.loadingProperty);
       done && done();
     }
   );

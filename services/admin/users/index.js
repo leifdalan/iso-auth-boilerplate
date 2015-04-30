@@ -38,8 +38,12 @@ export function createUser(req, res, next) {
 }
 
 export function getUsers(req, res, next) {
-  const {perpage, currentPageNumber} = req.params;
+  let {perpage, currentPageNumber} = req.params;
   debug(req.query.s);
+  if (perpage > 200) {
+    req.flash('flashMessage', '200 per page maximum.')
+    return res.redirect('/admin/users/page/20/1');
+  }
   const {s: search, sort} = req.query;
 
   let filter = {}, data;
