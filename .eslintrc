@@ -1,22 +1,24 @@
 {
-  // http://eslint.org/docs/rules/
   "parser": "babel-eslint",
+  "settings": {
+    "ecmascript": 6
+  },
   "ecmaFeatures": {
-    "binaryLiterals": false,                    // enable binary literals
-    "blockBindings": false,                     // enable let and const (aka block bindings)
-    "defaultParams": false,                     // enable default function parameters
-    "forOf": false,                             // enable for-of loops
-    "generators": false,                        // enable generators
-    "objectLiteralComputedProperties": false,   // enable computed object literal property names
-    "objectLiteralDuplicateProperties": false,  // enable duplicate object literal properties in strict mode
-    "objectLiteralShorthandMethods": false,     // enable object literal shorthand methods
-    "objectLiteralShorthandProperties": false,  // enable object literal shorthand properties
-    "octalLiterals": false,                     // enable octal literals
-    "regexUFlag": false,                        // enable the regular expression u flag
-    "regexYFlag": false,                        // enable the regular expression y flag
-    "templateStrings": false,                   // enable template strings
-    "unicodeCodePointEscapes": false,           // enable code point escapes
-    "jsx": false                                // enable JSX
+    "binaryLiterals": true,                    // enable binary literals
+    "blockBindings": true,                     // enable let and const (aka block bindings)
+    "defaultParams": true,                     // enable default function parameters
+    "forOf": true,                             // enable for-of loops
+    "generators": true,                        // enable generators
+    "objectLiteralComputedProperties": true,   // enable computed object literal property names
+    "objectLiteralDuplicateProperties": true,  // enable duplicate object literal properties in strict mode
+    "objectLiteralShorthandMethods": true,     // enable object literal shorthand methods
+    "objectLiteralShorthandProperties": true,  // enable object literal shorthand properties
+    "octalLiterals": true,                     // enable octal literals
+    "regexUFlag": true,                        // enable the regular expression u flag
+    "regexYFlag": true,                        // enable the regular expression y flag
+    "templateStrings": true,                   // enable template strings
+    "unicodeCodePointEscapes": true,           // enable code point escapes
+    "jsx": true                                // enable JSX
   },
 
   "env": {
@@ -34,14 +36,30 @@
   "globals": {
     // e.g. "angular": true,
     "require": true,
-    "module": true
+    "module": true,
+    "window": true
   },
 
   "plugins": [
-    // e.g. "react" (must run `npm install eslint-plugin-react` first)
+    "react"
   ],
 
   "rules": {
+    ////////// REACT RULES ////////////
+    "react/display-name": 1,
+    "react/jsx-boolean-value": 1,
+    "react/jsx-quotes": 1,
+    "react/jsx-no-undef": 1,
+    "react/jsx-uses-react": 1,
+    "react/jsx-uses-vars": 1,
+    "react/no-did-mount-set-state": 1,
+    "react/no-did-update-set-state": 1,
+    "react/no-multi-comp": 1,
+    "react/no-unknown-property": 1,
+    "react/prop-types": 1,
+    "react/react-in-jsx-scope": 0,
+    "react/self-closing-comp": 1,
+    "react/wrap-multilines": 1,
     ////////// Possible Errors //////////
 
     "no-comma-dangle": 1,         // disallow trailing commas in object literals
@@ -137,10 +155,10 @@
     "no-label-var": 2,                // disallow labels that share a name with a variable
     "no-shadow": 1,                   // disallow declaration of variables already declared in the outer scope
     "no-shadow-restricted-names": 2,  // disallow shadowing of names such as arguments
-    "no-undef": 2,                    // disallow use of undeclared variables unless mentioned in a /*global */ block
+    "no-undef": 0,                    // disallow use of undeclared variables unless mentioned in a /*global */ block
     "no-undef-init": 2,               // disallow use of undefined when initializing variables
     "no-undefined": 2,                // disallow use of undefined variable (off by default)
-    "no-unused-vars": 2,              // disallow declaration of variables that are not used in the code
+    "no-unused-vars": [0],              // disallow declaration of variables that are not used in the code
     "no-use-before-define": 2,        // disallow use of variables before they are defined
 
 
@@ -187,7 +205,7 @@
     "padded-blocks": 0,             // enforce padding within blocks (off by default)
     "quote-props": 0,               // require quotes around object literal property names (off by default)
     "quotes": [1, "single", "avoid-escape"],                    // specify whether double or single quotes should be used
-    "semi": [l2, "always"],                      // require or disallow use of semicolons instead of ASI
+    "semi": [2, "always"],                      // require or disallow use of semicolons instead of ASI
     "sort-vars": 0,                 // sort variables within the same declaration block (off by default)
     "space-after-function-name": 0, // require a space after function names (off by default)
     "space-after-keywords": "always",      // require a space after certain keywords (off by default)

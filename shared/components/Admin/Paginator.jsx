@@ -1,7 +1,6 @@
 'use strict';
 
 import React, {Component, PropTypes as pt} from 'react';
-import {connectToStores} from 'fluxible/addons';
 import PaginatorLink from './PaginatorLink';
 import {autoBindAll} from '../../../utils';
 const debug = require('debug')('Component:Paginator');
@@ -34,7 +33,8 @@ export default class Paginator extends Component {
     currentPageNumber: pt.number.isRequired,
     totalItems: pt.number.isRequired,
     perpage: pt.number.isRequired,
-    pathBase: pt.string.isRequired
+    pathBase: pt.string.isRequired,
+    neighborDepth: pt.number
   }
 
   componentWillReceiveProps(nextProps) {
@@ -64,6 +64,7 @@ export default class Paginator extends Component {
   }
 
   _constructMiddle() {
+
     let atEnd, atBeginning, middleMarkup = [];
     const {currentPageNumber, neighborDepth} = this.props,
           {totalPages} = this.state;
@@ -132,6 +133,7 @@ export default class Paginator extends Component {
   }
 
   render() {
+    debug(this.props);
     const shouldrender = this.state.totalPages > 1;
     return (
       <div className="paginator">

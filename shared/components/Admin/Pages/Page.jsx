@@ -2,16 +2,16 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
-import UserStore from '../../../stores/UserStore';
-import UserForm from './UserForm';
+import PageStore from '../../../stores/PageStore';
+import PageForm from './PageForm';
 import {autoBindAll} from '../../../../utils';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
 import ConfirmationPopup from '../ConfirmationPopup';
-import {editUserAction, deleteUserAction} from '../../../actions/userActions';
-const debug = require('debug')('Component:User');
+import {editPageAction, deletePageAction} from '../../../actions/pageActions';
+const debug = require('debug')('Component:Page');
 debug();
 
-class User extends Component {
+class Page extends Component {
 
   constructor(props) {
     super(props);
@@ -22,13 +22,14 @@ class User extends Component {
     ]);
     debug('PROPS');
     debug(props);
-    let state = props.store.singleUser;
-    state.originalPassword = state.local.password;
 
+    let state = props.store.singlePage;
+    state.show = false;
     this.state = state;
+
   }
 
-  static displayName = 'User'
+  static displayName = 'Page'
 
   static contextTypes = {
     router: pt.func.isRequired,
@@ -39,8 +40,7 @@ class User extends Component {
   static willTransitionTo = CheckAdminWillTransitionTo
 
   componentWillReceiveProps(nextProps) {
-    let state = nextProps.store.singleUser;
-    state.originalPassword = state.local.password;
+    let state = nextProps.store.singlePage;
     this.setState(state);
   }
 
@@ -50,21 +50,21 @@ class User extends Component {
   }
 
   handleSubmit(formState) {
-    this.context.executeAction(editUserAction, formState);
+    this.context.executeAction(editPageAction, formState);
   }
 
   handleConfirmedDelete() {
     let payload = this.state;
     payload.router = this.context.router;
-    this.context.executeAction(deleteUserAction, payload);
+    this.context.executeAction(deletePageAction, payload);
   }
 
   render() {
     return (
       <div>
-        <UserForm {...this.state} handleSubmit={this.handleSubmit.bind(this)} />
+        <PageForm {...this.state} handleSubmit={this.handleSubmit} />
 
-        <button onClick={this.handleDelete}>Delete User</button>
+        <button onClick={this.handleDelete}>Delete Page</button>
         <ConfirmationPopup
           show={this.state.show}
           onHide={() => this.setState({show: false})}
@@ -75,10 +75,10 @@ class User extends Component {
   }
 }
 
-User = connectToStores(User, [UserStore], (stores) => {
+Page = connectToStores(Page, [PageStore], (stores) => {
   return {
-    store: stores.UserStore.getState()
+    store: stores.PageStore.getState()
   };
 });
 
-export default User;
+export default Page;

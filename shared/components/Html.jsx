@@ -1,5 +1,5 @@
 'use strict';
-import React from 'react';
+import React, {Component, PropTypes as pt} from 'react';
 import {
   PROTOCOL,
   PUBLIC_PATH,
@@ -9,15 +9,22 @@ import {
 
 const fullPublicPath = `${PROTOCOL}${PUBLIC_ASSET_DOMAIN}${PUBLIC_PATH}`;
 
-export default React.createClass({
+export default class Html extends Component {
+
+  constructor(props) {
+    super(props);
+  }
+
+  static displayName = 'Html'
+
+  static propTypes = {
+    state: pt.object.isRequired,
+    markup: pt.string.isRequired,
+    title: pt.object,
+    shouldClientRender: pt.bool
+  }
+
   render() {
-    const clientScript = (
-      <script src={`${fullPublicPath}/${JS_PATH}`} defer></script>
-    );
-    const clientBootstrap = (
-      <script dangerouslySetInnerHTML={{__html: this.props.state}}>
-      </script>
-    );
     return (
       <html>
         <head>
@@ -43,9 +50,13 @@ export default React.createClass({
             dangerouslySetInnerHTML={{__html: this.props.markup}}>
           </div>
         </body>
-        {this.props.shouldClientRender && clientScript}
-        {this.props.shouldClientRender && clientBootstrap}
+        {this.props.shouldClientRender &&
+          <script src={`${fullPublicPath}/${JS_PATH}`} defer />
+        }
+        {this.props.shouldClientRender &&
+          <script dangerouslySetInnerHTML={{__html: this.props.state}} />
+        }
       </html>
     );
   }
-});
+}

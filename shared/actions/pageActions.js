@@ -1,23 +1,23 @@
 import request from 'superagent';
 const debug = require('debug')('Action:userActions');
 
-export const editUserAction = ({dispatch}, payload, done) => {
+export const editPageAction = ({dispatch}, payload, done) => {
   request
-    .put(`/admin/users/${payload._id}`)
+    .put(`/admin/pages/${payload._id}`)
     .send(payload)
     .set('Accept', 'application/json')
     .set('X-Requested-With', 'XMLHttpRequest')
     .end((xhrError, res) => {
-      const {success, user, error} = res.body;
+      const {success, page, error} = res.body;
       if (xhrError || res.badRequest) {
         debug(xhrError || res.badRequest);
         dispatch('FLASH_MESSAGE', 'Bad Request.');
       } else {
         if (success) {
-          dispatch('adminUserEdit_PAYLOAD', user);
+          dispatch('adminPageEdit_PAYLOAD', page);
           dispatch('FLASH_MESSAGE', success);
         } else if (error) {
-          dispatch('adminUserEdit_FAILURE', error);
+          dispatch('adminPageEdit_FAILURE', error);
           dispatch('FLASH_MESSAGE', error);
         }
       }
@@ -30,7 +30,7 @@ export function updateResultsAction({dispatch}, payload, done) {
   dispatch('IN_PAGE_REQUEST_START', payload.loadingProperty);
   request
     .get(payload.url)
-    .send(payload.url)
+    .send(payload)
     .set('Accept', 'application/json')
     .set('X-Requested-With', 'XMLHttpRequest')
     .end((xhrError, res) => {
@@ -40,22 +40,23 @@ export function updateResultsAction({dispatch}, payload, done) {
         dispatch('FLASH_MESSAGE', 'Bad Request.');
       } else {
         if (success) {
-          dispatch('adminUsersPaginated_PAYLOAD', res.body);
+          dispatch('adminPagesPaginated_PAYLOAD', res.body);
         } else if (error) {
-          dispatch('adminUserEdit_FAILURE', error);
+          dispatch('adminPageEdit_FAILURE', error);
           dispatch('FLASH_MESSAGE', error);
         }
       }
+
       dispatch('IN_PAGE_REQUEST_END', payload.loadingProperty);
       done && done();
     }
   );
 }
 
-export function editManyUsersAction(actionContext, payload, done) {
+export function editManyPagesAction(actionContext, payload, done) {
   const {dispatch} = actionContext;
   request
-    .put(`/admin/users/`)
+    .put(`/admin/pages/`)
     .send(payload)
     .set('Accept', 'application/json')
     .set('X-Requested-With', 'XMLHttpRequest')
@@ -69,7 +70,7 @@ export function editManyUsersAction(actionContext, payload, done) {
           updateResultsAction(actionContext, window.location.href);
           dispatch('FLASH_MESSAGE', success);
         } else if (error) {
-          dispatch('adminUserEdit_FAILURE', error);
+          dispatch('adminPageEdit_FAILURE', error);
           dispatch('FLASH_MESSAGE', error);
         }
       }
@@ -78,24 +79,24 @@ export function editManyUsersAction(actionContext, payload, done) {
   );
 }
 
-export const deleteUserAction = ({dispatch}, payload, done) => {
+export const deletePageAction = ({dispatch}, payload, done) => {
   debug('Logging out.');
   request
-    .del(`/admin/users/${payload._id}`)
+    .del(`/admin/pages/${payload._id}`)
     .set('Accept', 'application/json')
     .set('X-Requested-With', 'XMLHttpRequest')
     .end((xhrError, res) => {
       debug('Response:');
       debug(res);
-      const {success, user, error} = res.body;
+      const {success, page, error} = res.body;
       if (xhrError || res.badRequest) {
         debug(xhrError || res.badRequest);
         dispatch('FLASH_MESSAGE', 'Bad Request.');
       } else {
         if (success) {
-          debug('Deleting: ', success, user);
+          debug('Deleting: ', success, page);
           dispatch('FLASH_MESSAGE', success);
-          payload.router.transitionTo('/admin/users/page/20/1');
+          payload.router.transitionTo('/admin/pages/page/20/1');
         } else {
           dispatch('FLASH_MESSAGE', error);
         }
@@ -105,18 +106,11 @@ export const deleteUserAction = ({dispatch}, payload, done) => {
   );
 };
 
-export const createUserAction = ({dispatch}, {formValues, router}, done) => {
+export const createPageAction = ({dispatch}, {formValues, router}, done) => {
   debug('createUser');
-  if (formValues.local && formValues.local.email && formValues.local.password) {
-    formValues.email = formValues.local.email;
-    formValues.password = formValues.local.password;
-  } else {
-    dispatch('FLASH_MESSAGE', 'Need email and password fields.');
-    return done();
-  }
   dispatch('REQUEST_START');
   request
-    .post('/admin/users')
+    .post('/admin/pages')
     .set('Accept', 'application/json')
     .set('X-Requested-With', 'XMLHttpRequest')
     .send(formValues)
@@ -124,15 +118,15 @@ export const createUserAction = ({dispatch}, {formValues, router}, done) => {
       dispatch('REQUEST_END');
       debug('Response:');
       debug(res);
-      const {success, user, error} = res.body;
+      const {success, page, error} = res.body;
       if (xhrError || res.badRequest) {
         debug(res);
         dispatch('FLASH_MESSAGE', error);
       } else {
         if (success) {
-          debug('Created: ', success, user);
+          debug('Created: ', success, page);
           dispatch('FLASH_MESSAGE', success);
-          router.transitionTo(`/admin/users/${user._id}`);
+          router.transitionTo(`/admin/pages/${page._id}`);
         } else {
           dispatch('FLASH_MESSAGE', error);
         }

@@ -1,7 +1,6 @@
 'use strict';
 
 import React, {Component, PropTypes as pt} from 'react';
-import {connectToStores} from 'fluxible/addons';
 import ModalWrapper from '../Modal';
 const debug = require('debug')('Component:ConfirmationPopup');
 debug();
@@ -20,7 +19,11 @@ export default class ConfirmationPopup extends Component {
   }
 
   static propTypes = {
-    onConfirm: pt.func.isRequired
+    onConfirm: pt.func.isRequired,
+    show: pt.bool,
+    onHide: pt.func.isRequired,
+    confirmationText: pt.string,
+    confirmationButton: pt.string
   }
 
   static contextTypes = {

@@ -1,7 +1,6 @@
 'use strict';
 
 import React, {Component, PropTypes as pt} from 'react';
-import {connectToStores} from 'fluxible/addons';
 import {autoBindAll} from '../../../utils';
 import classnames from 'classnames';
 import {Link} from 'react-router';
@@ -65,6 +64,15 @@ export default class AdminNav extends Component {
               to='adminUsersPaginated'
               params={{perpage: 20, pagenumber: 1}}
               >Users
+            </Link>
+          </li>
+          <li>
+            <Link
+              onMouseOver={this.mouseOverLink}
+              onMouseOut={this.mouseOut}
+              to='adminPagesPaginated'
+              params={{perpage: 20, pagenumber: 1}}
+              >Pages
             </Link>
           </li>
           <li>

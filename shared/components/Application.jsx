@@ -3,10 +3,10 @@ import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../stores/ApplicationStore';
 import UserStore from '../stores/UserStore';
-import {autoBindAll, warn, error} from '../../utils';
+import {autoBindAll} from '../../utils';
 import Nav from './Nav';
 import AdminNav from './Admin/AdminNav';
-import {RouteHandler, Navigation} from 'react-router';
+import {RouteHandler} from 'react-router';
 import {logoutAction} from '../actions/authActions';
 import DocumentTitle from 'react-document-title';
 import {clearFlashAction} from '../actions/appActions';
@@ -14,6 +14,8 @@ import TransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 const debug = require('debug')('Component:Application');
 
 class Application extends Component {
+
+  static displayName = 'Application'
 
   constructor(props) {
     super(props);
@@ -128,7 +130,7 @@ class Application extends Component {
 Application = connectToStores(Application, [ApplicationStore], (stores) => {
   return {
     appStore: stores.ApplicationStore.getState()
-  }
+  };
 });
 
 export default Application;

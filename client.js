@@ -4,7 +4,6 @@ import React from 'react';
 import debug from 'debug';
 import app from './shared/app';
 import Router, {HistoryLocation} from 'react-router';
-import {provideContext} from 'fluxible/addons';
 import navigateAction from './shared/actions/navigate';
 import config from './config';
 import FluxibleComponent from 'fluxible/addons/FluxibleComponent';
@@ -26,7 +25,7 @@ app.rehydrate(dehydratedState, (err, context) => {
     throw err;
   }
 
-  const renderApp = (context, Handler) => {
+  const renderApp = (runContext, Handler) => {
     bootstrapDebug('React Rendering');
     const mountNode = document.getElementById('app');
 
@@ -34,19 +33,9 @@ app.rehydrate(dehydratedState, (err, context) => {
     const component = React.createFactory(Handler);
     React.render(React.createElement(
       FluxibleComponent,
-      {context: context.getComponentContext()},
+      {context: runContext.getComponentContext()},
       component()
-    ), mountNode, () => {
-    //   bootstrapDebug('React Rendered');
-    // }
-
-      // component({
-      //   context: context.getComponentContext()
-      // }), mountNode, () => {
-      //   bootstrapDebug('React Rendered');
-      // }
-      }
-    );
+    ), mountNode);
   };
 
   const router = Router.create({

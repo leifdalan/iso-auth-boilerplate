@@ -1,3 +1,4 @@
+/*eslint-disable*/
 var defaults = {
   MONGOLAB_URI : '{{mongodbUrl}}',
   clientDebug: '*,-socket.io-client*,-engine.io-client:*,-socket.io-parser*',
@@ -32,3 +33,4 @@ if (process && process.env) {
 }
 
 module.exports = defaults;
+/*eslint-enable*/

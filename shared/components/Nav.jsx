@@ -28,6 +28,11 @@ export default class Nav extends Component {
     executeAction: pt.func.isRequired
   }
 
+  static propTypes = {
+    loggedIn: pt.bool,
+    userLevel: pt.number
+  }
+
   mouseOverLink(e) {
     e.target.classList.add('hovering');
     this.setState({
@@ -88,7 +93,7 @@ export default class Nav extends Component {
               <Link
                 onMouseOver={this.mouseOverLink}
                 onMouseOut={this.mouseOut}
-                to='/signIn'>SignIn
+                to='signin'>SignIn
               </Link>
             </li>
           }

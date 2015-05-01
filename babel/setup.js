@@ -163,10 +163,10 @@ Async.auto({
             newUser.userLevel = 3;
 
 
-            newUser.save((err) => {
-              if (err) {
+            newUser.save((userErr) => {
+              if (userErr) {
                 debug('Error adding user.');
-                seriesDone(err);
+                seriesDone(userErr);
               }
               seriesDone();
             });
@@ -192,10 +192,10 @@ Async.auto({
             newUser.userLevel = 1;
 
 
-            newUser.save((err) => {
-              if (err) {
+            newUser.save((userErr) => {
+              if (userErr) {
                 debug('Error adding user.');
-                seriesDone(err);
+                seriesDone(userErr);
               }
               return seriesDone();
             });
@@ -209,12 +209,12 @@ Async.auto({
     progressBar.setTotal(999);
     let tick = 0;
     function makeid() {
-      var text = "";
+      var text = '';
       var possible =
-        "abcdefghijklmnopqrstuvwxyz0123456789";
+        'abcdefghijklmnopqrstuvwxyz0123456789';
 
       var charLength = Math.floor(Math.random() * 5 + 5);
-      for( var i=0; i < charLength; i++ ) {
+      for (let k = 0; i < charLength; k++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
       }
 

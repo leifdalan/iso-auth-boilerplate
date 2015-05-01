@@ -3,56 +3,55 @@
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../../../stores/ApplicationStore';
-import UserStore from '../../../stores/UserStore';
-import {isClient, autoBindAll, trace, getTimeAgo} from '../../../../utils';
+import PageStore from '../../../stores/PageStore';
+import {isClient, autoBindAll, getTimeAgo} from '../../../../utils';
 import {merge, get, include} from 'lodash';
-import {updateResultsAction, editManyUsersAction} from '../../../actions/userActions';
+import {updateResultsAction, editManyPagesAction} from '../../../actions/pageActions';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
 import {setPageUserPrefAction} from '../../../actions/appActions';
-import UserForm from './UserForm';
+import PageForm from './PageForm';
 
 import ResultsNavigator from '../ResultsNavigator';
 const debug = require('debug')('Component:Pages');
 
-class AdminUserBrowser extends Component {
+class AdminPageBrowser extends Component {
 
   constructor(props) {
     super(props);
     debug(this);
     autoBindAll.call(this, [
-      '_setHighlightedMarkup',
-      'goToCreateUser'
+      'goToCreatePage',
+      '_setHighlightedMarkup'
     ]);
 
-    let state = props.userStore;
+    let state = props.pageStore;
 
-    const users = state.users.map((user) => {
-      user.selected = false;
-      user.email = user.local.email;
+    const pages = state.pages.map((page) => {
+      page.selected = false;
       if (state.search) {
         const searchLetters = state.search.split('');
-        user.email =
-          this._setHighlightedMarkup(user.email, searchLetters);
+        page.title =
+          this._setHighlightedMarkup(page.title, searchLetters);
       }
 
-      user.lastUpdated = getTimeAgo(user.lastUpdated);
+      page.lastUpdated = getTimeAgo(page.lastUpdated);
 
-      return user;
+      return page;
     });
 
     state = merge(state, {
-      users,
+      pages,
       showConfirm: false,
       show: false
     });
 
     state.pageAdjustment && this._adjustPageBounds(state);
-
+    debug('PAGE STATE', state);
     this.state = state;
 
   }
 
-  static displayName = 'AdminUserBrowser'
+  static displayName = 'AdminPageBrowser'
 
   static contextTypes = {
     router: pt.func.isRequired,
@@ -62,14 +61,17 @@ class AdminUserBrowser extends Component {
 
   static propTypes = {
     appStore: pt.object.isRequired,
-    userStore: pt.object.isRequired
+    pageStore: pt.object.isRequired
   }
 
   static willTransitionTo = CheckAdminWillTransitionTo
 
+  goToCreatePage(e) {
+    e.preventDefault();
+    this.context.router.transitionTo('createPage');
+  }
+
   componentWillMount() {
-    trace(this);
-    debug('TYPEOF', typeof this.props.userStore);
     const appState = this.props.appStore;
     const routes = appState.route.routes;
     const currentRouteName = routes[routes.length - 1].name;
@@ -80,29 +82,22 @@ class AdminUserBrowser extends Component {
       get(appState, `pageUserPref[${currentRouteName}].tablePropChoices`) ||
       [
         {
-          label: 'Name',
-          valueProp: 'email',
+          label: 'Title',
+          valueProp: 'title',
           selected: true
         },
         {
-          label: 'Login Token',
-          valueProp: 'loginToken'
+          label: 'Last Updated',
+          valueProp: 'lastUpdated'
         },
         {
-          label: 'Level',
-          valueProp: 'userLevel',
+          label: 'Slug',
+          valueProp: 'slug'
+        },
+        {
+          label: 'Created By',
+          valueProp: 'user.local.email',
           selected: true
-        },
-
-        // TODO: dates seem to be broken in the DB...
-        // {
-        //   label: 'Last Updated',
-        //   valueProp: 'lastUpdated'
-        // },
-
-        {
-          label: 'Validated?',
-          valueProp: 'isValidated'
         }
       ];
 
@@ -116,25 +111,23 @@ class AdminUserBrowser extends Component {
 
   componentWillReceiveProps(nextProps) {
 
-    let state = nextProps.userStore;
-    const users = state.users.map((user) => {
-      user.email = user.local.email;
-      user.lastUpdated = getTimeAgo(user.lastUpdated);
+    let state = nextProps.pageStore;
+    const pages = state.pages.map((page) => {
+      page.lastUpdated = getTimeAgo(page.lastUpdated);
       if (state.search) {
         const searchLetters = state.search.split('');
-        user.email =
-          this._setHighlightedMarkup(user.email, searchLetters);
+        page.title =
+          this._setHighlightedMarkup(page.title, searchLetters);
       }
-
-      return user;
+      page.lastUpdated = getTimeAgo(page.lastUpdated);
+      return page;
     });
-    state.users = users;
+    state.pages = pages;
     state.pageAdjustment && this._adjustPageBounds(state);
-    this.setState(state);
 
+    this.setState(state);
   }
 
-  //
   _setHighlightedMarkup(string, searchLetters) {
     if (typeof string === 'string') {
       let markup = [].map.call(string, (letter) =>
@@ -159,52 +152,46 @@ class AdminUserBrowser extends Component {
     }
   }
 
-  goToCreateUser(e) {
-    e.preventDefault();
-    this.context.router.transitionTo('createUser');
-  }
-
   render() {
 
     return (
       <div>
-        <h1>Users</h1>
+        <h1>Pages</h1>
         <div>
           <button
             className="button-primary"
-            onClick={this.goToCreateUser}>
-            Create user
+            onClick={this.goToCreatePage}>
+            Create page
           </button>
         </div>
 
         <ResultsNavigator
           loadingProperties={this.props.appStore.inPageLoadingProperties}
-          label="Users"
-          items={this.state.users}
-          totalItems={this.props.userStore.totalUsers}
+          label="Pages"
+          items={this.state.pages}
+          totalItems={this.props.pageStore.totalPages}
           updateResultsAction={updateResultsAction}
-          collection={this.state.users}
-          perPagePlaceholder={`Users per page (${this.state.perpage})`}
+          collection={this.state.pages}
+          perPagePlaceholder={`Pages per page (${this.state.perpage})`}
           tablePropChoices={this.state.tablePropChoices}
           neighborDepth={1}
-          pathBase="/admin/users/page/"
-          editForm={UserForm}
-          editManyAction={editManyUsersAction}
-          basePath="/admin/users/"
+          pathBase="/admin/pages/page/"
+          editForm={PageForm}
+          editManyAction={editManyPagesAction}
+          basePath="/admin/pages/"
           editable
-          {...this.props.userStore}
+          {...this.props.pageStore}
           />
-
       </div>
     );
   }
 }
 
-AdminUserBrowser = connectToStores(AdminUserBrowser, [ApplicationStore, UserStore], (stores) => {
+AdminPageBrowser = connectToStores(AdminPageBrowser, [ApplicationStore, PageStore], (stores) => {
   return {
     appStore: stores.ApplicationStore.getState(),
-    userStore: stores.UserStore.getState()
+    pageStore: stores.PageStore.getState()
   };
 });
 
-export default AdminUserBrowser;
+export default AdminPageBrowser;

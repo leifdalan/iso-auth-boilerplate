@@ -1,8 +1,7 @@
 import path from 'path';
 import express from 'express';
 import session from 'express-session';
-import favicon from 'serve-favicon'
-import compress from 'compression';
+import favicon from 'serve-favicon';
 import proxy from 'proxy-middleware';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -79,7 +78,9 @@ server.use(flash());
 if (process.env.ALWAYS_ADMIN) {
   let initialLogin = false;
   server.use((req, res, next) => {
-    if (initialLogin) return next();
+    if (initialLogin) {
+      return next();
+    }
     req.body = {email: 'admin', password: 'admin'};
     passport.authenticate('local-login', (err, user) => {
       req.logIn(user, function(loginErr) {
@@ -90,7 +91,7 @@ if (process.env.ALWAYS_ADMIN) {
         next();
       });
     })(req, res, next);
-  })
+  });
 }
 
 // Load our services and pass in our app and fully configured passport

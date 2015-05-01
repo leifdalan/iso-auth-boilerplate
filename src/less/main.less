@@ -1,6 +1,8 @@
 @import './lib/normalize.less';
 @import './lib/skeleton.less';
 @import './lib/rbm-complete.less';
+@import './lib/medium-editor.less';
+@import './lib/default.less';
 
 @import './someModule.less';
 @import './paginator.less';
@@ -244,4 +246,16 @@ button.warning {
   background: #e92626;
   color: white;
   display: block;
+}
+
+.search-spinner {
+  float: right;
+}
+.sort-spinner {
+  position:absolute;
+}
+
+[contenteditable]:focus {
+  outline: none;
+  box-shadow: 0px 0px 10px #eee;
 }

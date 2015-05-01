@@ -1,24 +1,31 @@
-import User from '../models/user';
+import Page from '../models/page';
 import {signUp, logOut, login, isAdmin, isLoggedIn} from './authentication';
 import {
-  redirect,
-  get,
-  getOne,
-  update,
-  create,
+  redirectUser,
+  getUsers,
+  getOneUser,
+  updateUser,
+  createUser,
   deleteUser,
-  updateMany} from './admin/users';
-import adminUserServices from './admin/users';
+  updateManyUsers} from './admin/users';
+import {
+  redirectPage,
+  getPages,
+  getOnePage,
+  updatePage,
+  createPage,
+  deletePage,
+  updateManyPages} from './admin/pages';
 const debug = require('debug')('Routes');
 
 // Abstract of sending data from the server to client,
 // whether its the first request or an in-app XHR.
 export function sendData({data, req, res, next}) {
   debug('Sending data:');
-  const {success, error, payload} = data;
+  const {success, error} = data;
   if (req.xhr) {
     debug('Via XHR');
-    if (error) {
+    if (error || !success) {
       debug('Error sending data:', error);
       res.status(400).json(data);
     } else {
@@ -49,7 +56,6 @@ export default function(server) {
   });
 
 
-
   // ----------------------------------------------------------------------------
   // Authorization endpoints
   // ----------------------------------------------------------------------------
@@ -62,18 +68,63 @@ export default function(server) {
   // Admin Users CRUD (/admin/users)
   // ----------------------------------------------------------------------------
 
-  server.get('/admin/users/', isLoggedIn, isAdmin, redirect);
+  server.get('/admin/users/', isLoggedIn, isAdmin, redirectUser);
   server.get(
     '/admin/users/page/:perpage/:currentPageNumber',
     isLoggedIn,
     isAdmin,
-    get
+    getUsers
   );
-  server.post('/admin/users/', isLoggedIn, isAdmin, create);
-  server.put('/admin/users/', isLoggedIn, isAdmin, updateMany);
-  server.get('/admin/users/:id', isLoggedIn, isAdmin, getOne);
-  server.put('/admin/users/:id', isLoggedIn, isAdmin, update);
+  server.post('/admin/users/', isLoggedIn, isAdmin, createUser);
+  server.put('/admin/users/', isLoggedIn, isAdmin, updateManyUsers);
+  server.get('/admin/users/:id', isLoggedIn, isAdmin, getOneUser);
+  server.put('/admin/users/:id', isLoggedIn, isAdmin, updateUser);
   server.delete('/admin/users/:id', isLoggedIn, isAdmin, deleteUser);
+
+  // ----------------------------------------------------------------------------
+  // Admin Pages CRUD (/admin/pages)
+  // ----------------------------------------------------------------------------
+
+  server.get('/admin/pages/', isLoggedIn, isAdmin, redirectPage);
+  server.get(
+    '/admin/pages/page/:perpage/:currentPageNumber',
+    isLoggedIn,
+    isAdmin,
+    getPages
+  );
+  server.post('/admin/pages/', isLoggedIn, isAdmin, createPage);
+  server.put('/admin/pages/', isLoggedIn, isAdmin, updateManyPages);
+  server.get('/admin/pages/:id', isLoggedIn, isAdmin, getOnePage);
+  server.put('/admin/pages/:id', isLoggedIn, isAdmin, updatePage);
+  server.delete('/admin/pages/:id', isLoggedIn, isAdmin, deletePage);
+
+  // ----------------------------------------------------------------------------
+  // Page resolution
+  // ----------------------------------------------------------------------------
+
+  server.get('*', (req, res, next) => {
+    debug('Looking for', req.path);
+    if (req.preRender) {
+
+      next();
+    } else {
+      if (req.path.split('/')[1] === 'dist') {
+        next();
+      } else {
+        Page.findOne({slug: req.path.substring(1)}, (err, page) => {
+          if (err) {
+            next();
+          }
+          if (page) {
+            req.preRender = page;
+            next();
+          } else {
+            next();
+          }
+        });
+      }
+    }
+  });
 
   // Blacklist undefined http verbs routes
   function fourHundred(req, res) {
@@ -82,8 +133,7 @@ export default function(server) {
       error: 'Not allowed.'
     });
   }
-  server.delete('*', fourHundred)
-  server.put('*', fourHundred)
-  server.post('*', fourHundred)
-
-};
+  server.delete('*', fourHundred);
+  server.put('*', fourHundred);
+  server.post('*', fourHundred);
+}

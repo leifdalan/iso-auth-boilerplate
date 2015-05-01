@@ -5,7 +5,6 @@ import browserSync from 'browser-sync';
 import del from 'del';
 import webpackHotConfig from '../webpack.hot-config';
 import webpackConfig from '../webpack.config';
-import CST from '../shared/constants';
 import config from '../config';
 
 const aws = {
@@ -13,7 +12,7 @@ const aws = {
   secret: config.AWS_SECRET,
   bucket: config.AWS_BUCKET,
   region: 'us-west-2'
-}
+};
 
 const debug = require('debug')('gulp:feedback');
 const $ = require('gulp-load-plugins')();
@@ -29,8 +28,8 @@ const {
   PUBLIC_PATH
 } = config;
 const paths = {
-  sharedJS: './shared/**/*',
-  baseJS: './*.js'
+  sharedJS: '!node_modules/**/*',
+  baseJS: './**/*.{js,jsx}'
 };
 const webPackAddress = `${PROTOCOL}${HOSTNAME}:${WPDEVPORT}`;
 
@@ -74,6 +73,7 @@ gulp.task('server', (cb) => {
 
 gulp.task('eslint', () => {
   return gulp.src([paths.sharedJS, paths.baseJS])
+    .pipe($.cached('eslint'))
     .pipe($.eslint({
       globals: {
         document: true,
@@ -88,9 +88,7 @@ gulp.task('eslint', () => {
         window: true
       }
     }))
-    .on('error', (error) => {
-      debug(error);
-    })
+    .pipe($.eslint.format())
     .pipe($.notify({
       message: (file) => {
         if (!file || !file.eslint || file.eslint.success || !file.eslint.messages.length) {
@@ -222,7 +220,7 @@ gulp.task('bundleJS', ['clean'], () => {
 gulp.task('g-zip', ['rev'], function() {
   return gulp.src([`.${PUBLIC_PATH}/**/*`])
     .pipe($.gzip())
-    .pipe(gulp.dest(`.${PUBLIC_PATH}/`))
+    .pipe(gulp.dest(`.${PUBLIC_PATH}/`));
 });
 
 gulp.task('rev', ['build'], function() {
@@ -230,7 +228,7 @@ gulp.task('rev', ['build'], function() {
     .pipe($.rev())
     .pipe(gulp.dest(`.${PUBLIC_PATH}/`))
     .pipe($.rev.manifest())
-    .pipe(gulp.dest('.'))
+    .pipe(gulp.dest('.'));
 });
 
 gulp.task('awsJS', function() {
@@ -243,7 +241,7 @@ gulp.task('awsJS', function() {
         'Vary': 'Accept-Encoding'
       }
     }));
-})
+});
 
 
 gulp.task('awsCSS', function() {
@@ -265,7 +263,7 @@ gulp.task('dev', ['clean', 'watch', 'devserver', 'browser-sync', 'less', 'server
 gulp.task('build', ['clean', 'less', 'bundleJS']);
 
 gulp.task('server-only', ['clean', 'watch', 'browser-sync', 'less', 'server']);
-;
+
 gulp.task('deploy', ['g-zip'], function() {
   gulp.start('aws');
   const manifest = require('../rev-manifest.json');

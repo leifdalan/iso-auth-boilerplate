@@ -1,7 +1,5 @@
 'use strict';
 import React, {Component, PropTypes as pt} from 'react';
-import {connectToStores} from 'fluxible/addons';
-import ApplicationStore from '../stores/ApplicationStore';
 import {loginAction, signUpAction} from '../actions/authActions';
 import {autoBindAll} from '../../utils';
 const debug = require('debug')('Component:SignIn');

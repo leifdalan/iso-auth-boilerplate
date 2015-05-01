@@ -2,14 +2,14 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {autoBindAll} from '../../../../utils';
-import UserForm from './UserForm';
+import PageForm from './PageForm';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
-import {createUserAction} from '../../../actions/userActions';
+import {createPageAction} from '../../../actions/pageActions';
 
-const debug = require('debug')('Component:CreateUser');
+const debug = require('debug')('Component:CreatePage');
 debug();
 
-export default class CreateUser extends Component {
+export default class CreatePage extends Component {
 
   constructor(props) {
     super(props);
@@ -18,7 +18,7 @@ export default class CreateUser extends Component {
     ]);
   }
 
-  static displayName = 'CreateUser'
+  static displayName = 'CreatePage'
 
   static contextTypes = {
     router: pt.func.isRequired,
@@ -30,7 +30,7 @@ export default class CreateUser extends Component {
 
   handleSubmit(formValues) {
     const router = this.context.router;
-    this.context.executeAction(createUserAction, {
+    this.context.executeAction(createPageAction, {
       formValues,
       router
     });
@@ -38,7 +38,7 @@ export default class CreateUser extends Component {
 
   render() {
     return (
-      <UserForm handleSubmit={this.handleSubmit} buttonText="Create" />
+      <PageForm handleSubmit={this.handleSubmit} buttonText="Create" />
     );
   }
 }

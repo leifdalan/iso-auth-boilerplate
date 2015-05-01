@@ -6,13 +6,18 @@ debug();
 
 export default class ModalWrapper extends Component {
 
+  static displayName = 'ModalWrapper'
+
   static defaultProps = {
     ariaLabel: 'ModalHeader'
   }
 
   static propTypes = {
     show: rpt.bool.isRequired,
-    onHide: rpt.func.isRequired
+    onHide: rpt.func.isRequired,
+    ariaLabel: rpt.string,
+    title: rpt.string,
+    children: rpt.node
   }
 
   render() {

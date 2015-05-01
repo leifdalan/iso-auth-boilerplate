@@ -161,7 +161,7 @@ export default function(req, res, next) {
     req.abortNavigation = {
       error: err,
       reactRenderError: true
-    }
+    };
     next();
   }
-};// server.use
+} // server.use

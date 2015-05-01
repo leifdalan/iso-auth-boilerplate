@@ -1,5 +1,4 @@
 import request from 'superagent';
-import {warn} from '../../utils';
 const debug = require('debug')('Action:authAction');
 
 export const loginAction = (
@@ -22,12 +21,12 @@ export const loginAction = (
       .set('Accept', 'application/json')
       .set('X-Requested-With', 'XMLHttpRequest')
       .end((err, {body}) => {
-        const {success, user, message} = body;
+        const {success, responseUser, message} = body;
         debug('RESPONSE?!');
         debug(err);
-        // debug(success, user);
+        // debug(success, responseUser);
         if (success) {
-          dispatch('LOGIN', user);
+          dispatch('LOGIN', responseUser);
           router.transitionTo(reqAttempt || '/dashboard');
           dispatch('FLASH_MESSAGE', 'Welcome!');
         } else {

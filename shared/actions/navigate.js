@@ -38,7 +38,7 @@ export default function navigateAction({dispatch}, payload, done) {
       });
     }
   }).then((resolution) => {
-    dispatch('CHANGE_ROUTE', payload);
+    dispatch('CHANGE_ROUTE', {payload, resolution});
     const activeRouteName = payload.routes[payload.routes.length - 1].name;
     debug(activeRouteName);
     // Create dynamic action based on path, dispatch with data.

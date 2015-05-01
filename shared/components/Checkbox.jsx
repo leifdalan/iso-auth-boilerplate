@@ -24,14 +24,15 @@ export default class Checkbox extends Component {
         </label>
       );
     } else {
-      input =
+      input = (
         <input
           id={this.props.inputKey}
           checked={this.props.value}
           {...this.props}
           onChange={this.props.onChangeCallback}
           type="checkbox"
-        />;
+        />
+      );
     }
     return input;
   }

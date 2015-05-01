@@ -1,10 +1,25 @@
 'use strict';
-import {createStore} from 'fluxible/addons';
+import {BaseStore} from 'fluxible/addons';
+import {pull} from 'lodash';
 const debug = require('debug')('Store:ApplicationStore');
 
-export default createStore({
-  storeName: 'ApplicationStore',
-  handlers: {
+export default class ApplicationStore extends BaseStore {
+
+  constructor(dispatcher) {
+    super(dispatcher);
+    this.pages = [];
+    this.totalPages = null;
+    this.singlePage = null;
+    this.search = null;
+    this.currentPageNumber = null;
+    this.perpage = null;
+    this.pageAdjustment = null;
+    this._lastValidSinglePage = null;
+  }
+
+  static storeName = 'ApplicationStore'
+
+  static handlers = {
     'CHANGE_ROUTE': 'handleNavigate',
     'LOGIN': 'login',
     'LOGOUT': 'logout',
@@ -14,15 +29,17 @@ export default createStore({
     'FLASH_MESSAGE': 'setFlashMessage',
     'CLEAR_FLASH_MESSAGE': 'clearFlashMessage',
     'SET_PAGE_USER_PREF': 'setPageUserPref',
-    'SAVE_REQUEST_ATTEMPT': 'saveRequestAttempt'
-  },
+    'SAVE_REQUEST_ATTEMPT': 'saveRequestAttempt',
+    'IN_PAGE_REQUEST_START': 'inPageRequestStart',
+    'IN_PAGE_REQUEST_END': 'inPageRequestEnd'
+  }
 
   navigationError(payload) {
     this.setRedirect({
       url: '/',
       flashMessage: payload
     });
-  },
+  }
 
   initialize() {
     this.currentRoute = null;
@@ -33,18 +50,20 @@ export default createStore({
     this.flashMessage = null;
     this.reqAttempt = null;
     this.userLevel = null;
+    this.inPageLoadingProperties = [];
     this.pageUserPref = null;
-  },
+  }
 
   setPageUserPref({route, preference}) {
     this.pageUserPref = {
       [route]: preference
     };
-  },
+    this.emitChange();
+  }
 
   saveRequestAttempt(message) {
     this.reqAttempt = message;
-  },
+  }
 
   setFlashMessage(message) {
     if (message instanceof Array) {
@@ -52,27 +71,27 @@ export default createStore({
     }
     this.flashMessage = message;
     this.emitChange();
-  },
+  }
 
   clearFlashMessage() {
     this.flashMessage = null;
     this.emitChange();
-  },
+  }
 
   requestStart() {
     this.appIsLoading = true;
     this.emitChange();
-  },
+  }
 
   requestEnd() {
     this.appIsLoading = false;
     this.emitChange();
-  },
+  }
 
-  handleNavigate(route) {
+  handleNavigate({payload: route, resolution}) {
     this.appIsLoading = false;
     debug('HANDLING NAVIGATE vvvvvvv');
-    debug(route);
+    debug(route, resolution);
     if (this.currentRoute && route.path === this.currentRoute.path) {
       debug('Attempted to navigate to the same path.');
       return;
@@ -80,22 +99,32 @@ export default createStore({
 
     this.currentRoute = route;
     this.emitChange();
-  },
+  }
 
   login({userLevel=1, local}) {
-    debug('logging in');
     this.loggedIn = true;
     this.email = local.email;
     this.userLevel = userLevel;
     this.emitChange();
-  },
+  }
 
   logout() {
     this.loggedIn = false;
     this.email = null;
     this.userLevel = null;
     this.emitChange();
-  },
+  }
+
+  inPageRequestStart(payload) {
+    this.inPageLoadingProperties = this.inPageLoadingProperties || [];
+    this.inPageLoadingProperties.push(payload);
+    this.emitChange();
+  }
+
+  inPageRequestEnd(payload) {
+    pull(this.inPageLoadingProperties, payload);
+    this.emitChange();
+  }
 
   getState() {
     return {
@@ -106,13 +135,14 @@ export default createStore({
       appIsLoading: this.appIsLoading,
       flashMessage: this.flashMessage,
       pageUserPref: this.pageUserPref,
+      inPageLoadingProperties: this.inPageLoadingProperties,
       reqAttempt: this.reqAttempt
     };
-  },
+  }
 
   dehydrate() {
     return this.getState();
-  },
+  }
 
   rehydrate(state) {
     this.currentRoute = state.route;
@@ -122,6 +152,7 @@ export default createStore({
     this.appIsLoading = state.appIsLoading;
     this.flashMessage = state.flashMessage;
     this.pageUserPref = state.pageUserPref;
+    this.inPageLoadingProperties = state.inPageLoadingProperties;
     this.reqAttempt = state.reqAttempt;
   }
-});
+}

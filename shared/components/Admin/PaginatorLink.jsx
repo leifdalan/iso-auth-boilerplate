@@ -28,7 +28,8 @@ export default class PaginatorLink extends Component {
     pathBase: React.PropTypes.string.isRequired,
     pagenumber: React.PropTypes.number.isRequired,
     perpage: React.PropTypes.number.isRequired,
-    currentPageNumber: React.PropTypes.number.isRequired
+    currentPageNumber: React.PropTypes.number.isRequired,
+    children: React.PropTypes.node
   }
 
   navigate() {
