@@ -56,7 +56,7 @@ export function getUsers(req, res, next) {
         {'local.email': new RegExp(search, 'i')},
         {'userLevel': number}
       ]
-    }
+    };
   }
 
   let sortCriteria = {};
@@ -67,8 +67,8 @@ export function getUsers(req, res, next) {
     sortTerm = sortTerm === 'email' ? 'local.email' : sortTerm;
     const sortValue = sortDirection === 'asc' ? 1 : -1;
     sortCriteria = {
-      [sortTerm] : sortValue
-    }
+      [sortTerm]: sortValue
+    };
   }
 
   // TODO use generators + Promises for multiple async
@@ -78,7 +78,7 @@ export function getUsers(req, res, next) {
       data = {
         success: false,
         error: countError
-      }
+      };
       sendData({data, req, res, next});
     } else {
       if (totalUsers < currentPageNumber * perpage) {
@@ -101,7 +101,7 @@ export function getUsers(req, res, next) {
           data = {
             success: false,
             error: paginateError
-          }
+          };
 
         } else {
           data = {
@@ -119,14 +119,14 @@ export function getUsers(req, res, next) {
     }
 
   });
-};
+}
 
 export function getOneUser(req, res, next) {
   debug('GETTING USER');
   if (req.params.id === 'create') {
     const data = {
       success: true
-    }
+    };
     sendData({data, req, res, next});
   } else {
     User.findOne({_id: req.params.id}, (error, user) => {
@@ -135,7 +135,7 @@ export function getOneUser(req, res, next) {
         data = {
           success: false,
           error
-        }
+        };
         debug('USER ERROR', error);
         sendData({data, req, res, next});
       } else {
@@ -143,10 +143,10 @@ export function getOneUser(req, res, next) {
           data = {
             success: false,
             error: `No user found for ${req.params.id}`
-          }
+          };
         } else {
           data = user;
-          data.success = true
+          data.success = true;
         }
         debug('USER DATA', data);
         sendData({data, req, res, next});
@@ -198,10 +198,10 @@ export function updateUser(req, res, next) {
 }
 export function updateManyUsers(req, res, next) {
   debug('SETTING USER');
-  const {users, formValues} = req.body;
+  const {items, formValues} = req.body;
 
   User.update(
-    {_id: {$in: users}},
+    {_id: {$in: items}},
     formValues,
     {
       'new': true,

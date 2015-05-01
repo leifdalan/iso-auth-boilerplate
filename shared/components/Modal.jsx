@@ -17,7 +17,7 @@ export default class ModalWrapper extends Component {
     onHide: rpt.func.isRequired,
     ariaLabel: rpt.string,
     title: rpt.string,
-    children: rpt.object
+    children: rpt.node
   }
 
   render() {

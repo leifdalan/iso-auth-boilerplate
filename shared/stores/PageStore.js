@@ -1,27 +1,12 @@
 'use strict';
-import {createStore} from 'fluxible/addons';
-import _ from 'lodash';
+
+import {BaseStore} from 'fluxible/addons';
+import cloneDeep from 'lodash';
 const debug = require('debug')('Store:Pages');
 
-export default createStore({
-  storeName: 'PageStore',
-
-  handlers: {
-    'adminPagesPaginated_PAYLOAD': 'handlePayload',
-    'adminPageEdit_PAYLOAD': 'handleEditPayload',
-    'adminPageEdit_FAILURE': 'handleEditFailure',
-    'CHANGE_ROUTE': 'handleNavigate'
-  },
-
-  handleNavigate({payload, resolution}) {
-    debug(payload);
-    debug('==========================');
-    debug(resolution);
-    this.singlePage = resolution;
-    this.emitChange();
-  },
-
-  initialize() {
+export default class PageStore extends BaseStore {
+  constructor(dispatcher) {
+    super(dispatcher);
     this.pages = [];
     this.totalPages = null;
     this.singlePage = null;
@@ -30,7 +15,23 @@ export default createStore({
     this.perpage = null;
     this.pageAdjustment = null;
     this._lastValidSinglePage = null;
-  },
+  }
+
+  static storeName = 'PageStore'
+
+  static handlers = {
+    'adminPagesPaginated_PAYLOAD': 'handlePayload',
+    'adminPageEdit_PAYLOAD': 'handleEditPayload',
+    'adminPageEdit_FAILURE': 'handleEditFailure',
+    'CHANGE_ROUTE': 'handleNavigate'
+  }
+
+  handleNavigate({payload, resolution}) {
+    debug(payload);
+    debug(resolution);
+    this.singlePage = resolution;
+    this.emitChange();
+  }
 
   handlePayload(payload) {
     // debug('RECEIVING PAYLOAD', payload);
@@ -41,22 +42,22 @@ export default createStore({
     this.pageAdjustment = payload.pageAdjustment;
     this.search = payload.search;
     this.emitChange();
-  },
+  }
 
   handleEditFailure(message) {
     debug('Handling Edit Failre', message);
-    this.singlePage = _.cloneDeep(this._lastValidSinglePage);
+    this.singlePage = cloneDeep(this._lastValidSinglePage);
     debug('Failure old page...', this.singlePage);
     this.emitChange();
-  },
+  }
 
   handleEditPayload(payload) {
     this.singlePage = payload;
-    this._lastValidSinglePage = _.cloneDeep(payload);
-    debug(_.cloneDeep(payload));
+    this._lastValidSinglePage = cloneDeep(payload);
+    debug(cloneDeep(payload));
     debug('Last Valid', this._lastValidSinglePage);
     this.emitChange();
-  },
+  }
 
   getState() {
     return {
@@ -68,11 +69,11 @@ export default createStore({
       pageAdjustment: this.pageAdjustment,
       totalPages: this.totalPages
     };
-  },
+  }
 
   dehydrate() {
     return this.getState();
-  },
+  }
 
   rehydrate(state) {
     this.pages = state.pages;
@@ -83,4 +84,4 @@ export default createStore({
     this.pageAdjustment = state.pageAdjustment;
     this.currentPageNumber = state.currentPageNumber;
   }
-});
+}

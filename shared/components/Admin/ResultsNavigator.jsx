@@ -14,9 +14,6 @@ import {
   error
 } from '../../../utils';
 import {filter, include, includes} from 'lodash';
-// import {connectToStores} from 'fluxible/addons';
-// import asdf from '../stores/asdf';
-// import {autoBindAll} from '../../utils';
 import {flashMessageAction, setPageUserPrefAction} from '../../actions/appActions';
 const debug = require('debug')('Component:ResultsNavigator');
 debug();
@@ -57,21 +54,21 @@ export default class ResultsNavigator extends Component {
   }
 
   static propTypes = {
-    loadingProperties: pt.array,
     label: pt.string.isRequired,
     items: pt.array.isRequired,
     updateResultsAction: pt.func.isRequired,
     collection: pt.array.isRequired,
-    perPagePlaceholder: pt.string,
     tablePropChoices: pt.array.isRequired,
-    neighborDepth: pt.number,
     pathBase: pt.string.isRequired,
-    editForm: pt.element,
+    totalItems: pt.number.isRequired,
+    loadingProperties: pt.array,
+    perPagePlaceholder: pt.string,
+    neighborDepth: pt.number,
+    editForm: pt.func,
     editManyAction: pt.func,
     handleBulkEditClick: pt.func,
     basePath: pt.string,
     editable: pt.bool,
-    totalItems: pt.number.isRequired,
     perpage: pt.number,
     search: pt.string,
     currentPageNumber: pt.number

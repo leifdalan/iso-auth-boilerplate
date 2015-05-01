@@ -18,7 +18,7 @@ import NotFound from './NotFound';
 
 export default (
   <Route name="app" path="/" handler={Application}>
-    <DefaultRoute name="home" handler={Home}/>
+    <Route name="home" path="/" handler={Home}/>
     <Route name="about" handler={About}/>
     <Route name="page" path="/page/:id" handler={Page}/>
     <Route name="dashboard" handler={Dashboard}/>
@@ -72,10 +72,7 @@ export default (
       </Route>
 
     </Route>
-    {/*
-
-       */}
-       <Route path="*" name="wildCard" handler={WildCard} />
+     <Route path="*" name="wildCard" handler={WildCard} />
 
     <NotFoundRoute handler={NotFound}/>
   </Route>

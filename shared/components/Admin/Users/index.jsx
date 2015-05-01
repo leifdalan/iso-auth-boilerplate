@@ -14,7 +14,7 @@ import UserForm from './UserForm';
 import ResultsNavigator from '../ResultsNavigator';
 const debug = require('debug')('Component:Pages');
 
-class AdminItemBrowser extends Component {
+class AdminUserBrowser extends Component {
 
   constructor(props) {
     super(props);
@@ -52,7 +52,7 @@ class AdminItemBrowser extends Component {
 
   }
 
-  static displayName = 'AdminItemBrowser'
+  static displayName = 'AdminUserBrowser'
 
   static contextTypes = {
     router: pt.func.isRequired,
@@ -61,14 +61,15 @@ class AdminItemBrowser extends Component {
   }
 
   static propTypes = {
-    appStore: pt.object.isRequred,
-    userStore: pt.object.isRequred
+    appStore: pt.object.isRequired,
+    userStore: pt.object.isRequired
   }
 
   static willTransitionTo = CheckAdminWillTransitionTo
 
   componentWillMount() {
     trace(this);
+    debug('TYPEOF', typeof this.props.userStore);
     const appState = this.props.appStore;
     const routes = appState.route.routes;
     const currentRouteName = routes[routes.length - 1].name;
@@ -158,6 +159,11 @@ class AdminItemBrowser extends Component {
     }
   }
 
+  goToCreateUser(e) {
+    e.preventDefault();
+    this.context.router.transitionTo('createUser');
+  }
+
   render() {
 
     return (
@@ -194,11 +200,11 @@ class AdminItemBrowser extends Component {
   }
 }
 
-AdminItemBrowser = connectToStores(AdminItemBrowser, [ApplicationStore, UserStore], (stores) => {
+AdminUserBrowser = connectToStores(AdminUserBrowser, [ApplicationStore, UserStore], (stores) => {
   return {
     appStore: stores.ApplicationStore.getState(),
     userStore: stores.UserStore.getState()
   };
 });
 
-export default AdminItemBrowser;
+export default AdminUserBrowser;

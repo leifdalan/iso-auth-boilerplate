@@ -1,18 +1,11 @@
 'use strict';
-import {createStore} from 'fluxible/addons';
-import _ from 'lodash';
+import {BaseStore} from 'fluxible/addons';
+import {cloneDeep} from 'lodash';
 const debug = require('debug')('Store:Users');
 
-export default createStore({
-  storeName: 'UserStore',
-
-  handlers: {
-    'adminUsersPaginated_PAYLOAD': 'handlePayload',
-    'adminUserEdit_PAYLOAD': 'handleEditPayload',
-    'adminUserEdit_FAILURE': 'handleEditFailure'
-  },
-
-  initialize() {
+export default class UserStore extends BaseStore {
+  constructor(dispatcher) {
+    super(dispatcher);
     this.users = [];
     this.totalUsers = null;
     this.singleUser = null;
@@ -21,7 +14,15 @@ export default createStore({
     this.perpage = null;
     this.pageAdjustment = null;
     this._lastValidSingleUser = null;
-  },
+  }
+
+  static storeName = 'UserStore'
+
+  static handlers = {
+    'adminUsersPaginated_PAYLOAD': 'handlePayload',
+    'adminUserEdit_PAYLOAD': 'handleEditPayload',
+    'adminUserEdit_FAILURE': 'handleEditFailure'
+  }
 
   handlePayload(payload) {
     // debug('RECEIVING PAYLOAD', payload);
@@ -32,22 +33,22 @@ export default createStore({
     this.pageAdjustment = payload.pageAdjustment;
     this.search = payload.search;
     this.emitChange();
-  },
+  }
 
   handleEditFailure(message) {
     debug('Handling Edit Failre', message);
-    this.singleUser = _.cloneDeep(this._lastValidSingleUser);
+    this.singleUser = cloneDeep(this._lastValidSingleUser);
     debug('Failure old user...', this.singleUser);
     this.emitChange();
-  },
+  }
 
   handleEditPayload(payload) {
     this.singleUser = payload;
-    this._lastValidSingleUser = _.cloneDeep(payload);
-    debug(_.cloneDeep(payload));
+    this._lastValidSingleUser = cloneDeep(payload);
+    debug(cloneDeep(payload));
     debug('Last Valid', this._lastValidSingleUser);
     this.emitChange();
-  },
+  }
 
   getState() {
     return {
@@ -59,11 +60,11 @@ export default createStore({
       pageAdjustment: this.pageAdjustment,
       totalUsers: this.totalUsers
     };
-  },
+  }
 
   dehydrate() {
     return this.getState();
-  },
+  }
 
   rehydrate(state) {
     this.users = state.users;
@@ -74,4 +75,4 @@ export default createStore({
     this.pageAdjustment = state.pageAdjustment;
     this.currentPageNumber = state.currentPageNumber;
   }
-});
+}

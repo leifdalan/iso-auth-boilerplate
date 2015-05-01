@@ -14,7 +14,7 @@ import PageForm from './PageForm';
 import ResultsNavigator from '../ResultsNavigator';
 const debug = require('debug')('Component:Pages');
 
-class AdminItemBrowser extends Component {
+class AdminPageBrowser extends Component {
 
   constructor(props) {
     super(props);
@@ -51,7 +51,7 @@ class AdminItemBrowser extends Component {
 
   }
 
-  static displayName = 'AdminItemBrowser'
+  static displayName = 'AdminPageBrowser'
 
   static contextTypes = {
     router: pt.func.isRequired,
@@ -60,8 +60,8 @@ class AdminItemBrowser extends Component {
   }
 
   static propTypes = {
-    appStore: pt.object.isRequred,
-    pageStore: pt.object.isRequred
+    appStore: pt.object.isRequired,
+    pageStore: pt.object.isRequired
   }
 
   static willTransitionTo = CheckAdminWillTransitionTo
@@ -71,22 +71,7 @@ class AdminItemBrowser extends Component {
     this.context.router.transitionTo('createPage');
   }
 
-  _setHighlightedMarkup(string, searchLetters) {
-    if (typeof string === 'string') {
-      let markup = [].map.call(string, (letter) =>
-        include(searchLetters, letter) ?
-          <span className="search-term">{letter}</span> :
-          <span>{letter}</span>
-      );
-      const userMarkup = <span>{markup}</span>;
-
-      return userMarkup;
-    }
-    return string;
-  }
-
   componentWillMount() {
-    trace(this);
     const appState = this.props.appStore;
     const routes = appState.route.routes;
     const currentRouteName = routes[routes.length - 1].name;
@@ -143,6 +128,20 @@ class AdminItemBrowser extends Component {
     this.setState(state);
   }
 
+  _setHighlightedMarkup(string, searchLetters) {
+    if (typeof string === 'string') {
+      let markup = [].map.call(string, (letter) =>
+        include(searchLetters, letter) ?
+          <span className="search-term">{letter}</span> :
+          <span>{letter}</span>
+      );
+      const userMarkup = <span>{markup}</span>;
+
+      return userMarkup;
+    }
+    return string;
+  }
+
   _adjustPageBounds(state) {
     if (isClient()) {
       const pathArray = window.location.pathname.split('/');
@@ -188,11 +187,11 @@ class AdminItemBrowser extends Component {
   }
 }
 
-AdminItemBrowser = connectToStores(AdminItemBrowser, [ApplicationStore, PageStore], (stores) => {
+AdminPageBrowser = connectToStores(AdminPageBrowser, [ApplicationStore, PageStore], (stores) => {
   return {
     appStore: stores.ApplicationStore.getState(),
     pageStore: stores.PageStore.getState()
   }
 });
 
-export default AdminItemBrowser;
+export default AdminPageBrowser;

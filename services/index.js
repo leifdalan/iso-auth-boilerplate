@@ -1,4 +1,3 @@
-import User from '../models/user';
 import Page from '../models/page';
 import {signUp, logOut, login, isAdmin, isLoggedIn} from './authentication';
 import {
@@ -17,17 +16,16 @@ import {
   createPage,
   deletePage,
   updateManyPages} from './admin/pages';
-import adminUserServices from './admin/users';
 const debug = require('debug')('Routes');
 
 // Abstract of sending data from the server to client,
 // whether its the first request or an in-app XHR.
 export function sendData({data, req, res, next}) {
   debug('Sending data:');
-  const {success, error, payload} = data;
+  const {success, error} = data;
   if (req.xhr) {
     debug('Via XHR');
-    if (error) {
+    if (error || !success) {
       debug('Error sending data:', error);
       res.status(400).json(data);
     } else {
@@ -135,8 +133,7 @@ export default function(server) {
       error: 'Not allowed.'
     });
   }
-  server.delete('*', fourHundred)
-  server.put('*', fourHundred)
-  server.post('*', fourHundred)
-
-};
+  server.delete('*', fourHundred);
+  server.put('*', fourHundred);
+  server.post('*', fourHundred);
+}
