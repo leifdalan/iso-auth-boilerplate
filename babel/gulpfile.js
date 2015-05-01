@@ -202,7 +202,7 @@ gulp.task('watch', () => {
   gulp.watch('./**/*.less', ['less']);
   gulp.watch('/index.js', ['browser-reload']);
   // gulp.watch(paths.less, ['less']);
-  gulp.watch(['./**/*.{jsx,js}', '!./node_modules/**/*'], ['eslint']);
+  // gulp.watch(['./**/*.{jsx,js}', '!./node_modules/**/*'], ['eslint']);
 });
 
 gulp.task('clean', (cb) => {

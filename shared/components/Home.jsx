@@ -1,5 +1,5 @@
 'use strict';
-import React, {Component} from 'react';
+import React, {Component, PropTypes as pt} from 'react';
 import DocumentTitle from 'react-document-title';
 const debug = require('debug')('Component:Home');
 debug();
@@ -7,6 +7,12 @@ debug();
 
 export default class Home extends Component {
   static displayName = 'Home'
+
+  static propTypes = {
+    email: pt.string,
+    userLevel: pt.number,
+    loggedIn: pt.bool
+  }
 
   render() {
     return (

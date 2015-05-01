@@ -71,7 +71,7 @@ export default class ResultsNavigator extends Component {
     handleBulkEditClick: pt.func,
     basePath: pt.string,
     editable: pt.bool,
-    totalItems: pt.number,
+    totalItems: pt.number.isRequired,
     perpage: pt.number,
     search: pt.string,
     currentPageNumber: pt.number
@@ -372,6 +372,6 @@ export default class ResultsNavigator extends Component {
         }
       </div>
 
-    )
+    );
   }
 }

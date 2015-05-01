@@ -8,7 +8,7 @@ import {isClient, autoBindAll, trace, getTimeAgo} from '../../../../utils';
 import {merge, get, include} from 'lodash';
 import {updateResultsAction, editManyPagesAction} from '../../../actions/pageActions';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
-import {setPageUserPrefAction} from '../../actions/appActions';
+import {setPageUserPrefAction} from '../../../actions/appActions';
 import PageForm from './PageForm';
 
 import ResultsNavigator from '../ResultsNavigator';
@@ -170,6 +170,7 @@ class AdminItemBrowser extends Component {
           loadingProperties={this.props.appStore.inPageLoadingProperties}
           label="Pages"
           items={this.state.pages}
+          totalItems={this.props.pageStore.totalPages}
           updateResultsAction={updateResultsAction}
           collection={this.state.pages}
           perPagePlaceholder={`Pages per page (${this.state.perpage})`}
@@ -178,7 +179,6 @@ class AdminItemBrowser extends Component {
           pathBase="/admin/pages/page/"
           editForm={PageForm}
           editManyAction={editManyPagesAction}
-          handleBulkEditClick={this.handleBulkEditClick}
           basePath="/admin/pages/"
           editable
           {...this.props.pageStore}

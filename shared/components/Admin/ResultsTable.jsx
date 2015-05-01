@@ -29,14 +29,16 @@ export default class ResultsTable extends Component {
     collection: pt.arrayOf(pt.object).isRequired,
     handleCheckAll: pt.func,
     handleBulkEditClick: pt.func,
-    handleCheck: pt.func
+    handleCheck: pt.func,
+    basePath: pt.string,
+    editable: pt.bool
   }
 
   handleEditClick(item, e) {
     e.stopPropagation();
     this.context.router.transitionTo(
       `${this.props.basePath}${item._id}`
-    )
+    );
   }
 
   render() {

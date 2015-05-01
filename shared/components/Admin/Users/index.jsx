@@ -4,22 +4,15 @@ import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../../../stores/ApplicationStore';
 import UserStore from '../../../stores/UserStore';
-import {
-  isClient, upsertQuery, getTimeAgo, autoBindAll, error, trace
-} from '../../../../utils';
-import _, {merge} from 'lodash';
-import navigateAction from '../../../actions/navigate';
-import {flashMessageAction, setPageUserPrefAction} from '../../../actions/appActions';
+import {isClient, autoBindAll, trace, getTimeAgo} from '../../../../utils';
+import {merge, get, include} from 'lodash';
 import {updateResultsAction, editManyUsersAction} from '../../../actions/userActions';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
-
-import ModalWrapper from '../../Modal';
-import ConfirmationPopup from '../ConfirmationPopup';
+import {setPageUserPrefAction} from '../../../actions/appActions';
 import UserForm from './UserForm';
 
 import ResultsNavigator from '../ResultsNavigator';
-const debug = require('debug')('Component:Users');
-debug();
+const debug = require('debug')('Component:Pages');
 
 class AdminItemBrowser extends Component {
 
@@ -28,19 +21,7 @@ class AdminItemBrowser extends Component {
     debug(this);
     autoBindAll.call(this, [
       '_setHighlightedMarkup',
-      '_setHighlightedMarkup',
-      '_adjustPageBounds',
-      'handlePerPageInput',
-      'handlePerPageButton',
-      'goToCreateUser',
-      'handleCheckAll',
-      'handleSearchInput',
-      'handleCheck',
-      'handleSort',
-      'handleBulkEdit',
-      'handleBulkEditConfirmation',
-      'handleBulkEditClick',
-      'handleTablePropChange'
+      'goToCreateUser'
     ]);
 
     let state = props.userStore;
@@ -79,6 +60,11 @@ class AdminItemBrowser extends Component {
     executeAction: pt.func.isRequired
   }
 
+  static propTypes = {
+    appStore: pt.object.isRequred,
+    userStore: pt.object.isRequred
+  }
+
   static willTransitionTo = CheckAdminWillTransitionTo
 
   componentWillMount() {
@@ -89,14 +75,9 @@ class AdminItemBrowser extends Component {
     let tablePropChoices;
     debug('CurrentRoute', currentRouteName);
 
-    // TODO: there's gotta be a better way to do this.
-    if (appState.pageUserPref &&
-      appState.pageUserPref[currentRouteName] &&
-      appState.pageUserPref[currentRouteName].tablePropChoices) {
-      tablePropChoices =
-        appState.pageUserPref[currentRouteName].tablePropChoices;
-    } else {
-      tablePropChoices = [
+    tablePropChoices =
+      get(appState, `pageUserPref[${currentRouteName}].tablePropChoices`) ||
+      [
         {
           label: 'Name',
           valueProp: 'email',
@@ -124,11 +105,11 @@ class AdminItemBrowser extends Component {
         }
       ];
 
-      this.context.executeAction(setPageUserPrefAction, {
-        route: currentRouteName,
-        preference: {tablePropChoices}
-      });
-    }
+    this.context.executeAction(setPageUserPrefAction, {
+      route: currentRouteName,
+      preference: {tablePropChoices}
+    });
+
     this.setState({tablePropChoices});
   }
 
@@ -156,7 +137,7 @@ class AdminItemBrowser extends Component {
   _setHighlightedMarkup(string, searchLetters) {
     if (typeof string === 'string') {
       let markup = [].map.call(string, (letter) =>
-        _.include(searchLetters, letter) ?
+        include(searchLetters, letter) ?
           <span className="search-term">{letter}</span> :
           <span>{letter}</span>
       );
@@ -177,132 +158,6 @@ class AdminItemBrowser extends Component {
     }
   }
 
-  //
-  handlePerPageInput(e) {
-    this.setState({
-      perPageInput: e.target.value > 200 ? 200 : e.target.value
-    });
-  }
-  //
-  handlePerPageButton(e) {
-    e.preventDefault();
-    const perpage = this.state.perPageInput || this.state.perpage;
-
-    this.context.router.transitionTo(
-      `/admin/users/page/${perpage}/1${window.location.search}`
-    );
-  }
-
-  goToCreateUser(e) {
-    e.preventDefault();
-    this.context.router.transitionTo('createUser');
-  }
-
-  //
-  handleCheckAll(e) {
-    const value = e.target.checked;
-    const users = this.state.users.map((user) => {
-      user.selected = value;
-      return user;
-    });
-    this.setState({users});
-  }
-
-  //
-  handleSearchInput(e) {
-    this.setState({
-      searchValue: e.target.value
-    });
-
-    if (e.target.value.length === 0 && isClient()) {
-
-      // Remove query string if the search bar is empty. It's ugly.
-      window.history.replaceState({}, {}, window.location.href.split('?')[0]);
-    } else {
-      const query = upsertQuery('s', e.target.value);
-      window.history.replaceState({}, {}, query);
-    }
-
-    this.context.executeAction(updateResultsAction, {
-      url: window.location.href,
-      loadingProperty: 'search'
-    });
-  }
-
-  //
-  handleCheck(_id) {
-    const users = this.state.users.map((user) => {
-      user.selected = user._id === _id ? !user.selected : user.selected;
-      return user;
-    });
-    this.setState({users});
-  }
-
-//
-  handleSort(e) {
-    let criteria = e.target.value;
-    if (criteria === 'noop') {
-      return;
-    }
-    e.preventDefault();
-    debug(criteria);
-    const query = upsertQuery('sort', criteria);
-    window.history.replaceState({}, {}, query);
-    this.context.executeAction(updateResultsAction, {
-      url: window.location.href,
-      loadingProperty: 'sort'
-    });
-  }
-//
-  handleBulkEdit(formValues) {
-    error(formValues);
-    this.setState({
-      showConfirm: true,
-      bulkEditFormValues: formValues
-    })
-  }
-
-  handleBulkEditConfirmation() {
-    const users = _.filter(this.state.users, (user) => user.selected);
-    const formValues = this.state.bulkEditFormValues;
-    this.context.executeAction(editManyUsersAction, {formValues, users});
-    this.setState({
-      show: false,
-      showConfirm: false
-    });
-  }
-
-  handleBulkEditClick() {
-    const users = _.filter(this.state.users, (user) => user.selected);
-    if (users.length === 0) {
-      this.context.executeAction(flashMessageAction,
-        'Please select some users to bulk edit first.');
-    } else {
-      this.setState({
-        userCount: users.length,
-        show: true
-      });
-    }
-  }
-
-  handleTablePropChange(valueProp) {
-    const tablePropChoices = this.state.tablePropChoices.map((propChoice) => {
-      if (propChoice.valueProp === valueProp) {
-        propChoice.selected = !propChoice.selected;
-      }
-      return propChoice;
-    });
-    this.setState({tablePropChoices});
-
-    const routes = this.context.router.getCurrentRoutes();
-    const currentRouteName = routes[routes.length - 1].name;
-
-    this.context.executeAction(setPageUserPrefAction, {
-      route: currentRouteName,
-      preference: {tablePropChoices}
-    });
-  }
-
   render() {
 
     return (
@@ -317,54 +172,22 @@ class AdminItemBrowser extends Component {
         </div>
 
         <ResultsNavigator
-          label="Users"
-          itemStore={this.props.userStore}
-          collection={this.state.users}
-          tablePropChoices={this.state.tablePropChoices}
-          pathBase="/admin/users/page/"
-          basePath="/admin/users/"
-
-
           loadingProperties={this.props.appStore.inPageLoadingProperties}
-          handleSearchInput={this.handleSearchInput}
-          searchValue={this.state.searchValue}
-          search={this.props.userStore.search}
-          handlePerPageInput={this.handlePerPageInput}
-          perPageValue={this.state.perPageInput}
+          label="Users"
+          items={this.state.users}
+          totalItems={this.props.userStore.totalUsers}
+          updateResultsAction={updateResultsAction}
+          collection={this.state.users}
           perPagePlaceholder={`Users per page (${this.state.perpage})`}
-          handlePerPageButton={this.handlePerPageButton}
-          handleSort={this.handleSort}
-
-          handleTablePropChange={this.handleTablePropChange}
-          currentPageNumber={this.state.currentPageNumber}
-          totalItems={this.state.totalUsers}
-          perpage={this.state.perpage}
+          tablePropChoices={this.state.tablePropChoices}
           neighborDepth={1}
-
-
-          handleCheckAll={this.handleCheckAll}
-          handleBulkEditClick={this.handleBulkEditClick}
-          handleCheck={this.handleCheck}
-
-        />
-
-        <ModalWrapper
-          title={`Bulk editing ${this.state.userCount} Users`}
-          show={this.state.show}
-          onHide={() => this.setState({show: false, showConfirm: false})}>
-
-          <UserForm handleSubmit={this.handleBulkEdit} />
-
-          <ConfirmationPopup
-            show={!!this.state.showConfirm}
-            onHide={() => this.setState({showConfirm: false})}
-            onConfirm={this.handleBulkEditConfirmation}
-            confirmationText={
-              `You sure you want to edit ${this.state.userCount} at a time?`
-            }
+          pathBase="/admin/users/page/"
+          editForm={UserForm}
+          editManyAction={editManyUsersAction}
+          basePath="/admin/users/"
+          editable
+          {...this.props.userStore}
           />
-
-      </ModalWrapper>
 
       </div>
     );

@@ -28,6 +28,11 @@ export default class Nav extends Component {
     executeAction: pt.func.isRequired
   }
 
+  static propTypes = {
+    loggedin: pt.bool,
+    userLevel: pt.number
+  }
+
   mouseOverLink(e) {
     e.target.classList.add('hovering');
     this.setState({
