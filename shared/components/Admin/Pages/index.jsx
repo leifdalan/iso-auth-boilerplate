@@ -4,7 +4,7 @@ import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../../../stores/ApplicationStore';
 import PageStore from '../../../stores/PageStore';
-import {isClient, autoBindAll, trace, getTimeAgo} from '../../../../utils';
+import {isClient, autoBindAll, getTimeAgo} from '../../../../utils';
 import {merge, get, include} from 'lodash';
 import {updateResultsAction, editManyPagesAction} from '../../../actions/pageActions';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
@@ -99,7 +99,7 @@ class AdminPageBrowser extends Component {
           valueProp: 'user.local.email',
           selected: true
         }
-      ]
+      ];
 
     this.context.executeAction(setPageUserPrefAction, {
       route: currentRouteName,
@@ -191,7 +191,7 @@ AdminPageBrowser = connectToStores(AdminPageBrowser, [ApplicationStore, PageStor
   return {
     appStore: stores.ApplicationStore.getState(),
     pageStore: stores.PageStore.getState()
-  }
+  };
 });
 
 export default AdminPageBrowser;

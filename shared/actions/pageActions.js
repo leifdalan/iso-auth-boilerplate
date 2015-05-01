@@ -96,7 +96,7 @@ export const deletePageAction = ({dispatch}, payload, done) => {
         if (success) {
           debug('Deleting: ', success, page);
           dispatch('FLASH_MESSAGE', success);
-          payload.router.transitionTo('/admin/pages/page/20/1')
+          payload.router.transitionTo('/admin/pages/page/20/1');
         } else {
           dispatch('FLASH_MESSAGE', error);
         }
@@ -126,7 +126,7 @@ export const createPageAction = ({dispatch}, {formValues, router}, done) => {
         if (success) {
           debug('Created: ', success, page);
           dispatch('FLASH_MESSAGE', success);
-          router.transitionTo(`/admin/pages/${page._id}`)
+          router.transitionTo(`/admin/pages/${page._id}`);
         } else {
           dispatch('FLASH_MESSAGE', error);
         }

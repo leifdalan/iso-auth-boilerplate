@@ -1,6 +1,5 @@
 import passport from 'passport';
 import User from '../../../models/user';
-import {login, isAdmin, isLogged} from '../../authentication';
 import {sendData} from '../../../services';
 const debug = require('debug')('Routes:AdminUserCRUD');
 
@@ -10,7 +9,7 @@ const debug = require('debug')('Routes:AdminUserCRUD');
 
 export function redirectUser(req, res) {
   res.redirect('/admin/users/page/20/1');
-};
+}
 
 export function createUser(req, res, next) {
   debug('Creating user');
@@ -21,17 +20,17 @@ export function createUser(req, res, next) {
         success: false,
         error: error,
         errorFor: error.errors
-      }
+      };
     } else if (!user) {
       data = {
         success: false,
         error: 'User couldn\'t be created.'
-      }
+      };
     } else {
       data = {
         success: `User ${user.local.email} created successfully`,
         user
-      }
+      };
     }
     sendData({data, req, res, next});
   })(req, res, next);
@@ -41,7 +40,7 @@ export function getUsers(req, res, next) {
   let {perpage, currentPageNumber} = req.params;
   debug(req.query.s);
   if (perpage > 200) {
-    req.flash('flashMessage', '200 per page maximum.')
+    req.flash('flashMessage', '200 per page maximum.');
     return res.redirect('/admin/users/page/20/1');
   }
   const {s: search, sort} = req.query;

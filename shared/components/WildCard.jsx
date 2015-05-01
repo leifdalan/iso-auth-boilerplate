@@ -3,7 +3,6 @@
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
 import PageStore from '../stores/PageStore';
-import {autoBindAll} from '../../utils';
 const debug = require('debug')('Component:WildCard');
 debug();
 
@@ -41,7 +40,7 @@ class WildCard extends Component {
 WildCard = connectToStores(WildCard, [PageStore], (stores) => {
   return {
     store: stores.PageStore.getState()
-  }
+  };
 });
 
 export default WildCard;

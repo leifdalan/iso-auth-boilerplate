@@ -95,7 +95,7 @@ export const deleteUserAction = ({dispatch}, payload, done) => {
         if (success) {
           debug('Deleting: ', success, user);
           dispatch('FLASH_MESSAGE', success);
-          payload.router.transitionTo('/admin/users/page/20/1')
+          payload.router.transitionTo('/admin/users/page/20/1');
         } else {
           dispatch('FLASH_MESSAGE', error);
         }
@@ -132,7 +132,7 @@ export const createUserAction = ({dispatch}, {formValues, router}, done) => {
         if (success) {
           debug('Created: ', success, user);
           dispatch('FLASH_MESSAGE', success);
-          router.transitionTo(`/admin/users/${user._id}`)
+          router.transitionTo(`/admin/users/${user._id}`);
         } else {
           dispatch('FLASH_MESSAGE', error);
         }

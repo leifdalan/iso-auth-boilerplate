@@ -1,6 +1,6 @@
 import XDate from 'xdate';
 
-const debug = require('debug')('Utils');  
+const debug = require('debug')('Utils');
 
 /**
  * Checks if code is run in a browser.
@@ -10,7 +10,7 @@ const debug = require('debug')('Utils');
  */
 export function isClient() {
   return typeof window !== 'undefined';
-};
+}
 
 /**
  * Checks if browser supports HTML5 history API
@@ -20,7 +20,7 @@ export function isClient() {
  */
 export function hasHTML5History() {
   return isClient() && 'history' in window;
-};
+}
 
 /**
  * Takes a search query and returns an Object representation of it
@@ -32,7 +32,7 @@ export function hasHTML5History() {
 export function parseSearchQuery(query) {
   const queries = query.split('&');
   let queryObj = {};
-  queries.forEach((q, i) => {
+  queries.forEach((q) => {
     const keyValue = q.split('=');
     queryObj[keyValue[0]] = keyValue[1];
 
@@ -50,7 +50,9 @@ export function parseSearchQuery(query) {
 export function makeQueryFromObject(obj) {
   let queryString = '';
   for (let key in obj) {
-    queryString = `${queryString}${key}=${obj[key]}&`;
+    if (obj[key].hasOwnProperty) {
+      queryString = `${queryString}${key}=${obj[key]}&`;
+    }
   }
   queryString = queryString.slice(0, -1);
   return queryString;
@@ -91,7 +93,6 @@ export function upsertQuery(key, value) {
  */
 export function getTimeAgo(isoDate) {
   const now = new XDate(),
-    date = new XDate(isoDate),
     year = now.diffYears(isoDate),
     month = now.diffMonths(isoDate),
     week = now.diffWeeks(isoDate),
@@ -116,7 +117,7 @@ export function getTimeAgo(isoDate) {
   if (quantity && quantifier) {
     quantity = Math.abs(Math.floor(quantity));
     plural = quantity === 1? '' : 's';
-    return `about ${quantity} ${quantifier}${plural} ago.`
+    return `about ${quantity} ${quantifier}${plural} ago.`;
   }
 }
 

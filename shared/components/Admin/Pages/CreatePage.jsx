@@ -1,7 +1,6 @@
 'use strict';
 
 import React, {Component, PropTypes as pt} from 'react';
-import {connectToStores} from 'fluxible/addons';
 import {autoBindAll} from '../../../../utils';
 import PageForm from './PageForm';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';

@@ -16,7 +16,7 @@ export const CheckLoginWillTransitionTo = function(transition) {
     debug('Redirecting from about to "/signin"...');
     transition.redirect('/signin', { reason: 'UNAUTHENTICATED' });
   }
-}
+};
 
 export const CheckAdminWillTransitionTo = function(transition) {
   const {loggedIn, userLevel} =
@@ -38,4 +38,4 @@ export const CheckAdminWillTransitionTo = function(transition) {
       transition.redirect('/', { reason: 'UNAUTHORIZED' });
     }
   }
-}
+};

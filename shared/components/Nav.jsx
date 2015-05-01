@@ -29,7 +29,7 @@ export default class Nav extends Component {
   }
 
   static propTypes = {
-    loggedin: pt.bool,
+    loggedIn: pt.bool,
     userLevel: pt.number
   }
 

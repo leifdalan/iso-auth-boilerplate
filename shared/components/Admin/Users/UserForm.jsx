@@ -1,7 +1,6 @@
 'use strict';
 
 import React, {Component, PropTypes as pt} from 'react';
-import {connectToStores} from 'fluxible/addons';
 import {autoBindAll} from '../../../../utils';
 const debug = require('debug')('Component:UserForm');
 debug();
@@ -23,6 +22,10 @@ export default class UserForm extends Component {
     router: pt.func.isRequired,
     getStore: pt.func.isRequired,
     executeAction: pt.func.isRequired
+  }
+
+  static propTypes = {
+    handleSubmit: pt.func.isRequired
   }
 
   handleSubmit(e) {

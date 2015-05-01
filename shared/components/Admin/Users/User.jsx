@@ -78,7 +78,7 @@ class User extends Component {
 User = connectToStores(User, [UserStore], (stores) => {
   return {
     store: stores.UserStore.getState()
-  }
+  };
 });
 
 export default User;

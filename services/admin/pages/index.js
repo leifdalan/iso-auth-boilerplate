@@ -1,6 +1,5 @@
-import passport from 'passport';
+
 import Page from '../../../models/page';
-import {login, isAdmin, isLogged} from '../../authentication';
 import {sendData} from '../../../services';
 const debug = require('debug')('Routes:AdminPageCRUD');
 
@@ -10,7 +9,7 @@ const debug = require('debug')('Routes:AdminPageCRUD');
 
 export function redirectPage(req, res) {
   res.redirect('/admin/pages/page/20/1');
-};
+}
 
 export function createPage(req, res, next) {
   debug('CREATING PAGE');
@@ -47,7 +46,7 @@ export function getPages(req, res, next) {
         {'title': new RegExp(search, 'i')},
         {'content': new RegExp(search, 'i')}
       ]
-    }
+    };
   }
 
   let sortCriteria = {};
@@ -58,8 +57,8 @@ export function getPages(req, res, next) {
 
     const sortValue = sortDirection === 'asc' ? 1 : -1;
     sortCriteria = {
-      [sortTerm] : sortValue
-    }
+      [sortTerm]: sortValue
+    };
   }
 
   // TODO use generators + Promises for multiple async
@@ -69,7 +68,7 @@ export function getPages(req, res, next) {
       data = {
         success: false,
         error: countError
-      }
+      };
       sendData({data, req, res, next});
     } else {
       if (totalPages < currentPageNumber * perpage) {
@@ -93,7 +92,7 @@ export function getPages(req, res, next) {
           data = {
             success: false,
             error: paginateError
-          }
+          };
 
         } else {
           data = {
@@ -111,14 +110,14 @@ export function getPages(req, res, next) {
     }
 
   });
-};
+}
 
 export function getOnePage(req, res, next) {
   debug('GETTING PAGE');
   if (req.params.id === 'create') {
     const data = {
       success: true
-    }
+    };
     sendData({data, req, res, next});
   } else {
     Page.findOne({_id: req.params.id}, (error, page) => {
@@ -127,7 +126,7 @@ export function getOnePage(req, res, next) {
         data = {
           success: false,
           error
-        }
+        };
         debug('PAGE ERROR', error);
         sendData({data, req, res, next});
       } else {
@@ -135,10 +134,10 @@ export function getOnePage(req, res, next) {
           data = {
             success: false,
             error: `No page found for ${req.params.id}`
-          }
+          };
         } else {
           data = page;
-          data.success = true
+          data.success = true;
         }
         debug('PAGE DATA', data);
         sendData({data, req, res, next});

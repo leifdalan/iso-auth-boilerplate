@@ -1,5 +1,4 @@
 import passport from 'passport';
-import {sendData} from '../services';
 const debug = require('debug')('Routes:Authentication');
 
 export function signUp(req, res, next) {
@@ -40,7 +39,7 @@ export function logOut(req, res) {
     req.flash('flashMessage', 'Come back again soon!');
     res.redirect('/');
   }
-};
+}
 
 export function login(req, res, next) {
   passport.authenticate('local-login', (err, user) => {

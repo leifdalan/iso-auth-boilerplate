@@ -1,9 +1,6 @@
 'use strict';
 
 import React, {Component, PropTypes as pt} from 'react';
-import {connectToStores} from 'fluxible/addons';
-import UserStore from '../../stores/UserStore';
-import {autoBindAll} from '../../../utils';
 import {CheckAdminWillTransitionTo} from '../../mixins/authMixins';
 const debug = require('debug')('Component:AdminDashboard');
 debug();

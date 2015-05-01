@@ -1,7 +1,6 @@
 'use strict';
 
 import React, {Component, PropTypes as pt, findDOMNode} from 'react';
-import {connectToStores} from 'fluxible/addons';
 import {autoBindAll} from '../../../../utils';
 import {merge} from 'lodash';
 const debug = require('debug')('Component:PageForm');
@@ -25,7 +24,11 @@ export default class PageForm extends Component {
   static contextTypes = {
     router: pt.func.isRequired,
     getStore: pt.func.isRequired,
-    executeAction: pt.func.isRequired
+    executeAction: pt.func.isRequired,
+  }
+
+  propTypes = {
+    handleSubmit: pt.func.isRequired
   }
 
   handleSubmit(e) {

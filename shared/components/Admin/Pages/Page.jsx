@@ -78,7 +78,7 @@ class Page extends Component {
 Page = connectToStores(Page, [PageStore], (stores) => {
   return {
     store: stores.PageStore.getState()
-  }
+  };
 });
 
 export default Page;

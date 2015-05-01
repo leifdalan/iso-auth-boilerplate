@@ -34,7 +34,9 @@ export default function(passport) {
       // allows us to pass in the req from our route
       // (lets us check if a user is logged in or not)
       passReqToCallback: true
+      /*eslint-disable*/
     }, (req, email, password, done) => {
+      /*eslint-enable*/
       if (email) {
         // Use lower-case e-mails to avoid case-sensitive e-mail matching
         email = email.toLowerCase();
@@ -93,10 +95,11 @@ export default function(passport) {
               return done(
                 null, false, req.flash('loginMessage', 'Oops! Wrong password.')
               );
+            /*eslint-disable*/
             } else {
-
               return done(null, user);
             }
+            /*eslint-enable*/
           });
         }
       });
@@ -114,7 +117,9 @@ export default function(passport) {
       // allows us to pass in the req from our route
       // (lets us check if a user is logged in or not)
       passReqToCallback: true
+      /*eslint-disable*/
     }, (req, email, password, done) => {
+      /*eslint-enable*/
       debug('LOCAL SIGNUP');
       if (email) {
 
@@ -142,8 +147,9 @@ export default function(passport) {
               return done(
                 {message: `${email} already exists.`}, false,
                 req.flash('signupMessage', 'That email is already taken.'));
+            /*eslint-disable*/
             } else {
-
+            /*eslint-enable*/
               // create the user
               var newUser = new User();
 
@@ -151,14 +157,15 @@ export default function(passport) {
               newUser.local.password = newUser.generateHash(password);
               newUser.loginToken = newUser.generateToken();
               newUser.userLevel = req.body.userLevel;
-
-              newUser.save((err) => {
-                if (err) {
-                  return done(err);
-                  debug('User saving failed.', err);
+              /*eslint-disable*/
+              newUser.save((saveErr) => {
+                if (saveErr) {
+                  return done(saveErr);
+                  debug('User saving failed.', saveErr);
                 }
                 return done(null, newUser);
               });
+              /*eslint-enable*/
             }
 
           });
@@ -170,8 +177,9 @@ export default function(passport) {
           User.findOne({
             'local.email': email
           }, (err, user) => {
-            if (err)
-              return done(err);
+            if (findErr) {
+              return done(findErr);
+            }
 
             if (user) {
               return done(
@@ -180,13 +188,15 @@ export default function(passport) {
                 req.flash('loginMessage', 'That email is already taken.'));
               // Using 'loginMessage instead of
               // signupMessage because it's used by /connect/local'
+              /*eslint-disable*/
             } else {
+              /*eslint-enable*/
               var user = req.user;
               user.local.email = email;
               user.local.password = user.generateHash(password);
-              user.save((err) => {
-                if (err) {
-                  return done(err);
+              user.save((saveErr) => {
+                if (saveErr) {
+                  return done(saveErr);
                 }
                 return done(null, user);
               });

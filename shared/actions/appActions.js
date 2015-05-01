@@ -10,5 +10,5 @@ export const setPageUserPrefAction = ({dispatch}, payload, done) => {
 
 export const clearFlashAction = ({dispatch}, payload, done) => {
   dispatch('CLEAR_FLASH_MESSAGE');
-  done(); 
-}
+  done();
+};
