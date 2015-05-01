@@ -5,7 +5,7 @@ import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../../../stores/ApplicationStore';
 import UserStore from '../../../stores/UserStore';
 import {
-  isClient, upsertQuery, getTimeAgo, autoBindAll, warn, error, trace
+  isClient, upsertQuery, getTimeAgo, autoBindAll, error, trace
 } from '../../../../utils';
 import _, {merge} from 'lodash';
 import navigateAction from '../../../actions/navigate';
@@ -375,7 +375,7 @@ AdminItemBrowser = connectToStores(AdminItemBrowser, [ApplicationStore, UserStor
   return {
     appStore: stores.ApplicationStore.getState(),
     userStore: stores.UserStore.getState()
-  }
+  };
 });
 
 export default AdminItemBrowser;

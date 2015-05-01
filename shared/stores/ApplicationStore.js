@@ -44,6 +44,7 @@ export default createStore({
     this.pageUserPref = {
       [route]: preference
     };
+    this.emitChange();
   },
 
   saveRequestAttempt(message) {
@@ -76,7 +77,7 @@ export default createStore({
   handleNavigate({payload: route, resolution}) {
     this.appIsLoading = false;
     debug('HANDLING NAVIGATE vvvvvvv');
-    debug(route);
+    debug(resolution);
     if (this.currentRoute && route.path === this.currentRoute.path) {
       debug('Attempted to navigate to the same path.');
       return;

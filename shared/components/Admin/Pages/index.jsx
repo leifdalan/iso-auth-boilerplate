@@ -4,22 +4,15 @@ import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
 import ApplicationStore from '../../../stores/ApplicationStore';
 import PageStore from '../../../stores/PageStore';
-import {
-  isClient, upsertQuery, getTimeAgo, autoBindAll, warn, error, trace
-} from '../../../../utils';
-import _, {merge, get} from 'lodash';
-import navigateAction from '../../../actions/navigate';
-import {flashMessageAction, setPageUserPrefAction} from '../../../actions/appActions';
+import {isClient, autoBindAll, trace, getTimeAgo} from '../../../../utils';
+import {merge, get, include} from 'lodash';
 import {updateResultsAction, editManyPagesAction} from '../../../actions/pageActions';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
-
-import ModalWrapper from '../../Modal';
-import ConfirmationPopup from '../ConfirmationPopup';
+import {setPageUserPrefAction} from '../../actions/appActions';
 import PageForm from './PageForm';
 
 import ResultsNavigator from '../ResultsNavigator';
 const debug = require('debug')('Component:Pages');
-debug();
 
 class AdminItemBrowser extends Component {
 
@@ -27,19 +20,8 @@ class AdminItemBrowser extends Component {
     super(props);
     debug(this);
     autoBindAll.call(this, [
-      '_setHighlightedMarkup',
-      '_adjustPageBounds',
-      'handlePerPageInput',
-      'handlePerPageButton',
       'goToCreatePage',
-      'handleCheckAll',
-      'handleSearchInput',
-      'handleCheck',
-      'handleSort',
-      'handleBulkEdit',
-      'handleBulkEditConfirmation',
-      'handleBulkEditClick',
-      'handleTablePropChange'
+      '_setHighlightedMarkup'
     ]);
 
     let state = props.pageStore;
@@ -77,7 +59,31 @@ class AdminItemBrowser extends Component {
     executeAction: pt.func.isRequired
   }
 
+  static propTypes = {
+    appStore: pt.object.isRequred,
+    pageStore: pt.object.isRequred
+  }
+
   static willTransitionTo = CheckAdminWillTransitionTo
+
+  goToCreatePage(e) {
+    e.preventDefault();
+    this.context.router.transitionTo('createPage');
+  }
+
+  _setHighlightedMarkup(string, searchLetters) {
+    if (typeof string === 'string') {
+      let markup = [].map.call(string, (letter) =>
+        include(searchLetters, letter) ?
+          <span className="search-term">{letter}</span> :
+          <span>{letter}</span>
+      );
+      const userMarkup = <span>{markup}</span>;
+
+      return userMarkup;
+    }
+    return string;
+  }
 
   componentWillMount() {
     trace(this);
@@ -87,14 +93,9 @@ class AdminItemBrowser extends Component {
     let tablePropChoices;
     debug('CurrentRoute', currentRouteName);
 
-    // TODO: there's gotta be a better way to do this.
-    if (appState.pageUserPref &&
-      appState.pageUserPref[currentRouteName] &&
-      appState.pageUserPref[currentRouteName].tablePropChoices) {
-      tablePropChoices =
-        appState.pageUserPref[currentRouteName].tablePropChoices;
-    } else {
-      tablePropChoices = [
+    tablePropChoices =
+      get(appState, `pageUserPref[${currentRouteName}].tablePropChoices`) ||
+      [
         {
           label: 'Title',
           valueProp: 'title',
@@ -113,15 +114,13 @@ class AdminItemBrowser extends Component {
           valueProp: 'user.local.email',
           selected: true
         }
+      ]
 
+    this.context.executeAction(setPageUserPrefAction, {
+      route: currentRouteName,
+      preference: {tablePropChoices}
+    });
 
-      ];
-
-      this.context.executeAction(setPageUserPrefAction, {
-        route: currentRouteName,
-        preference: {tablePropChoices}
-      });
-    }
     this.setState({tablePropChoices});
   }
 
@@ -142,21 +141,6 @@ class AdminItemBrowser extends Component {
     state.pageAdjustment && this._adjustPageBounds(state);
 
     this.setState(state);
-
-  }
-
-  _setHighlightedMarkup(string, searchLetters) {
-    if (typeof string === 'string') {
-      let markup = [].map.call(string, (letter) =>
-        _.include(searchLetters, letter) ?
-          <span className="search-term">{letter}</span> :
-          <span>{letter}</span>
-      );
-      const userMarkup = <span>{markup}</span>;
-
-      return userMarkup;
-    }
-    return string;
   }
 
   _adjustPageBounds(state) {
@@ -167,128 +151,6 @@ class AdminItemBrowser extends Component {
 
       window.history.replaceState({}, {}, `${pathArray.join('/')}${queryString}`);
     }
-  }
-
-  handlePerPageInput(e) {
-    this.setState({
-      perPageInput: e.target.value > 200 ? 200 : e.target.value
-    });
-  }
-
-  handlePerPageButton(e) {
-    e.preventDefault();
-    const perpage = this.state.perPageInput || this.state.perpage;
-
-    this.context.router.transitionTo(
-      `/admin/pages/page/${perpage}/1${window.location.search}`
-    );
-  }
-
-  goToCreatePage(e) {
-    e.preventDefault();
-    this.context.router.transitionTo('createPage');
-  }
-
-  handleCheckAll(e) {
-    const value = e.target.checked;
-    const pages = this.state.pages.map((page) => {
-      page.selected = value;
-      return page;
-    });
-    this.setState({pages});
-  }
-
-  handleSearchInput(e) {
-    this.setState({
-      search: e.target.value,
-      searchValue: e.target.value
-    });
-
-    if (e.target.value.length === 0 && isClient()) {
-
-      // Remove query string if the search bar is empty. It's ugly.
-      window.history.replaceState({}, {}, window.location.href.split('?')[0]);
-    } else {
-      const query = upsertQuery('s', e.target.value);
-      window.history.replaceState({}, {}, query);
-    }
-
-    this.context.executeAction(updateResultsAction, {
-      url: window.location.href,
-      loadingProperty: 'search'
-    });
-  }
-
-  handleCheck(_id) {
-    const pages = this.state.pages.map((page) => {
-      page.selected = page._id === _id ? !page.selected : page.selected;
-      return page;
-    });
-    this.setState({pages});
-  }
-
-  handleSort(e) {
-    let criteria = e.target.value;
-    if (criteria === 'noop') {
-      return;
-    }
-    e.preventDefault();
-    debug(criteria);
-    const query = upsertQuery('sort', criteria);
-    window.history.replaceState({}, {}, query);
-    this.context.executeAction(updateResultsAction, {
-      url: window.location.href,
-      loadingProperty: 'sort'
-    });
-  }
-
-  handleBulkEdit(formValues) {
-    error(formValues);
-    this.setState({
-      showConfirm: true,
-      bulkEditFormValues: formValues
-    })
-  }
-
-  handleBulkEditConfirmation() {
-    const pages = _.filter(this.state.pages, (page) => page.selected);
-    const formValues = this.state.bulkEditFormValues;
-    this.context.executeAction(editManyPagesAction, {formValues, pages});
-    this.setState({
-      show: false,
-      showConfirm: false
-    });
-  }
-
-  handleBulkEditClick() {
-    const pages = _.filter(this.state.pages, (page) => page.selected);
-    if (pages.length === 0) {
-      this.context.executeAction(flashMessageAction,
-        'Please select some pages to bulk edit first.');
-    } else {
-      this.setState({
-        pageCount: pages.length,
-        show: true
-      });
-    }
-  }
-
-  handleTablePropChange(valueProp) {
-    const tablePropChoices = this.state.tablePropChoices.map((propChoice) => {
-      if (propChoice.valueProp === valueProp) {
-        propChoice.selected = !propChoice.selected;
-      }
-      return propChoice;
-    });
-    this.setState({tablePropChoices});
-
-    const routes = this.context.router.getCurrentRoutes();
-    const currentRouteName = routes[routes.length - 1].name;
-
-    this.context.executeAction(setPageUserPrefAction, {
-      route: currentRouteName,
-      preference: {tablePropChoices}
-    });
   }
 
   render() {
@@ -307,46 +169,20 @@ class AdminItemBrowser extends Component {
         <ResultsNavigator
           loadingProperties={this.props.appStore.inPageLoadingProperties}
           label="Pages"
-          handleSearchInput={this.handleSearchInput}
-          searchValue={this.state.searchValue}
-          search={this.props.pageStore.search}
-          handlePerPageInput={this.handlePerPageInput}
-          perPageValue={this.state.perPageInput}
+          items={this.state.pages}
+          updateResultsAction={updateResultsAction}
+          collection={this.state.pages}
           perPagePlaceholder={`Pages per page (${this.state.perpage})`}
-          handlePerPageButton={this.handlePerPageButton}
-          handleSort={this.handleSort}
           tablePropChoices={this.state.tablePropChoices}
-          handleTablePropChange={this.handleTablePropChange}
-          currentPageNumber={this.state.currentPageNumber}
-          totalItems={this.state.totalUsers}
-          perpage={this.state.perpage}
           neighborDepth={1}
           pathBase="/admin/pages/page/"
-          collection={this.state.pages}
-          handleCheckAll={this.handleCheckAll}
+          editForm={PageForm}
+          editManyAction={editManyPagesAction}
           handleBulkEditClick={this.handleBulkEditClick}
-          handleCheck={this.handleCheck}
           basePath="/admin/pages/"
-        />
-
-        <ModalWrapper
-          title={`Bulk editing ${this.state.pageCount} Pages`}
-          show={this.state.show}
-          onHide={() => this.setState({show: false, showConfirm: false})}>
-
-          <PageForm handleSubmit={this.handleBulkEdit} />
-
-          <ConfirmationPopup
-            show={!!this.state.showConfirm}
-            onHide={() => this.setState({showConfirm: false})}
-            onConfirm={this.handleBulkEditConfirmation}
-            confirmationText={
-              `You sure you want to edit ${this.state.pageCount} at a time?`
-            }
+          editable
+          {...this.props.pageStore}
           />
-
-      </ModalWrapper>
-
       </div>
     );
   }

@@ -54,9 +54,12 @@
   },
   "devDependencies": {
     "autoprefixer-loader": "^1.2.0",
+    "babel-eslint": "^3.0.1",
     "browser-sync": "^2.6.4",
     "compression-webpack-plugin": "^0.2.0",
     "css-loader": "^0.9.1",
+    "eslint": "^0.20.0",
+    "eslint-plugin-react": "^2.2.0",
     "extract-text-webpack-plugin": "^0.5.0",
     "gulp": "^3.8.9",
     "gulp-autoprefixer": "^2.1.0",

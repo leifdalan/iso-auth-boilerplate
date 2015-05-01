@@ -184,10 +184,10 @@ export function updatePage(req, res, next) {
 }
 export function updateManyPages(req, res, next) {
   debug('SETTING PAGE');
-  const {pages, formValues} = req.body;
+  const {items, formValues} = req.body;
 
   Page.update(
-    {_id: {$in: pages}},
+    {_id: {$in: items}},
     formValues,
     {
       'new': true,

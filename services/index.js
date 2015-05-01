@@ -58,7 +58,6 @@ export default function(server) {
   });
 
 
-
   // ----------------------------------------------------------------------------
   // Authorization endpoints
   // ----------------------------------------------------------------------------
@@ -105,29 +104,29 @@ export default function(server) {
   // Page resolution
   // ----------------------------------------------------------------------------
 
-  // server.get('*', (req, res, next) => {
-  //   debug('Looking for', req.path);
-  //   if (req.preRender) {
-  //
-  //     next();
-  //   } else {
-  //     if (req.path.split('/')[1] === 'dist') {
-  //       next();
-  //     } else {
-  //       Page.findOne({slug: req.path.substring(1)}, (err, page) => {
-  //         if (err) {
-  //           next();
-  //         }
-  //         if (page) {
-  //           req.preRender = page;
-  //           next();
-  //         } else {
-  //           next();
-  //         }
-  //       });
-  //     }
-  //   }
-  // });
+  server.get('*', (req, res, next) => {
+    debug('Looking for', req.path);
+    if (req.preRender) {
+
+      next();
+    } else {
+      if (req.path.split('/')[1] === 'dist') {
+        next();
+      } else {
+        Page.findOne({slug: req.path.substring(1)}, (err, page) => {
+          if (err) {
+            next();
+          }
+          if (page) {
+            req.preRender = page;
+            next();
+          } else {
+            next();
+          }
+        });
+      }
+    }
+  });
 
   // Blacklist undefined http verbs routes
   function fourHundred(req, res) {

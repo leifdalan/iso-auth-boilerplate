@@ -10,7 +10,7 @@ export default createStore({
     'adminPagesPaginated_PAYLOAD': 'handlePayload',
     'adminPageEdit_PAYLOAD': 'handleEditPayload',
     'adminPageEdit_FAILURE': 'handleEditFailure',
-    'CHANGE_ROUTE': 'handleNavigate',
+    'CHANGE_ROUTE': 'handleNavigate'
   },
 
   handleNavigate({payload, resolution}) {

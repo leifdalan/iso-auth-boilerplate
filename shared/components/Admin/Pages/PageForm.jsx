@@ -5,6 +5,7 @@ import {connectToStores} from 'fluxible/addons';
 import {autoBindAll} from '../../../../utils';
 import {merge} from 'lodash';
 const debug = require('debug')('Component:PageForm');
+debug();
 
 export default class PageForm extends Component {
 

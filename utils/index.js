@@ -1,6 +1,6 @@
 import XDate from 'xdate';
 
-const debug = require('debug')('Utils');
+const debug = require('debug')('Utils');  
 
 /**
  * Checks if code is run in a browser.

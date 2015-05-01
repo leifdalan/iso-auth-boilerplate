@@ -27,9 +27,9 @@ export default class ResultsTable extends Component {
   static propTypes = {
     properties: pt.arrayOf(pt.object).isRequired,
     collection: pt.arrayOf(pt.object).isRequired,
-    handleCheckAll: pt.func.isRequired,
-    handleBulkEditClick: pt.func.isRequired,
-    handleCheck: pt.func.isRequired
+    handleCheckAll: pt.func,
+    handleBulkEditClick: pt.func,
+    handleCheck: pt.func
   }
 
   handleEditClick(item, e) {
@@ -44,19 +44,23 @@ export default class ResultsTable extends Component {
       <table className="user-table">
         <thead>
           <tr>
-            <td>
-              <Checkbox onChangeCallback={this.props.handleCheckAll} />
-            </td>
+            {this.props.editable &&
+              <td>
+                <Checkbox onChangeCallback={this.props.handleCheckAll} />
+              </td>
+            }
             {this.props.properties.map((prop, index) =>
               <td key={index}>
                 {prop.label}
               </td>
             )}
-            <td>
-              <button onClick={this.props.handleBulkEditClick}>
-                Bulk Edit
-              </button>
-            </td>
+            {this.props.editable &&
+              <td>
+                <button onClick={this.props.handleBulkEditClick}>
+                  Bulk Edit
+                </button>
+              </td>
+            }
           </tr>
         </thead>
         <tbody>
@@ -67,27 +71,34 @@ export default class ResultsTable extends Component {
               className={`selected-${item.selected}`}
               index={index}
               onClick={this.props.handleCheck.bind(null, item._id)}>
-              <td>
-                <Checkbox
-                  onChangeCallback={this.props.handleCheck.bind(null, item._id)}
-                  ref={item._id}
-                  checked={item.selected}
-                  />
-              </td>
-              {this.props.properties.map((prop, index) =>
-                <td key={`value${index}`}>
+              {this.props.editable &&
+                <td>
+
+                  <Checkbox
+                    onChangeCallback={this.props.handleCheck.bind(null, item._id)}
+                    ref={item._id}
+                    checked={item.selected}
+                    />
+                </td>
+              }
+
+              {this.props.properties.map((prop, propIndex) =>
+                <td key={`value${propIndex}`}>
                   {isObject(get(item, prop.valueProp)) ?
                     get(item, prop.valueProp) :
                     `${get(item, prop.valueProp)}`
                   }
                 </td>
               )}
-              <td>
-                <button
-                  onClick={this.handleEditClick.bind(null, item)}>
-                  Edit
-                </button>
-              </td>
+              {this.props.editable &&
+                <td>
+                  <button
+                    onClick={this.handleEditClick.bind(null, item)}>
+                    Edit
+                  </button>
+                </td>
+              }
+
             </tr>
             )
           }
