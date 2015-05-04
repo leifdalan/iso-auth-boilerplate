@@ -35,7 +35,7 @@ export default class PageStore extends BaseStore {
 
   handlePayload(payload) {
     // debug('RECEIVING PAYLOAD', payload);
-    this.pages = payload.pages;
+    this.pages = payload.pages || [];
     this.totalPages = payload.totalPages;
     this.currentPageNumber = payload.currentPageNumber;
     this.perpage = payload.perpage;

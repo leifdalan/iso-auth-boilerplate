@@ -2,8 +2,6 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
-import ApplicationStore from '../../../stores/ApplicationStore';
-import UserStore from '../../../stores/UserStore';
 import {isClient, autoBindAll, trace, getTimeAgo} from '../../../../utils';
 import {merge, get, include} from 'lodash';
 import {updateResultsAction, editManyUsersAction} from '../../../actions/userActions';
@@ -200,7 +198,8 @@ class AdminUserBrowser extends Component {
   }
 }
 
-AdminUserBrowser = connectToStores(AdminUserBrowser, [ApplicationStore, UserStore], (stores) => {
+AdminUserBrowser = connectToStores(
+  AdminUserBrowser, ['ApplicationStore', 'UserStore'], (stores) => {
   return {
     appStore: stores.ApplicationStore.getState(),
     userStore: stores.UserStore.getState()

@@ -1,5 +1,6 @@
-import Page from '../models/page';
 import {signUp, logOut, login, isAdmin, isLoggedIn} from './authentication';
+import Page from '../models/page';
+
 import {
   redirectUser,
   getUsers,

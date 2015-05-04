@@ -3,6 +3,7 @@ import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 import browserSync from 'browser-sync';
 import del from 'del';
+import path from 'path';
 import webpackHotConfig from '../webpack.hot-config';
 import webpackConfig from '../webpack.config';
 import config from '../config';
@@ -27,10 +28,12 @@ const {
   NODE_ENV,
   PUBLIC_PATH
 } = config;
+
 const paths = {
   sharedJS: '!node_modules/**/*',
   baseJS: './**/*.{js,jsx}'
 };
+
 const webPackAddress = `${PROTOCOL}${HOSTNAME}:${WPDEVPORT}`;
 
 gulp.task('server', (cb) => {
@@ -100,7 +103,8 @@ gulp.task('eslint', () => {
             return '(' + data.line + ':' + data.column + ') ' + data.message;
           }
         }).join('\n');
-        const endPath = file.eslint.filePath.replace(__dirname, '');
+        const rootPath = path.join(__dirname, '../');
+        const endPath = file.eslint.filePath.replace(rootPath, '');
         return endPath + ' (' + file.eslint.messages.length + ' errors)\n' + errors;
       },
       title: 'ESLint'
@@ -231,7 +235,7 @@ gulp.task('rev', ['build'], function() {
     .pipe(gulp.dest('.'));
 });
 
-gulp.task('awsJS', function() {
+gulp.task('awsJS', ['awsCSS'], function() {
   return gulp.src(`.${PUBLIC_PATH}/**/*.js.gz`)
     .pipe($.s3(aws, {
       gzippedOnly: true,
@@ -244,7 +248,7 @@ gulp.task('awsJS', function() {
 });
 
 
-gulp.task('awsCSS', function() {
+gulp.task('awsCSS', ['g-zip'], function() {
   return gulp.src(`.${PUBLIC_PATH}/**/*.css.gz`)
     .pipe($.s3(aws, {
       gzippedOnly: true,
@@ -256,22 +260,21 @@ gulp.task('awsCSS', function() {
     }));
 });
 
-gulp.task('aws', ['awsCSS', 'awsJS']);
-
 gulp.task('dev', ['clean', 'watch', 'devserver', 'browser-sync', 'less', 'server']);
 
 gulp.task('build', ['clean', 'less', 'bundleJS']);
 
 gulp.task('server-only', ['clean', 'watch', 'browser-sync', 'less', 'server']);
 
-gulp.task('deploy', ['g-zip'], function() {
-  gulp.start('aws');
+gulp.task('deploy', ['awsJS'], () => {
   const manifest = require('../rev-manifest.json');
-  $.run(`heroku config:set CSS_PATH=${manifest['main.css']} ` +
+  let herokuCommand = `heroku config:set CSS_PATH=${manifest['main.css']} ` +
         `JS_PATH=${manifest['client.js']} ` +
         `PUBLIC_ASSET_DOMAIN=s3-${aws.region}.amazonaws.com ` +
-        `PUBLIC_PATH=/${aws.bucket}`).exec();
-  $.run(`git push heroku master`).exec();
+        `PUBLIC_PATH=/${aws.bucket}`;
+  debug(herokuCommand);
+  // $.run(herokuCommand).exec();
+
 });
 
 gulp.task('run', function() {

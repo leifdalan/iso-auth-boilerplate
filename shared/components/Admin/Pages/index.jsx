@@ -2,8 +2,6 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
-import ApplicationStore from '../../../stores/ApplicationStore';
-import PageStore from '../../../stores/PageStore';
 import {isClient, autoBindAll, getTimeAgo} from '../../../../utils';
 import {merge, get, include} from 'lodash';
 import {updateResultsAction, editManyPagesAction} from '../../../actions/pageActions';
@@ -187,7 +185,8 @@ class AdminPageBrowser extends Component {
   }
 }
 
-AdminPageBrowser = connectToStores(AdminPageBrowser, [ApplicationStore, PageStore], (stores) => {
+AdminPageBrowser = connectToStores(
+  AdminPageBrowser, ['ApplicationStore', 'PageStore'], (stores) => {
   return {
     appStore: stores.ApplicationStore.getState(),
     pageStore: stores.PageStore.getState()

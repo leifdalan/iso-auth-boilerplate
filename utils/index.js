@@ -116,7 +116,7 @@ export function getTimeAgo(isoDate) {
 
   if (quantity && quantifier) {
     quantity = Math.abs(Math.floor(quantity));
-    plural = quantity === 1? '' : 's';
+    plural = quantity === 1 ? '' : 's';
     return `about ${quantity} ${quantifier}${plural} ago.`;
   }
 }
