@@ -2,7 +2,6 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
-import PageStore from '../../../stores/PageStore';
 import PageForm from './PageForm';
 import {autoBindAll} from '../../../../utils';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
@@ -75,7 +74,7 @@ class Page extends Component {
   }
 }
 
-Page = connectToStores(Page, [PageStore], (stores) => {
+Page = connectToStores(Page, ['PageStore'], (stores) => {
   return {
     store: stores.PageStore.getState()
   };

@@ -176,7 +176,7 @@ export default function(passport) {
           // being used by another user
           User.findOne({
             'local.email': email
-          }, (err, user) => {
+          }, (findErr, user) => {
             if (findErr) {
               return done(findErr);
             }

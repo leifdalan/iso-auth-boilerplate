@@ -105,10 +105,11 @@ if (process.env.NODE_ENV === 'development' &&
   server.use(`${PUBLICPATH}`,
     proxy(url.parse(`${PROTOCOL}${HOSTNAME}:${DEVSERVERPORT}${PUBLICPATH}`))
   );
-  server.use(`${PUBLICPATH}`,
-    express.static(path.join(__dirname, `../${PUBLICPATH}`))
-  );
 }
+
+server.use(`${PUBLICPATH}`,
+  express.static(path.join(__dirname, `../${PUBLICPATH}`))
+);
 
 server.use(favicon(path.join(__dirname, '../favicon.ico')));
 

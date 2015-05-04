@@ -38,7 +38,6 @@ export default class ResultsNavigator extends Component {
     ]);
 
     this.state = props;
-    this.state = props;
   }
 
   static displayName = 'ResultsNavigator'

@@ -1,12 +1,11 @@
 import React from 'react';
 import Router from 'react-router';
-import {loginAction, logoutAction} from '../shared/actions/authActions';
+import {loginAction} from '../shared/actions/authActions';
 import navigateAction from '../shared/actions/navigate';
 import app from '../shared/app';
 import Html from '../shared/components/Html';
 import DocumentTitle from 'react-document-title';
 import serialize from 'serialize-javascript';
-import uglify from 'uglify-js';
 const debug = require('debug')('Server:ReactRouter');
 import FluxibleComponent from 'fluxible/addons/FluxibleComponent';
 const htmlComponent = React.createFactory(Html);

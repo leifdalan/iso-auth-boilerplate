@@ -127,7 +127,7 @@ class Application extends Component {
   }
 }
 
-Application = connectToStores(Application, [ApplicationStore], (stores) => {
+Application = connectToStores(Application, ['ApplicationStore'], (stores) => {
   return {
     appStore: stores.ApplicationStore.getState()
   };

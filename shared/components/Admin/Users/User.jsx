@@ -2,7 +2,6 @@
 
 import React, {Component, PropTypes as pt} from 'react';
 import {connectToStores} from 'fluxible/addons';
-import UserStore from '../../../stores/UserStore';
 import UserForm from './UserForm';
 import {autoBindAll} from '../../../../utils';
 import {CheckAdminWillTransitionTo} from '../../../mixins/authMixins';
@@ -75,7 +74,7 @@ class User extends Component {
   }
 }
 
-User = connectToStores(User, [UserStore], (stores) => {
+User = connectToStores(User, ['UserStore'], (stores) => {
   return {
     store: stores.UserStore.getState()
   };

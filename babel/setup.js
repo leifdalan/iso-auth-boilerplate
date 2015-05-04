@@ -204,7 +204,7 @@ Async.auto({
         });      }
     ], done);
   }],
-  generateABunchOfUsers: ['insertUsers', (done, results) => {
+  generateABunchOfUsers: ['insertUsers', (done) => {
     const progressBar = new ProgressBar();
     progressBar.setTotal(999);
     let tick = 0;
@@ -244,14 +244,13 @@ Async.auto({
       //   return callback();
       // });
     }
-    const numOfUsers = 999;
     const asyncArray = [];
     for (var i = 0; i < 999; i++) {
       asyncArray.push(createUser);
     }
     Async.parallel(asyncArray, () => {
       debug('Inserting...', users.length);
-      User.collection.insert(users, (err, docs) => {
+      User.collection.insert(users, (err) => {
         debug(err);
         debug(`${users.length} inserted into Users collection`);
         done();

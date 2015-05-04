@@ -21,7 +21,7 @@ export const loginAction = (
       .set('Accept', 'application/json')
       .set('X-Requested-With', 'XMLHttpRequest')
       .end((err, {body}) => {
-        const {success, responseUser, message} = body;
+        const {success, user: responseUser, message} = body;
         debug('RESPONSE?!');
         debug(err);
         // debug(success, responseUser);
