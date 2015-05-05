@@ -1,7 +1,7 @@
 'use strict';
 import request from 'superagent';
 import RSVP from 'rsvp';
-import {trace} from '../../utils';
+import {trace, error as consoleError} from '../../utils';
 const debug = require('debug')('Action:navigate');
 
 export default function navigateAction({dispatch}, payload, done) {
@@ -54,7 +54,7 @@ export default function navigateAction({dispatch}, payload, done) {
     }
     done();
   }).catch((err) => {
-    debug('Navigation error promise catch', err);
+    consoleError('Navigation error promise catch', err);
     dispatch('NAVIGATION_ERROR',
       `Oops, having problems navigating to ${payload.path}`
     );

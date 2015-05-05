@@ -43,7 +43,7 @@ export default {
   module: {
     loaders: [{
       test: /\.(js|jsx)$/,
-      exclude: /node_modules\/(?!react-router)/,
+      exclude: /node_modules\/(?!react-router)(?!app)/,
       loaders: ['react-hot-loader', `babel-loader?stage=${BABEL_STAGE}`]
     }]
   }

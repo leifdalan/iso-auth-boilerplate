@@ -43,7 +43,6 @@ class AdminPageBrowser extends Component {
       show: false
     });
 
-    state.pageAdjustment && this._adjustPageBounds(state);
     debug('PAGE STATE', state);
     this.state = state;
 
@@ -70,6 +69,8 @@ class AdminPageBrowser extends Component {
   }
 
   componentWillMount() {
+    this.props.pageStore.pageAdjustment &&
+      this._adjustPageBounds(this.props.pageStore);
     const appState = this.props.appStore;
     const routes = appState.route.routes;
     const currentRouteName = routes[routes.length - 1].name;

@@ -42,6 +42,7 @@ export default class PageStore extends BaseStore {
     this.pageAdjustment = payload.pageAdjustment;
     this.search = payload.search;
     this.emitChange();
+    this.pageAdjustment = null;
   }
 
   handleEditFailure(message) {

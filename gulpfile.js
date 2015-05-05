@@ -3,7 +3,7 @@ var BABEL_STAGE = require('./config').BABEL_STAGE;
 
 // Babel entry point
 require('babel/register')({
-  ignore: /node_modules\/(?!react-router)/,
+  ignore: /node_modules\/(?!react-router)(?!app)/,
   stage: BABEL_STAGE
 });
 
