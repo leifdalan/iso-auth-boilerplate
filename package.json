@@ -87,7 +87,8 @@
     "strip-loader": "^0.1.0",
     "style-loader": "^0.8.3",
     "vinyl-source-stream": "^1.0.0",
-    "webpack-dev-server": "1.6.4"
+    "webpack-dev-server": "1.6.4",
+    "webpack-stats-plugin": "0.0.4"
   },
   "scripts": {
     "server-only": "DEBUG=*,-babel,-express*,-socket.io*,-engine*,-connect*,-morgan,-Fluxible*,-send,-eslint* && gulp server-only --serverOnly",

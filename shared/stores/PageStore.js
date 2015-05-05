@@ -1,7 +1,7 @@
 'use strict';
 
 import {BaseStore} from 'fluxible/addons';
-import cloneDeep from 'lodash';
+import {cloneDeep} from 'lodash';
 const debug = require('debug')('Store:Pages');
 
 export default class PageStore extends BaseStore {

@@ -71,5 +71,6 @@ module.exports = {
       /debug/, process.cwd() + '/utils/noop.js'
     ),
     new webpack.optimize.DedupePlugin()
+
   ]
 };

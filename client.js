@@ -27,7 +27,7 @@ app.rehydrate(dehydratedState, (err, context) => {
 
   const renderApp = (runContext, Handler) => {
     bootstrapDebug('React Rendering');
-    const mountNode = document.getElementById('app');
+    const mountNode = window.document.getElementById('app');
 
     // wrap the root element to provide children with access to the context
     const component = React.createFactory(Handler);

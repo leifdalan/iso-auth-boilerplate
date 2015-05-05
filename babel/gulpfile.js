@@ -115,7 +115,8 @@ gulp.task('eslint', () => {
 
 gulp.task('devserver', (callback) => {
   // Start a webpack-dev-server
-  new WebpackDevServer(webpack(webpackHotConfig), {
+  new WebpackDevServer(
+    webpack(webpackHotConfig), {
     publicPath: `${PUBLIC_PATH}/`,
     hot: true,
     noInfo: true,
@@ -213,7 +214,16 @@ gulp.task('clean', (cb) => {
 
 gulp.task('bundleJS', ['clean'], () => {
   return gulp.src('./client.js')
-    .pipe($.webpack(webpackConfig))
+    .pipe($.webpack(webpackConfig, null, (err, stats) => {
+      var sorted = stats.toJson({
+        modulesSort: 'size'
+      });
+      sorted.modules.forEach((sortedModule) => {
+        /*eslint-disable*/
+        console.log(`${sortedModule.name}: ${sortedModule.size}`);
+        /*eslint-enable*/
+      });
+    }))
     .pipe(gulp.dest(`.${PUBLIC_PATH}/`));
 });
 
