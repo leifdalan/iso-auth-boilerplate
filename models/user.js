@@ -1,10 +1,10 @@
 // load the things we need
-import {Schema as schema, model} from 'mongoose';
+const mongoose = require('mongoose');
 import bcrypt from 'bcrypt-nodejs';
 import uuid from 'uuid';
 
 // define the schema for our user model
-const userSchema = schema({
+const userSchema = mongoose.Schema({
   groups: Array,
   isValidated: { type: Boolean, 'default': true },
   loginToken: { type: String, 'default': uuid.v4() },
@@ -31,4 +31,4 @@ userSchema.methods.generateToken = () => uuid.v4();
 
 
 // create the model for users and expose it to our app
-export default model('User', userSchema);
+export default mongoose.model('User', userSchema);

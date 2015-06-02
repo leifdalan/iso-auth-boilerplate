@@ -1,8 +1,9 @@
 // load the things we need
+const mongoose = require('mongoose');
 import {Schema as schema, model} from 'mongoose';
 
 // define the schema for our user model
-const pageSchema = schema({
+const pageSchema = mongoose.Schema({
   isPublished: { type: Boolean, 'default': true },
   created: { type: Date, 'default': Date.now },
   lastUpdated: { type: Date, 'default': Date.now },
@@ -25,4 +26,4 @@ const pageSchema = schema({
 });
 
 // create the model for users and expose it to our app
-export default model('Page', pageSchema);
+export default mongoose.model('Page', pageSchema);
